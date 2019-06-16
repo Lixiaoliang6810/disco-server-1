@@ -7,11 +7,14 @@ import com.miner.disco.front.dao.DynamicMapper;
 import com.miner.disco.front.exception.BusinessException;
 import com.miner.disco.front.model.request.DynamicsListRequest;
 import com.miner.disco.front.model.request.MemberPhotosRequest;
+import com.miner.disco.front.model.request.ReportRequest;
 import com.miner.disco.front.model.response.DynamicsListResponse;
 import com.miner.disco.pojo.Dynamic;
 import com.miner.disco.front.service.DynamicService;
+import com.miner.disco.pojo.Report;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,7 @@ public class DynamicServiceImpl implements DynamicService {
         dynamic.setUpdateDate(new Date());
         dynamicMapper.insert(dynamic);
     }
+
 
     @Override
     @Transactional(readOnly = true)

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAsync
 @SpringBootApplication
 @EnableTransactionManagement
+@tk.mybatis.spring.annotation.MapperScan("com.miner.disco.front.dao")
 @MapperScan(basePackages = "com.miner.disco.front.dao")
 @ComponentScan(basePackages = {"com.miner.disco.front", "com.miner.disco.boot.support",
         "com.miner.disco.oss.support", "com.miner.disco.mybatis.support"})

@@ -56,4 +56,7 @@ public class DynamicController {
         return ViewData.builder().data(list).message("相册列表").build();
     }
 
+
+
+
 }

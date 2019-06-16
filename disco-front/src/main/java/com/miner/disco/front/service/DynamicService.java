@@ -3,6 +3,7 @@ package com.miner.disco.front.service;
 import com.miner.disco.front.exception.BusinessException;
 import com.miner.disco.front.model.request.DynamicsListRequest;
 import com.miner.disco.front.model.request.MemberPhotosRequest;
+import com.miner.disco.front.model.request.ReportRequest;
 import com.miner.disco.front.model.response.DynamicsListResponse;
 
 import java.util.List;

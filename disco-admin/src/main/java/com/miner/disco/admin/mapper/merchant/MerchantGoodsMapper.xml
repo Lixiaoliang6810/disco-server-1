@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.merchant.MerchantGoodsDao">
+
+    <select id="queryGoodsByMerchant" resultType="com.miner.disco.admin.model.response.merchant.MerchantGoodsListResponse">
+        select dmg.*,dm.name merchantName from ds_merchant_goods dmg left join ds_merchant dm on dmg.merchant_id = dm.id
+        <where>
+            <if test="search.name != null and search.name != ''">
+                dmg.name LIKE CONCAT('%', #{search.name}, '%')
+            </if>
+            <if test="search.merchantName != null and search.merchantName != ''">
+                dm.name LIKE CONCAT('%', #{search.merchantName}, '%')
+            </if>
+            <if test="search.merchantId != null ">
+                dmg.merchant_id = #{search.merchantId}
+            </if>
+            <if test="search.status != null">
+                dmg.status = #{search.status}
+            </if>
+        </where>
+        ORDER BY dmg.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countMerchant" resultType="int">
+        select count(dmg.id) from ds_merchant_goods dmg
+        <where>
+            <if test="search.name != null and search.name != ''">
+                dmg.name LIKE CONCAT('%', #{search.name}, '%')
+            </if>
+            <if test="search.merchantId != null ">
+                dmg.merchant_id = #{search.merchantId}
+            </if>
+            <if test="search.status != null">
+                dmg.status = #{search.status}
+            </if>
+        </where>
+    </select>
+
+    <select id="goodsDetail" resultType="com.miner.disco.admin.model.response.merchant.MerchantGoodsDetailResponse">
+        select dmg.*,dm.name merchantName from ds_merchant_goods dmg left join ds_merchant dm on dmg.merchant_id = dm.id
+        where dmg.id = #{id}
+    </select>
+</mapper>

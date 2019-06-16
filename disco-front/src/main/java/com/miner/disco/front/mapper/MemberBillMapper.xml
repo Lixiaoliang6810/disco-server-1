@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.MemberBillMapper">
+
+    <select id="queryByUserId" parameterType="com.miner.disco.front.model.request.MemberBillListRequest"
+            resultType="com.miner.disco.front.model.response.MemberBillListResponse">
+        SELECT
+            mb.serial_no,
+            mb.amount,
+            mb.type,
+            mb.trade_type,
+            mb.amount,
+            mb.remark,
+            mb.source,
+            mb.create_date
+        FROM
+            ds_member_bill mb
+        WHERE
+            mb.user_id = #{userId}
+        ORDER BY mb.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryByVipUserId" parameterType="com.miner.disco.front.model.request.VipBillListRequest"
+            resultType="com.miner.disco.front.model.response.VipBillListResponse">
+        SELECT
+            mb.serial_no,
+            mb.amount,
+            mb.type,
+            mb.trade_type,
+            mb.amount,
+            mb.remark,
+            mb.source,
+            mb.create_date
+        FROM
+            ds_member_bill mb
+        WHERE
+            mb.user_id = #{userId}
+            AND mb.trade_type = 4
+        ORDER BY mb.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+</mapper>

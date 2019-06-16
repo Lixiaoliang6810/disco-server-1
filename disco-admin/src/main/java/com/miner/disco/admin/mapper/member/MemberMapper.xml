@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.member.MemberDao">
+
+    <select id="memberList" resultType="com.miner.disco.admin.model.response.member.MemberListResponse">
+        SELECT dm.id,
+                dm.mobile,
+                dm.nickname,
+                dm.realname,
+                dm.invite_code,
+                dm.gender,
+                dm.balance,
+                dm.integral,
+                dm.vip,
+                dm.recommend,
+                dm.leader,
+                dm.last_login_date,
+                dm.update_date,
+                dm.create_date
+          FROM ds_member dm
+        <include refid="conditionSql" />
+        ORDER BY dm.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countMember" resultType="int">
+        SELECT COUNT(1) FROM ds_member dm
+        <include refid="conditionSql" />
+    </select>
+    
+    <sql id="conditionSql">
+        <where>
+            <if test="search.mobile != null and search.mobile != ''">
+                dm.mobile LIKE CONCAT('%', #{search.mobile}, '%')
+            </if>
+            <if test="search.nickname != null and search.nickname != ''">
+                AND dm.nickname LIKE CONCAT('%', #{search.nickname}, '%')
+            </if>
+            <if test="search.realname != null and search.realname != ''">
+                AND dm.realname LIKE CONCAT('%', #{search.realname}, '%')
+            </if>
+            <if test="search.vip != null">
+                AND dm.vip = #{search.vip}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

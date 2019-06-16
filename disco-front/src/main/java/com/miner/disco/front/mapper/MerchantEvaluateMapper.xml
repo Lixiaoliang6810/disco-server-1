@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.MerchantEvaluateMapper">
+
+    <select id="queryByMerchantId" parameterType="com.miner.disco.front.model.request.MerchantEvaluateListRequest"
+            resultType="com.miner.disco.front.model.response.MerchantEvaluateListResponse">
+        SELECT
+            me.content,
+            me.images,
+            me.score,
+            me.create_date,
+            me.user_id,
+            m.avatar,
+            m.nickname
+        FROM
+            ds_merchant_evaluate me
+            LEFT JOIN ds_member m ON me.user_id = m.id
+        WHERE me.merchant_id = #{merchantId}
+        ORDER BY me.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="countByMerchantId" resultType="java.lang.Integer">
+        SELECT COUNT(1) as total FROM ds_merchant_evaluate me WHERE me.merchant_id = #{merchantId}
+    </select>
+
+    <select id="calcAverage" resultType="java.lang.Double">
+        SELECT AVG(me.score) FROM ds_merchant_evaluate me WHERE me.id = #{merchantId}
+    </select>
+
+</mapper>

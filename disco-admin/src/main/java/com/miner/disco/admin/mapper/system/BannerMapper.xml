@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.BannerDao">
+
+    <select id="bannerList" resultType="com.miner.disco.admin.model.response.system.BannerListResponse">
+        SELECT * FROM ds_banner
+        <include refid="conditionSql" />
+        ORDER BY ${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countBannerList" resultType="int">
+        SELECT COUNT(id) FROM ds_banner
+      <include refid="conditionSql" />
+  </select>
+    
+    <sql id="conditionSql">
+        <where>
+            deleted = ${_DELETE_STATUS_NORMAL}
+            <if test="search.effectStartTime != null">
+               AND start_time >= #{search.effectStartTime}
+            </if>
+            <if test="search.effectEndTime != null">
+                <![CDATA[AND start_time <= #{search.effectEndTime}]]>
+            </if>
+            <if test="search.invalidStartTime != null">
+               AND end_time >= #{search.invalidStartTime}
+            </if>
+            <if test="search.invalidEndTime != null">
+                <![CDATA[AND end_time <= #{search.invalidEndTime}]]>
+            </if>
+        </where>
+    </sql>
+
+</mapper>

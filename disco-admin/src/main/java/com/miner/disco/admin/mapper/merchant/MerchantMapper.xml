@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.merchant.MerchantDao">
+
+    <select id="merchantList" resultType="com.miner.disco.admin.model.response.merchant.MerchantListResponse">
+        select * from ds_merchant dm
+        <where>
+            <if test="search.tel != null and search.tel != ''">
+                and dm.tel LIKE CONCAT('%', #{search.tel}, '%')
+            </if>
+            <if test="search.name != null and search.name != ''">
+                and dm.name LIKE CONCAT('%', #{search.name}, '%')
+            </if>
+            <if test="search.classifyId != null ">
+                and dm.classify_id = #{search.classifyId}
+            </if>
+            <if test="search.recommend != null">
+                and dm.recommend = #{search.recommend}
+            </if>
+        </where>
+        ORDER BY dm.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countMerchantList" resultType="int">
+        select count(dm.id) from ds_merchant dm
+        <where>
+            <if test="search.tel != null and search.tel != ''">
+                and dm.tel LIKE CONCAT('%', #{search.tel}, '%')
+            </if>
+            <if test="search.name != null and search.name != ''">
+                and dm.name LIKE CONCAT('%', #{search.name}, '%')
+            </if>
+            <if test="search.classifyId != null ">
+                and dm.classify_id = #{search.classifyId}
+            </if>
+            <if test="search.recommend != null">
+                and dm.recommend = #{search.recommend}
+            </if>
+        </where>
+    </select>
+
+    <select id="auditingList" resultType="com.miner.disco.admin.model.response.merchant.MerchantAuditingListResponse">
+        select *
+        from ds_merchant dm
+        <where>
+            <if test="search.name != null and search.name != ''">
+                and dm.name LIKE CONCAT('%', #{search.name}, '%')
+            </if>
+            <if test="search.address != null and search.address != ''">
+                and dm.address LIKE CONCAT('%', #{search.address}, '%')
+            </if>
+            <if test="search.classifyId != null">
+                and dm.classify_id = #{search.classifyId}
+            </if>
+            <if test="search.status != null">
+                and dm.status = #{search.status}
+            </if>
+            <if test="search.contactName != null and search.contactName != ''">
+                and dm.contact_name LIKE CONCAT('%', #{search.contactName}, '%')
+            </if>
+            <if test="search.contactMobile != null and search.contactMobile != ''">
+                and dm.contact_mobile LIKE CONCAT('%', #{search.contactMobile}, '%')
+            </if>
+        </where>
+        ORDER BY dm.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countAuditingList" resultType="int">
+        select count(dm.id)
+        from ds_merchant dm
+        <where>
+            <if test="search.name != null and search.name != ''">
+                and dm.name LIKE CONCAT('%', #{search.name}, '%')
+            </if>
+            <if test="search.address != null and search.address != ''">
+                and dm.address LIKE CONCAT('%', #{search.address}, '%')
+            </if>
+            <if test="search.classifyId != null">
+                and dm.classify_id = #{search.classifyId}
+            </if>
+            <if test="search.status != null">
+                and dm.status = #{search.status}
+            </if>
+            <if test="search.contactName != null and search.contactName != ''">
+                and dm.contact_name LIKE CONCAT('%', #{search.contactName}, '%')
+            </if>
+            <if test="search.contactMobile != null and search.contactMobile != ''">
+                and dm.contact_mobile LIKE CONCAT('%', #{search.contactMobile}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryForUpdate" resultType="com.miner.disco.pojo.Merchant">
+        select * from ds_merchant dm
+        where dm.id = #{id}
+        for update
+    </select>
+
+</mapper>

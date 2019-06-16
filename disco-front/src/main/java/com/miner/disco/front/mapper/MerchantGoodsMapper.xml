@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.MerchantGoodsMapper">
+
+    <select id="queryByMerchantId" resultType="com.miner.disco.front.model.response.MerchantGoodsListResponse">
+        <bind name="_STATUS_UPPER" value="@com.miner.disco.pojo.MerchantGoods$STATUS@UPPER.key"/>
+        SELECT
+            mg.id as goodsId,
+            mg.`name`,
+            mg.price,
+            mg.images,
+            mg.merchant_id,
+            mg.minimum_charge,
+            mg.standard,
+            mg.countermand,
+            mg.countermand_ahead_time
+        FROM
+            ds_merchant_goods mg
+        WHERE
+            mg.merchant_id = #{merchantId}
+            AND `status` = #{_STATUS_UPPER}
+            AND deleted = ${_DELETE_STATUS_NORMAL}
+        ORDER BY mg.update_date DESC
+    </select>
+
+</mapper>

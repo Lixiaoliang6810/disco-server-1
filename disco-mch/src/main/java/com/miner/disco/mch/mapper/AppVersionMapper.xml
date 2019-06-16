@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.mch.dao.AppVersionMapper">
+
+    <select id="queryLatestByAppAndType" resultType="com.miner.disco.pojo.AppVersion">
+        SELECT
+            *
+        FROM
+            ds_app_version av
+        WHERE
+            av.app = #{app.key}
+            AND av.type = #{type.key}
+        ORDER BY
+            av.create_date DESC,
+            av.update_date DESC
+        LIMIT 1
+    </select>
+
+</mapper>

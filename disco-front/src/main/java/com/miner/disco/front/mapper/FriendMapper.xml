@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.FriendMapper">
+
+    <!--UNION ALL-->
+    <!--SELECT m.id as userId,m.nickname,m.avatar,m.slogan,m.im_account,f.create_date FROM ds_friend f LEFT JOIN ds_member m ON f.own_user_id = m.id WHERE f.him_user_id = #{userId} AND f.deleted = ${_DELETE_STATUS_NORMAL}-->
+    <select id="queryByUserId" parameterType="com.miner.disco.front.model.request.FriendListRequest" resultType="com.miner.disco.front.model.response.FriendListResponse">
+        SELECT * FROM (
+            SELECT m.id as userId,m.nickname,m.avatar,m.slogan,m.im_account,f.create_date FROM ds_friend f LEFT JOIN ds_member m ON f.him_user_id = m.id WHERE f.own_user_id = #{userId} AND f.deleted = ${_DELETE_STATUS_NORMAL}
+        ) as temp
+        ORDER BY temp.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <!--UNION ALL-->
+    <!--SELECT f.id FROM ds_friend f WHERE f.him_user_id = #{userId}  AND f.deleted = ${_DELETE_STATUS_NORMAL}-->
+    <select id="countByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1) as total FROM (
+            SELECT f.id FROM ds_friend f WHERE f.own_user_id = #{userId}  AND f.deleted = ${_DELETE_STATUS_NORMAL}
+        ) as temp
+    </select>
+
+    <select id="queryByOwnAndHim" resultType="com.miner.disco.pojo.Friend">
+        SELECT  * FROM ds_friend f WHERE f.own_user_id = #{ownUserId} AND f.him_user_id = #{himUserId} AND f.deleted = ${_DELETE_STATUS_NORMAL} LIMIT 1
+    </select>
+
+</mapper>

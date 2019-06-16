@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.OauthClientMapper">
+
+    <select id="queryByClientId" resultType="com.miner.disco.pojo.OauthClient">
+        SELECT * FROM ds_oauth_client_details ocd WHERE ocd.client_id = #{clientId} LIMIT 1
+    </select>
+
+</mapper>

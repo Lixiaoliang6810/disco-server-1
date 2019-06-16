@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.orders.OrdersInvitationDao">
+
+        <select id="invitationList" resultType="com.miner.disco.admin.model.response.orders.InvitationListResponse">
+            select doi.*,dm.nickname,do.no from ds_orders_invitation doi
+            left join ds_orders do on doi.orders_id = do.id left join  ds_member dm on doi.invitee_id = dm.id
+            <where>
+                <if test="search.inviteeName != null and search.inviteeName !=''">
+                    dm.nickname LIKE CONCAT('%', #{search.inviteeName}, '%')
+                </if>
+                <if test="search.no != null and search.no != ''">
+                    do.no like CONCAt('%',#{search.no},'%')
+                </if>
+            </where>
+            LIMIT #{search.offset}, #{search.limit}
+        </select>
+
+        <select id="countList" resultType="int">
+            select count(doi.id) from ds_orders_invitation doi
+            left join ds_orders do on doi.orders_id = do.id left join  ds_member dm on doi.invitee_id = dm.id
+            <where>
+                <if test="search.inviteeName != null and search.inviteeName !=''">
+                    dm.nickname LIKE CONCAT('%', #{search.inviteeName}, '%')
+                </if>
+                <if test="search.no != null and search.no != ''">
+                    do.no like CONCAt('%',#{search.no},'%')
+                </if>
+            </where>
+        </select>
+</mapper>

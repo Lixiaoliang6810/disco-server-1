@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.RoleDao">
+
+    <select id="queryPage" resultType="com.miner.disco.admin.model.response.system.SysRoleResponse">
+        SELECT * FROM ds_sys_role
+        <include refid="conditionSql" />
+        ORDER BY ${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="queryPageCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM ds_sys_role
+         <include refid="conditionSql" />
+    </select>
+
+    <sql id="conditionSql">
+        WHERE id NOT IN
+        <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
+            #{roleId}
+        </foreach>
+        <if test="search.name != null and search.name.length > 0">
+            name = #{search.name}
+        </if>
+    </sql>
+
+    <select id="queryAll" resultType="com.miner.disco.admin.model.response.system.SysRoleResponse">
+        SELECT * FROM ds_sys_role
+    </select>
+
+    <select id="queryRoleIdsByUserId" resultType="java.lang.Long">
+         SELECT role_id FROM ds_sys_user_role WHERE user_id = #{userId}
+    </select>
+
+    <select id="queryByName" resultType="com.miner.disco.pojo.SysRole">
+        SELECT * FROM ds_sys_role WHERE name = #{name} LIMIT 1
+    </select>
+
+    <delete id="deleteRole">
+        DELETE FROM ds_sys_role WHERE id = #{id};
+        DELETE FROM ds_sys_user_role WHERE role_id = #{id};
+        DELETE FROM ds_sys_role_menu WHERE role_id = #{id};
+        DELETE FROM ds_sys_role_module WHERE role_id = #{id};
+    </delete>
+
+    <delete id="deleteMenusRelation">
+        <foreach collection="menuIds" item="menuId" open="" close="" separator=";">
+            DELETE FROM ds_sys_role_menu WHERE role_id = #{id} AND menu_id = #{menuId}
+        </foreach>
+    </delete>
+
+    <insert id="relationMenus">
+        INSERT INTO ds_sys_role_menu (role_id, menu_id) VALUES
+        <foreach collection="menuIds" item="menuId" separator=",">
+            (#{id}, #{menuId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteAuthsRelation">
+        <foreach collection="authIds" item="authId" open="" close="" separator=";">
+            DELETE FROM ds_sys_role_module WHERE role_id = #{id} AND module_func_id = #{authId}
+        </foreach>
+    </delete>
+
+    <insert id="relationAuths">
+        INSERT INTO ds_sys_role_module (role_id, module_func_id) VALUES
+        <foreach collection="authIds" item="authId" separator=",">
+            (#{id}, #{authId})
+        </foreach>
+    </insert>
+</mapper>

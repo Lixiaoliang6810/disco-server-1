@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.PermissionDao">
+
+    <select id="queryPermisByRole" resultType="com.miner.disco.admin.model.request.system.PermissionRequest">
+        SELECT sm.id AS moduleId,
+                sm.module_code,
+                sm.module_name,
+                sm.`group`,
+                sf.id AS funcId,
+                sf.func_code,
+                sf.func_name
+         FROM ds_sys_role_module rm
+        INNER JOIN ds_sys_module_func mf ON rm.module_func_id = mf.id -- inner join 防止查出错误权限数据
+        INNER JOIN ds_sys_module sm ON mf.module_id = sm.id
+        INNER JOIN ds_sys_func sf ON mf.func_id = sf.id
+        WHERE rm.role_id = #{roleId}
+        ORDER BY sm.id desc
+    </select>
+
+    <select id="queryModuleByGroup" resultType="com.miner.disco.admin.auth.model.ModuleBean">
+        SELECT * FROM ds_sys_module WHERE `group` = #{group}
+    </select>
+
+    <select id="queryFunctionByModuleId" resultType="com.miner.disco.admin.auth.model.FunctionBean">
+        <!--<bind name="_DEFAULT" value="" />-->
+        SELECT sf.func_name, sf.func_code, smf.id FROM ds_sys_module_func smf INNER JOIN ds_sys_func sf ON smf.func_id = sf.id
+        WHERE smf.module_id = #{moduleId} AND sf.func_code &lt;&gt; 'auth.default'
+    </select>
+
+    <select id="queryPermisIdsByRole" resultType="java.lang.Long">
+        SELECT module_func_id FROM ds_sys_role_module WHERE role_id = #{roleId}
+    </select>
+
+    <select id="querymoduleDefaultId" resultType="com.miner.disco.pojo.SysModuleFunc">
+         SELECT smf.* FROM ds_sys_module_func smf INNER JOIN ds_sys_func sf ON smf.func_id = sf.id
+         WHERE sf.func_code = 'auth.default'
+    </select>
+</mapper>

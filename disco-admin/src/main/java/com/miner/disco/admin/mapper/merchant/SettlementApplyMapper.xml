@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.merchant.SettlementApplyDao">
+
+    <select id="list" resultType="com.miner.disco.admin.model.response.merchant.SettlementApplyListResponse">
+        select dmsa.*,merchant.name merchantName,merchant.mobile,dsu.nickname reviewUsername from ds_merchant_settlement_apply dmsa
+        left join ds_merchant merchant on dmsa.merchant_id = merchant.id
+        left join ds_sys_user dsu on dmsa.review_user_id = dsu.id
+        <include refid="conditionSql"/>
+        ORDER BY dmsa.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countList" resultType="int">
+        select count(dmsa.id)
+        from ds_merchant_settlement_apply dmsa
+        left join ds_merchant merchant on dmsa.merchant_id = merchant.id
+        left join ds_sys_user dsu on dmsa.review_user_id = dsu.id
+        <include refid="conditionSql"/>
+    </select>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="search.merchantName != null and search.merchantName !=''">
+                and merchant.name like CONCAT('%', #{search.merchantName}, '%')
+            </if>
+            <if test="search.reviewUsername != null and search.reviewUsername !=''">
+                and dsu.nickname like CONCAT('%', #{search.reviewUsername}, '%')
+            </if>
+            <if test="search.status != null">
+                and dmsa.status = #{search.status}
+            </if>
+            <if test="search.createStartTime != null">
+                AND dmsa.create_date >= #{search.createStartTime}
+            </if>
+            <if test="search.createEndTime != null">
+                <![CDATA[AND dmsa.create_date <= #{search.createEndTime}]]>
+            </if>
+        </where>
+    </sql>
+
+</mapper>

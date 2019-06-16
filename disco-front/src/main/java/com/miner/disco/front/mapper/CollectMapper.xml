@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.CollectMapper">
+
+    <select id="countByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1) as total FROM ds_collect c WHERE c.user_id = #{userId} AND c.deleted = ${_DELETE_STATUS_NORMAL}
+    </select>
+
+    <select id="queryByMerchantIdAndUserId" resultType="com.miner.disco.pojo.Collect">
+        SELECT * FROM ds_collect c WHERE c.merchant_id = #{merchantId} AND c.user_id = #{userId} AND c.deleted = ${_DELETE_STATUS_NORMAL}
+    </select>
+
+    <select id="queryByUserId" parameterType="com.miner.disco.front.model.request.CollectMerchantListRequest"
+            resultType="com.miner.disco.front.model.response.CollectMerchantListResponse">
+        SELECT
+            col.merchant_id,
+            m.name,
+            m.score,
+            m.address,
+            m.logo
+        FROM
+            ds_collect col
+            LEFT JOIN ds_merchant m ON col.merchant_id = m.id
+        WHERE col.user_id = #{userId}
+          AND col.deleted = ${_DELETE_STATUS_NORMAL}
+        ORDER BY col.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+</mapper>

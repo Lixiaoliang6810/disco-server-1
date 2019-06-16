@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.ConfigDao">
+
+    <select id="configList" resultType="com.miner.disco.admin.model.response.system.ConfigListResponse">
+          select * from ds_config
+          LIMIT #{page.offset}, #{page.limit}
+    </select>
+
+    <select id="countConfigList" resultType="int">
+        select count(id) from ds_config
+    </select>
+
+</mapper>

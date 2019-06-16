@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.mch.dao.MerchantSettlementApplyMapper">
+
+    <select id="record" parameterType="com.miner.disco.mch.model.request.MerchantSettlementRecordRequest"
+            resultType="com.miner.disco.mch.model.response.MerchantSettlementRecordResponse">
+        SELECT
+          *
+        FROM
+          ds_merchant_settlement_apply msa
+        WHERE msa.merchant_id = #{merchantId}
+        ORDER BY msa.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+</mapper>

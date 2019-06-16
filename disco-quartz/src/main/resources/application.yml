@@ -1,0 +1,38 @@
+server:
+  port: 8005
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    druid:
+      filters: stat
+      maxActive: 30
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 10
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+  profiles:
+    active: '@spring.profiles.active@'
+  jackson:
+    default-property-inclusion: NON_NULL
+    date-format: 'yyyy-MM-dd HH:mm:ss'
+    time-zone: "GMT+8"
+
+mybatis:
+  mapper-locations: classpath:com/miner/disco/quartz/mapper/*/*Mapper.xml
+  type-aliases-package: com.miner.disco.pojo
+#  configuration:
+#    map-underscore-to-camel-case: true
+
+
+logging:
+  level:
+    root: INFO
+    com.miner.disoc.admin.dao: debug

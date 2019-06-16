@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.EmergencyContactMapper">
+
+
+    <select id="queryByUserId" resultType="com.miner.disco.front.model.response.EmergencyContactListResponse">
+        SELECT * FROM ds_emergency_contact ec WHERE ec.user_id = #{userId} AND ec.deleted = 1 ORDER BY ec.create_date DESC
+    </select>
+
+</mapper>

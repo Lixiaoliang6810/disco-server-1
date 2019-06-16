@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.BannerMapper">
+
+    <select id="queryAllEffective" resultType="com.miner.disco.front.model.response.BannerListResponse">
+        SELECT b.image,b.link FROM ds_banner b WHERE b.deleted = 1 ORDER BY b.sort DESC
+    </select>
+
+</mapper>

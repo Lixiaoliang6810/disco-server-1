@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.mch.dao.MerchantGoodsMapper">
+
+    <select id="queryByMerchantId" parameterType="com.miner.disco.mch.model.request.MerchantGoodsListRequest"
+            resultType="com.miner.disco.mch.model.response.MerchantGoodsListResponse">
+        SELECT
+          mg.*,
+          mg.id as goodsId
+        FROM ds_merchant_goods mg
+        WHERE mg.merchant_id = #{merchantId}
+          AND mg.status = #{status}
+          AND mg.deleted = ${_DELETE_STATUS_NORMAL}
+        ORDER BY mg.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <update id="lower">
+        UPDATE ds_merchant_goods mg SET mg.status = 2 WHERE mg.id IN
+        <foreach collection="goodsIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+</mapper>

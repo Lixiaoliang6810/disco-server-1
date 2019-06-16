@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.member.MemberIntegralBillDao">
+
+    <select id="integralBillList" resultType="com.miner.disco.admin.model.response.member.MemberIntegralListResponse">
+        select * from ds_member_integral_bill dmib left join ds_member dm on dmib.user_id = dm.id
+        <where>
+            <if test="search.mobile != null and search.mobile != ''">
+                dm.mobile LIKE CONCAT('%', #{search.mobile}, '%')
+            </if>
+            <if test="search.nickname != null and search.nickname != ''">
+                dm.nickname LIKE CONCAT('%', #{search.nickname}, '%')
+            </if>
+            <if test="search.realname != null and search.realname !=''">
+                dm.realname LIKE CONCAT('%', #{search.realname}, '%')
+            </if>
+            <if test="search.type != null">
+                dmb.type = #{type}
+            </if>
+            <if test="search.tradeType != null">
+                dmb.trade_type = #{tradeType}
+            </if>
+        </where>
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countIntegralBill" resultType="int">
+        select count(dmib.id) from ds_member_integral_bill dmib left join ds_member dm on dmib.user_id = dm.id
+        <where>
+            <if test="search.mobile != null and search.mobile != ''">
+                dm.mobile LIKE CONCAT('%', #{search.mobile}, '%')
+            </if>
+            <if test="search.nickname != null and search.nickname != ''">
+                dm.nickname LIKE CONCAT('%', #{search.nickname}, '%')
+            </if>
+            <if test="search.realname != null and search.realname !=''">
+                dm.realname LIKE CONCAT('%', #{search.realname}, '%')
+            </if>
+            <if test="search.type != null">
+                dmb.type = #{type}
+            </if>
+            <if test="search.tradeType != null">
+                dmb.trade_type = #{tradeType}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

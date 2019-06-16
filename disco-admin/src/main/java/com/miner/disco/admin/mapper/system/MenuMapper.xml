@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.MenuDao">
+
+    <select id="queryUserMenus" resultType="com.miner.disco.pojo.SysMenu">
+         <!-- SELECT menu.* FROM ds_sys_user_role user_role
+             INNER JOIN ds_sys_role_menu role_menu ON user_role.role_id = role_menu.role_id
+             INNER JOIN ds_sys_menu menu ON role_menu.menu_id = menu.id
+             WHERE user_role.user_id = #{userId} -->
+        SELECT DISTINCT(sys_menu.id),sys_menu.* FROM ds_sys_menu sys_menu
+        INNER JOIN ds_sys_role_menu role_menu ON sys_menu.id = role_menu.menu_id
+        WHERE role_menu.role_id in (SELECT sur.role_id FROM ds_sys_user_role sur WHERE sur.user_id = #{userId})
+        ORDER BY sys_menu.sort
+    </select>
+
+    <select id="queryAll" resultType="com.miner.disco.pojo.SysMenu">
+         SELECT * FROM ds_sys_menu
+    </select>
+
+    <select id="queryMenuIdsByRoleId" resultType="java.lang.Long">
+         SELECT menu_id FROM ds_sys_role_menu WHERE role_id = #{roleId}
+    </select>
+
+</mapper>

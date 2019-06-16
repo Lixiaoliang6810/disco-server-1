@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.mch.dao.OrdersMapper">
+
+    <select id="queryByMerchantId" parameterType="com.miner.disco.mch.model.request.OrdersListRequest"
+            resultType="com.miner.disco.mch.model.response.OrdersListResponse">
+        SELECT
+            o.id AS ordersId,
+            o.`no`,
+            o.fullname,
+            o.mobile,
+            o.salutation,
+            o.arrival_time,
+            o.tail_money,
+            o.total_money,
+            o.create_date,
+            o.payment_date,
+            m.`name` AS merchantName,
+            mg.`name` AS goodsName
+        FROM
+            ds_orders o
+            LEFT JOIN ds_merchant m ON o.seller = m.id
+            LEFT JOIN ds_merchant_goods mg ON o.goods_id = mg.id
+        WHERE
+            o.seller = #{merchantId}
+          AND o.status = #{status}
+        ORDER BY o.payment_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryById" resultType="com.miner.disco.mch.model.response.OrdersDetailsResponse">
+        SELECT
+            o.id as ordersId,
+            o.`no`,
+            o.mobile,
+            o.`status`,
+            o.fullname,
+            o.salutation,
+            o.arrival_time,
+            o.tail_money,
+            o.total_money,
+            o.refund_money,
+            o.create_date,
+            o.payment_date,
+            o.refund_date,
+            m.`name` as merchantName,
+            m.address,
+            m.latitude,
+            m.longitude,
+            m.tel,
+            mg.`name` as goodsName
+        FROM
+            ds_orders o
+            LEFT JOIN ds_merchant m ON o.seller = m.id
+            LEFT JOIN ds_merchant_goods mg ON o.goods_id = mg.id
+        WHERE o.id = #{ordersId}
+        LIMIT 1
+    </select>
+
+    <select id="statisticsToDayOrders" resultType="java.lang.Integer">
+        SELECT COUNT(1) as total FROM ds_orders o WHERE o.seller = #{merchantId} AND TO_DAYS(o.create_date) = TO_DAYS(NOW())
+    </select>
+
+    <select id="statisticsThisMonthOrders" resultType="java.lang.Integer">
+        SELECT COUNT(1) as total FROM ds_orders o WHERE o.seller = #{merchantId} AND MONTH(o.create_date) = MONTH(NOW())
+    </select>
+
+    <select id="statisticsTotalOrders" resultType="java.lang.Integer">
+        SELECT COUNT(1) as total FROM ds_orders o WHERE o.seller = #{merchantId}
+    </select>
+
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.merchant.ClassifyDao">
+
+    <select id="classifyList" resultType="com.miner.disco.admin.model.response.merchant.ClassifyListResponse">
+        SELECT id,type, name, deleted, create_date, update_date FROM ds_classify LIMIT #{page.offset}, #{page.limit}
+    </select>
+
+    <select id="countClassify" resultType="java.lang.Integer">
+        SELECT count(id) FROM ds_classify;
+    </select>
+
+    <select id="allClassify" resultType="com.miner.disco.admin.model.response.merchant.ClassifyListResponse">
+        select id,type,name from ds_classify;
+    </select>
+
+</mapper>

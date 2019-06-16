@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.OrdersMapper">
+
+    <select id="queryByUserId" parameterType="com.miner.disco.front.model.request.OrdersListRequest"
+            resultType="com.miner.disco.front.model.response.OrdersListResponse">
+        SELECT
+            o.id as ordersId,
+            o.`no`,
+            o.`status`,
+            o.arrival_time,
+            o.tail_money,
+            o.total_money,
+            o.create_date,
+            o.assemble_seats,
+            m.`name` as merchantName,
+            mg.`name` as goodsName,
+            m.address,
+            m.logo
+        FROM
+            ds_orders o
+            LEFT JOIN ds_merchant m ON o.seller = m.id
+            LEFT JOIN ds_merchant_goods mg ON o.goods_id = mg.id
+        WHERE o.buyer = #{userId}
+        <if test="status.name != 'ALL'">
+            AND o.status IN (${status.key})
+        </if>
+        ORDER BY mg.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryById" resultType="com.miner.disco.front.model.response.OrdersDetailsResponse">
+        SELECT
+            o.id as ordersId,
+            o.`no`,
+            o.`status`,
+            o.arrival_time,
+            o.tail_money,
+            o.total_money,
+            o.refund_money,
+            o.create_date,
+            o.payment_date,
+            o.refund_date,
+            o.assemble_seats,
+            o.assemble_seats_count,
+            o.assemble_seats_surplus,
+            m.`name` as merchantName,
+            m.logo,
+            m.label,
+            m.address,
+            m.latitude,
+            m.longitude,
+            m.tel,
+            mg.`name` as goodsName
+        FROM
+            ds_orders o
+            LEFT JOIN ds_merchant m ON o.seller = m.id
+            LEFT JOIN ds_merchant_goods mg ON o.goods_id = mg.id
+        WHERE o.id = #{ordersId}
+        LIMIT 1
+    </select>
+
+    <select id="queryByPrimaryKeyForUpdate" resultType="com.miner.disco.pojo.Orders">
+        SELECT * FROM ds_orders o WHERE o.id = #{ordersId} FOR UPDATE
+    </select>
+
+    <select id="queryAssembleList" parameterType="com.miner.disco.front.model.request.AssembleOrdersListRequest"
+            resultType="com.miner.disco.front.model.response.AssembleOrdersListResponse">
+        SELECT
+          o.id as ordersId,
+          m.name as merchantName,
+          o.assemble_seats_count,
+          o.assemble_seats_surplus
+        FROM
+          ds_orders o
+            LEFT JOIN ds_merchant m ON o.seller = m.id
+        WHERE o.assemble_seats = ${_BOOLEAN_STATUS_YES}
+          AND o.assemble_seats_surplus > 0
+        <if test="classifyId != null">
+            AND m.classify_id = #{classifyId}
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND m.name LIKE CONCAT("%",CONCAT(#{merchantName},"%"))
+        </if>
+        ORDER BY o.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryLaunchAssembleList" parameterType="com.miner.disco.front.model.request.LaunchAssembleOrdersListRequest"
+            resultType="com.miner.disco.front.model.response.LaunchAssembleOrdersListResponse">
+        SELECT
+          o.id as ordersId,
+          m.name as merchantName,
+          o.status,
+          m.percapita,
+          o.arrival_time,
+          o.assemble_seats_count,
+          o.assemble_seats_surplus,
+          mg.`name` as goodsName
+        FROM
+          ds_orders o
+            LEFT JOIN ds_merchant m ON o.seller = m.id
+            LEFT JOIN  ds_merchant_goods mg ON o.goods_id = mg.id
+        WHERE o.assemble_seats = ${_BOOLEAN_STATUS_YES}
+          AND o.buyer = #{userId}
+        ORDER BY mg.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryApplyAssembleList" parameterType="com.miner.disco.front.model.request.ApplyAssembleOrdersListRequest"
+            resultType="com.miner.disco.front.model.response.ApplyAssembleOrdersListResponse">
+        SELECT
+          o.id as ordersId,
+          mm.name as merchantName,
+          mm.address,
+          mm.logo,
+          o.arrival_time,
+          oi.status,
+          m.id as launchUserId,
+          m.avatar as launchUserAvatar
+        FROM
+          ds_orders_invitation oi
+            LEFT JOIN ds_orders o ON oi.orders_id = o.id
+            LEFT JOIN ds_member m ON o.buyer = m.id
+            LEFT JOIN  ds_merchant mm ON o.seller = mm.id
+        WHERE oi.member_id = #{userId}
+          AND oi.`owner` = ${_BOOLEAN_STATUS_NO}
+        ORDER BY oi.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+</mapper>

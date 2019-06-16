@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.mch.dao.MerchantBillMapper">
+
+    <select id="queryByMerchantId" resultType="com.miner.disco.mch.model.response.QueryMerchantBill">
+        SELECT
+            mb.*,
+            DAY ( mb.create_date ) AS `day`
+        FROM
+            ds_merchant_bill mb
+        WHERE
+            YEAR ( mb.create_date ) = #{year}
+            AND MONTH ( mb.create_date ) = #{month}
+            AND mb.merchant_id = #{merchantId}
+    </select>
+
+    <select id="offLineBills" parameterType="com.miner.disco.mch.model.request.MerchantOfflineBillRequest"
+            resultType="com.miner.disco.mch.model.response.MerchantOfflineBillResponse">
+        SELECT
+            mmb.create_date,
+            mmb.amount,
+            mrq.pay_way
+        FROM
+            ( SELECT * FROM ds_merchant_bill mb WHERE mb.trade_type = 2 ) AS mmb
+            LEFT JOIN ds_merchant_receivables_qrcode mrq ON mmb.source_id = mrq.id
+        WHERE mmb.merchant_id = #{merchantId}
+        ORDER BY mmb.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="statisticsTodayIncomeMoney" resultType="java.math.BigDecimal">
+        SELECT SUM(mb.amount) FROM ds_merchant_bill mb WHERE mb.merchant_id = #{merchantId} AND mb.trade_type IN(1,2) AND TO_DAYS(mb.create_date) = TO_DAYS(NOW())
+    </select>
+
+    <select id="statisticsThisMonthIncomeMoney" resultType="java.math.BigDecimal">
+        SELECT SUM(mb.amount) FROM ds_merchant_bill mb WHERE mb.merchant_id = #{merchantId} AND mb.trade_type IN(1,2) AND MONTH(mb.create_date) = MONTH(NOW())
+    </select>
+
+    <select id="statisticsTotalIncomeMoney" resultType="java.math.BigDecimal">
+        SELECT SUM(mb.amount) FROM ds_merchant_bill mb WHERE mb.merchant_id = #{merchantId} AND mb.trade_type IN(1,2)
+    </select>
+
+</mapper>

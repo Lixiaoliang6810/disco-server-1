@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.DynamicMapper">
+
+    <select id="queryList" parameterType="com.miner.disco.front.model.request.DynamicsListRequest" resultType="com.miner.disco.front.model.response.DynamicsListResponse">
+        SELECT
+            dy.user_id,
+            dy.content,
+            dy.images,
+            dy.create_date,
+            m.nickname,
+            m.avatar
+        FROM
+            ds_dynamic dy
+            LEFT JOIN ds_member m ON dy.user_id = m.id
+        WHERE dy.deleted = ${_DELETE_STATUS_NORMAL}
+        <if test="userId != null">
+            AND dy.user_id = #{userId}
+        </if>
+        ORDER BY dy.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryImagesByUserId" resultType="java.lang.String">
+        SELECT
+          images
+        FROM ds_dynamic d
+          WHERE d.images IS NOT NULL
+        AND d.user_id = #{userId}
+        AND d.deleted = ${_DELETE_STATUS_NORMAL}
+        ORDER BY d.create_date DESC
+    </select>
+
+</mapper>

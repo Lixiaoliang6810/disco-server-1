@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.MerchantMapper">
+
+    <select id="queryRecommend" resultType="com.miner.disco.front.model.response.MerchantListResponse">
+        SELECT
+            m.id as merchantId,
+            m.*
+        FROM
+            ds_merchant m
+        WHERE m.`status` = 4
+        ORDER BY
+            m.recommend DESC,
+            m.sort DESC,
+            m.score DESC,
+	        m.update_date DESC
+        LIMIT 0,8
+    </select>
+
+    <select id="search" parameterType="com.miner.disco.front.model.request.MerchantListRequest"
+            resultType="com.miner.disco.front.model.response.MerchantListResponse">
+        SELECT
+            m.id as merchantId,
+            m.`name`,
+            m.logo,
+            m.slideshow,
+            m.label,
+            m.latitude,
+            m.longitude,
+            m.address,
+            m.score,
+            m.percapita,
+            m.create_date,
+            m.update_date
+        FROM
+          ds_merchant m
+        WHERE m.`status` = 4
+        <if test="classifyId != null">
+            AND m.classify_id = #{classifyId}
+        </if>
+        <if test="currentCity != null and currentCity != ''">
+            AND m.city = #{currentCity}
+        </if>
+        <if test="geohash != null and geohash != ''">
+            AND m.geohash LIKE  CONCAT(#{geohash},'%')
+        </if>
+        <if test="name != null and name != ''">
+            AND m.name LIKE CONCAT('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="queryByPrimaryKeyFroUpdate" resultType="com.miner.disco.pojo.Merchant">
+        SELECT * FROM ds_merchant m WHERE m.id = #{id} FOR UPDATE
+    </select>
+
+</mapper>

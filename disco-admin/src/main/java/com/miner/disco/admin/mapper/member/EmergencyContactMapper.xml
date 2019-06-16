@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.member.EmergencyContactDao">
+
+    <select id="emergencyContactList" resultType="com.miner.disco.admin.model.response.member.EmergencyContactResponse">
+        select de.*,dm.nickname from ds_emergency_contact de left join ds_member dm on de.user_id = dm.id
+        <where>
+            <if test="search.nickname != null and search.nickname != ''">
+                dm.nickname like CONCAT('%',#{search.nickname},'%')
+            </if>
+        </where>
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countList" resultType="int">
+        select count(de.id) from ds_emergency_contact de left join ds_member dm on de.user_id = dm.id
+        <where>
+            <if test="search.nickname != null and search.nickname != ''">
+                dm.nickname like CONCAT('%',#{search.nickname},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

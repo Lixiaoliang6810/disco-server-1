@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.MemberMapper">
+
+    <select id="queryByMobile" resultType="com.miner.disco.pojo.Member">
+        SELECT * FROM ds_member m WHERE m.mobile = #{mobile}
+    </select>
+
+    <select id="queryByImAccount" resultType="com.miner.disco.pojo.Member">
+        SELECT * FROM ds_member m WHERE m.im_account = #{imAccount} LIMIT 1
+    </select>
+
+    <select id="queryByPrimaryKeyForUpdate" resultType="com.miner.disco.pojo.Member">
+        SELECT * FROM ds_member m WHERE m.id = #{id} FOR UPDATE
+    </select>
+
+    <select id="queryByVip" parameterType="com.miner.disco.front.model.request.VipMemberListRequest"
+            resultType="com.miner.disco.front.model.response.VipMemberListResponse">
+        SELECT
+         m.id as userId,
+         m.avatar,
+         m.background_image,
+         m.gender,
+         m.label,
+         m.nickname,
+         m.recommend,
+         m.create_date,
+         m.update_date,
+         m.latitude,
+         m.longitude
+        FROM
+            ds_member m
+        WHERE m.vip = ${_BOOLEAN_STATUS_YES}
+        <if test="nickname != null and nickname != ''">
+            AND m.nickname LIKE CONCAT('%',#{nickname},'%')
+        </if>
+        <if test="gender != null">
+            AND m.gender = #{gender}
+        </if>
+        <if test="recommend != null">
+            AND recommend = #{recommend}
+        </if>
+        <if test="currentCity != null and currentCity != ''">
+            AND m.current_city = #{currentCity}
+        </if>
+        <if test="geohash != null and geohash != ''">
+            AND m.geohash LIKE CONCAT(#{geohash},'%')
+        </if>
+        <if test="sid != null and sid !=''">
+            AND NOT IN (#sid)
+        </if>
+    </select>
+
+    <select id="queryUser"  resultType="com.miner.disco.pojo.Member">
+        select id from ds_member where mobile= #{name}
+    </select>
+
+</mapper>

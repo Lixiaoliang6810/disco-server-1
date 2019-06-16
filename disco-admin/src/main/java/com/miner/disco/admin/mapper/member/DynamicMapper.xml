@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.member.DynamicDao">
+
+    <select id="queryMemberDynamicPage" resultType="com.miner.disco.admin.model.response.member.MemberDynamicListResponse">
+        SELECT dd.id,
+                dd.content,
+                dd.images,
+                dd.deleted,
+                dd.create_date,
+                dd.update_date FROM ds_dynamic dd
+        <include refid="conditionSql" />
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countDynamicPage" resultType="int">
+        SELECT COUNT(1) from ds_dynamic dd
+        <include refid="conditionSql" />
+    </select>
+    
+    <sql id="conditionSql">
+      WHERE dd.user_id = #{search.memberId} AND dd.deleted = ${_DELETE_STATUS_NORMAL}
+      <if test="search.show != null">
+          <choose>
+              <when test="search.show.getShow == 1">
+                 <if test="search.startYear != null">
+                    AND YEAR(dd.create_date) >= #{search.startYear}
+                 </if>
+                 <if test="search.endYear != null">
+                  AND YEAR(dd.create_date) &lt;= #{search.endYear}
+                 </if>
+              </when>
+              <when test="search.show.getShow == 2">
+                  <if test="search.year != null">
+                      AND YEAR(dd.create_date) = #{search.year}
+                  </if>
+                  <if test="search.quarter != null">
+                      AND QUARTER(dd.create_date) = #{search.quarter}
+                  </if>
+              </when>
+              <when test="search.show.getShow == 3">
+                  <if test="search.startDate != null">
+                      AND DATE_FORMAT(dd.create_date, '%Y-%m') >= DATE_FORMAT(#{search.startDate}, '%Y-%m')
+                  </if>
+                  <if test="search.endDate != null">
+                      AND DATE_FORMAT(dd.create_date, '%Y-%m') &lt;= DATE_FORMAT(#{search.endDate}, '%Y-%m')
+                  </if>
+              </when>
+              <otherwise>
+                  <if test="search.startDate != null">
+                      AND dd.create_date >= #{search.startDate}
+                  </if>
+                  <if test="search.endDate != null">
+                      AND dd.create_date &lt;= #{search.endDate}
+                  </if>
+              </otherwise>
+          </choose>
+      </if>
+    </sql>
+
+</mapper>

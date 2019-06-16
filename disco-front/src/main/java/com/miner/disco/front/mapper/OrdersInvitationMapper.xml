@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.OrdersInvitationMapper">
+
+    <select id="queryJoinedByOrdersId" resultType="com.miner.disco.front.model.response.OrdersInvitationResponse">
+        SELECT
+          oi.id as ordersInvitationId,
+          oi.member_id as userId,
+          oi.status,
+          oi.owner,
+          m.avatar,
+          m.nickname
+        FROM
+          ds_orders_invitation oi LEFT JOIN ds_member m ON oi.member_id = m.id
+        WHERE oi.orders_id = #{ordersId}
+          AND oi.status IN (${status})
+    </select>
+
+    <select id="queryJoinedByUserIdAndOrdersId" resultType="com.miner.disco.pojo.OrdersInvitation">
+        SELECT
+          *
+        FROM
+          ds_orders_invitation oi
+        WHERE oi.member_id = #{userId}
+          AND oi.orders_id = #{ordersId}
+          AND oi.status IN (1,2)
+        LIMIT 1
+    </select>
+
+</mapper>

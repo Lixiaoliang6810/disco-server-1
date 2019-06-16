@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.member.WithdrawalApplyDao">
+
+    <select id="queryPage" resultType="com.miner.disco.admin.model.response.member.WithdrawalApplyResponse">
+      SELECT wp.id,
+              wp.user_id,
+              wp.amount,
+              wp.status,
+              wp.update_date,
+              wp.create_date,
+              dm.nickname,
+              dm.mobile,
+              mb.card_no,
+              mb.type,
+              mb.bank_name
+       FROM ds_withdrawal_apply wp
+      LEFT JOIN ds_member dm ON wp.user_id = dm.id
+      LEFT JOIN ds_member_bank mb ON wp.bank_id = mb.id
+      <include refid="conditionSql" />
+        ORDER BY wp.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="queryPageCount" resultType="int">
+      SELECT COUNT(1) FROM ds_withdrawal_apply wp
+      LEFT JOIN ds_member dm ON wp.user_id = dm.id
+      LEFT JOIN ds_member_bank mb ON wp.bank_id = mb.id
+      <include refid="conditionSql" />
+    </select>
+
+    <sql id="conditionSql">
+      <where>
+          <if test="search.nickname != null and search.nickname.length > 0">
+              dm.nickname LIKE CONCAT('%', #{search.nickname}, '%')
+          </if>
+          <if test="search.status !=null">
+              AND wp.status = #{search.status}
+          </if>
+          <if test="search.backType != null">
+              AND mb.type = #{search.backType}
+          </if>
+          <if test="search.startDate != null">
+              AND wp.create_date >= #{search.startDate}
+          </if>
+          <if test="search.endDate != null">
+              AND wp.create_date &lt;= #{search.endDate}
+          </if>
+      </where>
+    </sql>
+
+    <select id="queryByPrimaryKeyForUpdate" resultType="com.miner.disco.pojo.WithdrawalApply">
+        SELECT * FROM ds_withdrawal_apply WHERE id = #{id} FOR UPDATE
+    </select>
+
+</mapper>

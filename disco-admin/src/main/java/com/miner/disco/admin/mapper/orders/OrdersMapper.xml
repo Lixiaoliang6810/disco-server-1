@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.orders.OrdersDao">
+
+    <select id="queryPage" resultType="com.miner.disco.admin.model.response.orders.OrdersListResponse">
+          select do.id,do.no,do.type,do.status,do.buyer,buyer.nickname,do.seller,seller.nickname,do.salutation,do.tota_money,do.goods_id,goods.name,do.create_date
+          from ds_orders do left join ds_member buyer on do.buyer = buyer.id left join ds_member seller on do.seller = seller.id
+          left join ds_merchant_goods goods on do.goods_id = goods.id
+          <where>
+              <if test="search.no != null and search.no != ''">
+                  do.no LIKE CONCAT('%', #{search.no}, '%')
+              </if>
+              <if test="search.type != null">
+                  do.type = #{search.type}
+              </if>
+              <if test="search.status != null">
+                  do.status = #{search.status}
+              </if>
+              <if test="search.buyerName != null and  search.buyerName != ''">
+                  buyer.nickname LIKE CONCAT('%', #{search.buyerName}, '%')
+              </if>
+              <if test="search.sellerName != null and  search.sellerName != ''">
+                  seller.nickname LIKE CONCAT('%', #{search.sellerName}, '%')
+              </if>
+              <if test="search.goodsName != null and  search.goodsName != ''">
+                  goods.name LIKE CONCAT('%', #{search.goodsName}, '%')
+              </if>
+          </where>
+          LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="queryPageCount" resultType="int">
+        select count(do.id)
+        from ds_orders do left join ds_member buyer on do.buyer = buyer.id left join ds_member seller on do.seller = seller.id
+        left join ds_merchant_goods goods on do.goods_id = goods.id
+        <where>
+            <if test="search.no != null and search.no != ''">
+                do.no LIKE CONCAT('%', #{search.no}, '%')
+            </if>
+            <if test="search.type != null">
+                do.type = #{search.type}
+            </if>
+            <if test="search.status != null">
+                do.status = #{search.status}
+            </if>
+            <if test="search.buyerName != null and  search.buyerName != ''">
+                buyer.nickname LIKE CONCAT('%', #{search.buyerName}, '%')
+            </if>
+            <if test="search.sellerName != null and  search.sellerName != ''">
+                seller.nickname LIKE CONCAT('%', #{search.sellerName}, '%')
+            </if>
+            <if test="search.goodsName != null and  search.goodsName != ''">
+                goods.name LIKE CONCAT('%', #{search.goodsName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="detail" resultType="com.miner.disco.admin.model.response.orders.OrdersDetailResponse">
+        SELECT do.*,
+                buyer.nickname AS buyerName,
+                seller.name AS sellerName,
+                goods.name AS goodsName
+        FROM ds_orders do
+        LEFT JOIN ds_member buyer ON do.buyer = buyer.id
+        LEFT JOIN ds_merchant seller ON do.seller = seller.id
+        LEFT JOIN ds_merchant_goods goods ON do.goods_id = goods.id
+        WHERE do.id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="queryMemberOrderPage" resultType="com.miner.disco.admin.model.response.member.MemberOrderPageResponse">
+        SELECT mo.no,
+                mo.type,
+                mo.status,
+                mo.arrival_time,
+                mo.earnest_money,
+                mo.tail_money,
+                mo.total_money,
+                mo.create_date,
+                mo.payment_date,
+                mo.update_date
+         FROM ds_orders mo
+         WHERE mo.buyer = #{search.memberId}
+         <include refid="memberOrderCondition" />
+        ORDER BY mo.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="queryMemberOrderPageCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM ds_orders mo
+        WHERE mo.buyer = #{search.memberId}
+        <include refid="memberOrderCondition" />
+    </select>
+
+    <sql id="memberOrderCondition">
+      <if test="search.status != null">
+          AND mo.status = #{search.status}
+      </if>
+
+      <if test="search.startDate != null">
+          AND mo.create_date >= #{search.startDate}
+      </if>
+      <if test="search.endDate != null">
+          AND mo.create_date &lt;= #{search.endDate}
+      </if>
+
+      <if test="search.startArrivalTime != null">
+          AND mo.arrival_time >= #{search.startArrivalTime}
+      </if>
+      <if test="search.endArrivalTime != null">
+          AND mo.arrival_time &lt;= #{search.endArrivalTime}
+      </if>
+
+      <if test="search.startPaymentDate != null">
+          AND mo.payment_date >= #{search.startPaymentDate}
+      </if>
+      <if test="search.endPaymentDate != null">
+          AND mo.payment_date &lt;= #{search.endPaymentDate}
+      </if>
+    </sql>
+
+</mapper>

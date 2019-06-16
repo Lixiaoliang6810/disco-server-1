@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.ScanDao">
+
+    <select id="queryAllModules" resultType="com.miner.disco.admin.auth.model.ModuleBean">
+        SELECT * FROM ds_sys_module;
+    </select>
+
+    <select id="queryAllFunc" resultType="com.miner.disco.admin.auth.model.FunctionBean">
+        SELECT * FROM ds_sys_func;
+    </select>
+
+    <insert id="inserModules" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ds_sys_module(module_code, module_name, `group`,create_date,update_date)
+        VALUES
+        <foreach collection="collection" item="u" separator=",">
+            (#{u.moduleCode}, #{u.moduleName}, #{u.group}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+    <insert id="inserFuncs" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ds_sys_func(func_code, func_name,create_date,update_date)
+        VALUES
+        <foreach collection="collection" item="u" separator=",">
+            (#{u.funcCode},#{u.funcName}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+    <update id="updateModules">
+        <bind name="StringUtils" value=":[@org.apache.commons.lang3.StringUtils@isNotEmpty(#this)]" />
+        <foreach collection="collection" item="item" index="index" open="" close="" separator=";">
+            UPDATE ds_sys_module
+            <set>
+                <if test="#fn = StringUtils, #fn(item.moduleName)">
+                    module_name = #{item.moduleName},
+                </if>
+
+                <if test="#fn = StringUtils, #fn(item.group)">
+                    group = #{item.group},
+                </if>
+
+                update_date = NOW()
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
+    <update id="updateFuncs">
+        <bind name="StringUtils" value=":[@org.apache.commons.lang3.StringUtils@isNotEmpty(#this)]" />
+        <foreach collection="collection" item="item" index="index" open="" close="" separator=";">
+            UPDATE ds_sys_func
+            <set>
+
+                <if test="#fn = StringUtils, #fn(item.funcName)">
+                    func_name = #{item.funcName},
+                </if>
+
+                update_date = NOW()
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteRelationsByModules">
+        <foreach collection="moduleBeans" item="item" index="index" open="" close="" separator=";">
+            DELETE FROM ds_sys_module_func WHERE module_id = #{item.id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRelationsByFuncs">
+        <foreach collection="functionBeans" item="item" index="index" open="" close="" separator=";">
+            DELETE FROM ds_sys_module_func WHERE module_id = #{item.id}
+        </foreach>
+    </delete>
+
+    <insert id="insertRelations" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ds_sys_module_func(module_id, func_id)
+        VALUES
+        <foreach collection="collection" item="u" separator=",">
+            (#{u.moduleBean.id},#{u.functionBean.id})
+        </foreach>
+    </insert>
+
+    <delete id="deleteModules">
+        <foreach collection="moduleBeans" item="item" index="index" open="" close="" separator=";">
+            DELETE FROM ds_sys_module WHERE id = #{item.id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteFuncs">
+        <foreach collection="functionBeans" item="item" index="index" open="" close="" separator=";">
+            DELETE FROM ds_sys_func WHERE id = #{item.id}
+        </foreach>
+    </delete>
+
+</mapper>

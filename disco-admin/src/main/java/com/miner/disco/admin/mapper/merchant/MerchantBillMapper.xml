@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.merchant.MerchantBillDao">
+
+    <select id="billList" resultType="com.miner.disco.admin.model.response.merchant.MerchantBillListResponse">
+        select dm.name merchantName,dmb.merchant_id,dmb.amount,dmb.type,dmb.trade_type,dmb.remark,dmb.create_date,dmb.source,dm.usable_balance,dm.frozen_balance
+        from ds_merchant_bill dmb left join ds_merchant dm on dmb.merchant_id = dm.id
+        <where>
+            <if test="search.merchantName != null and search.merchantName != ''">
+                and dm.name LIKE CONCAT('%', #{search.merchantName}, '%')
+            </if>
+            <if test="search.source != null and search.source != ''">
+                and dmb.source LIKE CONCAT('%', #{search.source}, '%')
+            </if>
+            <if test="search.type != null">
+                and dmb.type = #{search.type}
+            </if>
+            <if test="search.tradeType != null">
+                and dmb.trade_type = #{search.tradeType}
+            </if>
+        </where>
+        ORDER BY dmb.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countBillList" resultType="int">
+        select count(dmb.id) from ds_merchant_bill dmb left join ds_merchant dm on dmb.merchant_id = dm.id
+        <where>
+            <if test="search.merchantName != null and search.merchantName != ''">
+                and dm.name LIKE CONCAT('%', #{search.merchantName}, '%')
+            </if>
+            <if test="search.source != null and search.source != ''">
+                and dmb.source LIKE CONCAT('%', #{search.source}, '%')
+            </if>
+            <if test="search.type != null">
+                and dmb.type = #{search.type}
+            </if>
+            <if test="search.tradeType != null">
+                and dmb.trade_type = #{search.tradeType}
+            </if>
+        </where>
+    </select>
+
+</mapper>

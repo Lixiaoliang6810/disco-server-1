@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.InviteRecordMapper">
+
+    <select id="queryByUserId" parameterType="com.miner.disco.front.model.request.InviteRecordListRequest"
+            resultType="com.miner.disco.front.model.response.InviteRecordListResponse">
+        SELECT
+            m.id as userId,
+            m.avatar,
+            m.mobile,
+            ir.create_date
+        FROM
+            ds_invite_record ir LEFT JOIN ds_member m ON m.id = ir.invitee_id
+        WHERE
+            ir.inviter_id = #{userId}
+        ORDER BY ir.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+    <select id="queryLevelByInviteeId" resultType="java.lang.Integer">
+        SELECT ir.level FROM ds_invite_record ir WHERE ir.invitee_id = #{inviteeId}
+    </select>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.MemberBankMapper">
+
+    <select id="queryByUserId" parameterType="com.miner.disco.front.model.request.MemberBankListRequest"
+            resultType="com.miner.disco.front.model.response.MemberBankListResponse">
+        SELECT
+            mb.id,
+            mb.type,
+            mb.card_no,
+            mb.bank_name,
+            mb.cardholder
+        FROM
+            ds_member_bank mb
+        WHERE
+            mb.user_id = #{userId}
+          AND mb.deleted = ${_DELETE_STATUS_NORMAL}
+        ORDER BY mb.create_date DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+</mapper>

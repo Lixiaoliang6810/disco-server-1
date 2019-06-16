@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.member.VipApplyDao">
+
+    <select id="list" resultType="com.miner.disco.admin.model.response.member.VipApplyListResponse">
+        select dva.id,
+                dm.nickname,
+                dm.mobile,
+                dva.fullname,
+                dva.card_no,
+                dva.status,
+                dva.birthday,
+                dva.create_date,
+                dva.update_date
+        from ds_vip_apply dva left join ds_member dm on dva.user_id = dm.id
+        <where>
+            <if test="search.status != null">
+                dva.status = #{search.status}
+            </if>
+            <if test="search.nickname != null and search.nickname != ''">
+                dm.nickname LIKE CONCAT('%', #{search.nickname}, '%')
+            </if>
+            <if test="search.fullname != null and search.fullname !=''">
+                dva.fullname LIKE CONCAT('%', #{search.fullname}, '%')
+            </if>
+        </where>
+        ORDER BY dva.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countList" resultType="int">
+        select count(dva.id) from ds_vip_apply dva left join ds_member dm on dva.user_id = dm.id
+        <where>
+            <if test="search.status != null">
+                dva.status = #{search.status}
+            </if>
+            <if test="search.nickname != null and search.nickname != ''">
+                dm.nickname LIKE CONCAT('%', #{search.nickname}, '%')
+            </if>
+            <if test="search.fullname != null and search.fullname !=''">
+                dva.fullname LIKE CONCAT('%', #{search.fullname}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="details" resultType="com.miner.disco.admin.model.response.member.VipApplyDetailsResponse">
+        select dva.id,
+                dm.nickname,
+                dm.mobile,
+                dva.fullname,
+                dva.status,
+                dva.card_back_img_uri,
+                dva.card_front_img_uri,
+                dva.live_img_uri,
+                dva.audit_opinion,
+                dva.card_no,
+                dva.birthday,
+                su.nickname AS reviewUserName,
+                su.mobile AS reviewUserMobile,
+                dva.create_date,
+                dva.update_date
+        from ds_vip_apply dva left join ds_member dm on dva.user_id = dm.id
+        left join ds_sys_user su on su.id = dva.review_user_id
+        WHERE dva.id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="queryByPrimaryKeyForUpdate" resultType="com.miner.disco.pojo.VipApply">
+        SELECT * FROM ds_vip_apply WHERE id = #{id} FOR UPDATE
+    </select>
+</mapper>

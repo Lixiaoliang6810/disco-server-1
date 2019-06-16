@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.admin.dao.system.FeedbackDao">
+
+    <select id="feedbackList" resultType="com.miner.disco.admin.model.response.system.FeedbackListResponse">
+        select df.content,dm.nickname username,dm.mobile,df.create_date from ds_feedback df left join ds_member dm on df.user_id = dm.id
+        <where>
+            <if test="search.username != null and search.username !=''">
+                and dm.nickname LIKE CONCAT('%', #{search.username}, '%')
+            </if>
+            <if test="search.content != null and search.content != ''">
+                and df.content LIKE CONCAT('%', #{search.content}, '%')
+            </if>
+            <if test="search.mobile != null and search.mobile != ''">
+                and dm.mobile LIKE CONCAT('%', #{search.mobile}, '%')
+            </if>
+        </where>
+        ORDER BY df.${search.property} ${search.order}
+        LIMIT #{search.offset}, #{search.limit}
+    </select>
+
+    <select id="countFeedback" resultType="int">
+        select count(df.id) from ds_feedback df left join ds_member dm on df.user_id = dm.id
+        <where>
+            <if test="search.username != null and search.username !=''">
+                and dm.nickname LIKE CONCAT('%', #{search.username}, '%')
+            </if>
+            <if test="search.content != null and search.content != ''">
+                and df.content LIKE CONCAT('%', #{search.content}, '%')
+            </if>
+            <if test="search.mobile != null and search.mobile != ''">
+                and dm.mobile LIKE CONCAT('%', #{search.mobile}, '%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

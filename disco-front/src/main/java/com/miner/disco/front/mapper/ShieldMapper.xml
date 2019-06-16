@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miner.disco.front.dao.ShieldMapper">
+    <insert id="saveUserId">
+        insert into ds_shield (mid,sid) values(#{mid},#{sid});
+    </insert>
+    <select id="queryUses" resultType="com.miner.disco.pojo.Shield">
+        select sid from ds_shield where mid=#{mid};
+    </select>
+</mapper>

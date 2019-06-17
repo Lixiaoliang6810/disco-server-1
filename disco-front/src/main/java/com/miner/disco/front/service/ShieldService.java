@@ -1,12 +1,12 @@
 package com.miner.disco.front.service;
 
-import com.miner.disco.pojo.Shield;
+import com.miner.disco.front.model.response.VipMemberListResponse;
 
 import java.util.List;
 
 public interface ShieldService {
 
-    boolean saveUserId(Long mid,Long sid);
 
-    List<Shield> queryUses(Long mid);
+    List<VipMemberListResponse> screenList(Long currentUserId, List<VipMemberListResponse> vips);
+
 }

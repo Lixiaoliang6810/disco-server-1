@@ -17,19 +17,19 @@
     <select id="queryByVip" parameterType="com.miner.disco.front.model.request.VipMemberListRequest"
             resultType="com.miner.disco.front.model.response.VipMemberListResponse">
         SELECT
-         m.id as userId,
-         m.avatar,
-         m.background_image,
-         m.gender,
-         m.label,
-         m.nickname,
-         m.recommend,
-         m.create_date,
-         m.update_date,
-         m.latitude,
-         m.longitude
+        m.id as userId,
+        m.avatar,
+        m.background_image,
+        m.gender,
+        m.label,
+        m.nickname,
+        m.recommend,
+        m.create_date,
+        m.update_date,
+        m.latitude,
+        m.longitude
         FROM
-            ds_member m
+        ds_member m
         WHERE m.vip = ${_BOOLEAN_STATUS_YES}
         <if test="nickname != null and nickname != ''">
             AND m.nickname LIKE CONCAT('%',#{nickname},'%')
@@ -46,16 +46,6 @@
         <if test="geohash != null and geohash != ''">
             AND m.geohash LIKE CONCAT(#{geohash},'%')
         </if>
-<!--        <if test="sid != null and sid !=''">-->
-<!--            AND m.id NOT IN-->
-<!--            <foreach collection="array" item="sid" open="(" separator="," close=")">-->
-<!--                #{id}-->
-<!--            </foreach>-->
-<!--        </if>-->
-    </select>
-
-    <select id="queryUser"  resultType="Long">
-        select id from ds_member where mobile= #{name}
     </select>
 
 </mapper>

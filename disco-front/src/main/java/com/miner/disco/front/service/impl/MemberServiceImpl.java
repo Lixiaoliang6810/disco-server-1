@@ -24,14 +24,13 @@ import com.miner.disco.front.model.response.FriendListResponse;
 import com.miner.disco.front.model.response.MemberMeCenterResponse;
 import com.miner.disco.front.model.response.MemberTaCenterResponse;
 import com.miner.disco.front.model.response.VipMemberListResponse;
+import com.miner.disco.front.service.MemberService;
 import com.miner.disco.netease.support.DefaultNeteaseImClient;
 import com.miner.disco.netease.support.domain.NeteaseImCreateModel;
 import com.miner.disco.netease.support.request.NeteaseImCreateRequest;
 import com.miner.disco.netease.support.response.NeteaseImCreateResponse;
 import com.miner.disco.pojo.Friend;
 import com.miner.disco.pojo.Member;
-import com.miner.disco.front.service.MemberService;
-import com.miner.disco.pojo.Shield;
 import com.miner.disco.pojo.VipApply;
 import com.spatial4j.core.context.SpatialContext;
 import com.spatial4j.core.distance.DistanceUtils;
@@ -46,7 +45,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -249,10 +251,5 @@ public class MemberServiceImpl implements MemberService {
     public Long chatSession(String imAccount) throws BusinessException {
         Member member = memberMapper.queryByImAccount(imAccount);
         return member == null ? -1L : member.getId();
-    }
-
-    @Override
-    public Long queryUser(String name) {
-         return memberMapper.queryUser(name);
     }
 }

@@ -1,10 +1,7 @@
 package com.miner.disco.front.dao;
 
-import java.util.List;
+import com.miner.disco.mybatis.support.BaseMapper;
+import com.miner.disco.pojo.Shield;
 
-public interface ShieldMapper  {
-
-    boolean saveUserId(Long mid,Long sid);
-
-    List<Long> queryUses(Long mid);
+public interface ShieldMapper extends BaseMapper<Shield> {
 }

@@ -35,5 +35,4 @@ public interface MemberService {
 
     Long chatSession(String imAccount) throws BusinessException;
 
-    Long queryUser(String name);
 }

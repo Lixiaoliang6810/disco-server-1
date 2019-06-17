@@ -78,22 +78,25 @@ public class MemberController {
     }
 
     @GetMapping(value = "/member/vip/list", headers = Const.API_VERSION_1_0_0)
-    public ViewData vips(VipMemberListRequest request) {
-        List<VipMemberListResponse> responses = memberService.vips(request);
-        return ViewData.builder().data(responses).message("玩家列表").build();
+//    @SuppressWarnings({"unchecked"})
+    public ViewData vips(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,VipMemberListRequest request){
+        // 获取附近广场玩家
+        List<VipMemberListResponse> vips =vips(request);
+
+        Long currentUserId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
+        // 筛除当前用户已屏蔽的玩家
+        List<VipMemberListResponse> screenedVipList = shieldService.screenList(currentUserId, vips);
+        return ViewData.builder().data(screenedVipList).message("玩家列表").build();
+    }
+
+    private List<VipMemberListResponse> vips(VipMemberListRequest request) {
+        return memberService.vips(request);
     }
 
     @GetMapping(value = "/member/chat/session")
     public ViewData chatSession(@RequestParam("imAccount") String imAccount) {
         Long id = memberService.chatSession(imAccount);
         return ViewData.builder().data(id).build();
-    }
-    @PostMapping(value = "/member/shielding/users")
-    public ViewData shieldingUsers( ShieldRequest request){
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long mid=memberService.queryUser(name);
-        shieldService.saveUserId(mid,request.getId());
-        return ViewData.builder().message("屏蔽列表").build();
     }
 
 

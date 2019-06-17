@@ -1,14 +1,20 @@
 package com.miner.disco.pojo;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+import javax.persistence.*;
+
+@Table(name = "ds_shield")
+@Entity
+@Data
 public class Shield {
     /**
      * 主键id
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     /**

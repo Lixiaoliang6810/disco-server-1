@@ -12,6 +12,7 @@ import com.miner.disco.front.model.response.VipMemberListResponse;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
 import com.miner.disco.front.service.MemberService;
 import com.miner.disco.front.service.ShieldService;
+import com.miner.disco.pojo.Shield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
@@ -78,13 +79,8 @@ public class MemberController {
 
     @GetMapping(value = "/member/vip/list", headers = Const.API_VERSION_1_0_0)
     public ViewData vips(VipMemberListRequest request) {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long mid = memberService.queryUser(name);
-        Long[] sid = shieldService.queryUses(mid);
-        List<VipMemberListResponse> responses = memberService.vips(request,sid);
+        List<VipMemberListResponse> responses = memberService.vips(request);
         return ViewData.builder().data(responses).message("玩家列表").build();
-        
-
     }
 
     @GetMapping(value = "/member/chat/session")

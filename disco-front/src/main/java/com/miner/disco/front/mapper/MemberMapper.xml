@@ -46,15 +46,15 @@
         <if test="geohash != null and geohash != ''">
             AND m.geohash LIKE CONCAT(#{geohash},'%')
         </if>
-        <if test="sid != null and sid !=''">
-            AND m.id NOT IN
-            <foreach collection="array" item="sid" open="(" separator="," close=")">
-                #{id}
-            </foreach>
-        </if>
+<!--        <if test="sid != null and sid !=''">-->
+<!--            AND m.id NOT IN-->
+<!--            <foreach collection="array" item="sid" open="(" separator="," close=")">-->
+<!--                #{id}-->
+<!--            </foreach>-->
+<!--        </if>-->
     </select>
 
-    <select id="queryUser"  resultType="com.miner.disco.pojo.Member">
+    <select id="queryUser"  resultType="Long">
         select id from ds_member where mobile= #{name}
     </select>
 

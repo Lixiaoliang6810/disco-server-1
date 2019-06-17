@@ -31,6 +31,7 @@ import com.miner.disco.netease.support.response.NeteaseImCreateResponse;
 import com.miner.disco.pojo.Friend;
 import com.miner.disco.pojo.Member;
 import com.miner.disco.front.service.MemberService;
+import com.miner.disco.pojo.Shield;
 import com.miner.disco.pojo.VipApply;
 import com.spatial4j.core.context.SpatialContext;
 import com.spatial4j.core.distance.DistanceUtils;
@@ -219,8 +220,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<VipMemberListResponse> vips(VipMemberListRequest request,Long[] sid) throws BusinessException {
-        List<VipMemberListResponse> responses = memberMapper.queryByVip(request,sid);
+    public List<VipMemberListResponse> vips(VipMemberListRequest request) throws BusinessException {
+        List<VipMemberListResponse> responses = memberMapper.queryByVip(request);
         DecimalFormat df = new DecimalFormat("######0.00");
         SpatialContext spatialContext = SpatialContext.GEO;
         if (responses == null) return Lists.newArrayList();

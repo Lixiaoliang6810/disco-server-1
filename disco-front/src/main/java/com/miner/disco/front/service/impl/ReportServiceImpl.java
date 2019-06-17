@@ -20,9 +20,7 @@ import java.util.Date;
  */
 @Service
 public class ReportServiceImpl implements ReportService {
-
-    private final ReportMapper reportMapper;
-
+    private ReportMapper reportMapper;
     @Autowired
     public ReportServiceImpl(ReportMapper reportMapper){
         this.reportMapper = reportMapper;

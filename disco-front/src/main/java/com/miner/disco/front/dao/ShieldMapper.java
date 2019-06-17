@@ -1,8 +1,10 @@
 package com.miner.disco.front.dao;
 
+import java.util.List;
+
 public interface ShieldMapper  {
 
     boolean saveUserId(Long mid,Long sid);
 
-    Long[] queryUses(Long mid);
+    List<Long> queryUses(Long mid);
 }

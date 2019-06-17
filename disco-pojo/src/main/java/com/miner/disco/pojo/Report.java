@@ -13,12 +13,10 @@ import java.util.Date;
  * @Date: 2019/6/16 17:00
  * @Description: TODO
  */
-@Table(name = "report")
+@Table(name = "ds_report")
 @Entity
 @Data
 public class Report {
-
-
     @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     /**
@@ -47,8 +45,8 @@ public class Report {
      */
     private Date createDate;
 
-    public Report(){
-        super();
-        this.createDate = new Date();
-    }
+//    public Report(){
+//        super();
+//        this.createDate = new Date();
+//    }
 }

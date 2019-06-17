@@ -17,7 +17,7 @@ public interface MemberMapper extends BasicMapper<Member> {
 
     Member queryByPrimaryKeyForUpdate(@Param("id") Long id);
 
-    List<VipMemberListResponse> queryByVip(VipMemberListRequest request,Long[] sid);
+    List<VipMemberListResponse> queryByVip(VipMemberListRequest request);
 
     Member queryByImAccount(@Param("imAccount") String imAccount);
 

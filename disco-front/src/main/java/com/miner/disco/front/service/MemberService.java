@@ -8,6 +8,7 @@ import com.miner.disco.front.model.response.MemberMeCenterResponse;
 import com.miner.disco.front.model.response.MemberTaCenterResponse;
 import com.miner.disco.front.model.response.VipMemberListResponse;
 import com.miner.disco.pojo.Member;
+import com.miner.disco.pojo.Shield;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface MemberService {
 
     MemberTaCenterResponse taCenter(Long currentUserId, Long userId) throws BusinessException;
 
-    List<VipMemberListResponse> vips(VipMemberListRequest request,Long[] sid ) throws BusinessException;
+    List<VipMemberListResponse> vips(VipMemberListRequest request) throws BusinessException;
 
     Long chatSession(String imAccount) throws BusinessException;
 

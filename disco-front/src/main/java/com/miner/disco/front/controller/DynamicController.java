@@ -49,6 +49,11 @@ public class DynamicController {
         List<DynamicsListResponse> response = dynamicService.list(request);
         return ViewData.builder().data(response).message("动态列表").build();
     }
+    @PostMapping("/dynamic/delete")
+    public ViewData dynamicDel(@RequestParam("id") Long id) {
+        dynamicService.del(id);
+        return ViewData.builder().message("删除动态成功").build();
+    }
 
     @GetMapping(value = "/dynamic/photos", headers = Const.API_VERSION_1_0_0)
     public ViewData photos(MemberPhotosRequest request) {

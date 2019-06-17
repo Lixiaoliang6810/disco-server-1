@@ -65,4 +65,13 @@ public class DynamicServiceImpl implements DynamicService {
         int index = request.getOffset() + request.getLimit();
         return temps.subList(request.getOffset(), temps.size() < index ? temps.size() - 1 : index);
     }
+
+    @Override
+    public void del(Long id) {
+        Dynamic del = new Dynamic();
+        del.setId(id);
+        del.setDeleted(DeleteStatus.DELETE.getKey());
+        del.setUpdateDate(new Date());
+        dynamicMapper.updateByPrimaryKey(del);
+    }
 }

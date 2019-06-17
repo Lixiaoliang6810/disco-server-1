@@ -47,7 +47,10 @@
             AND m.geohash LIKE CONCAT(#{geohash},'%')
         </if>
         <if test="sid != null and sid !=''">
-            AND NOT IN (#sid)
+            AND m.id NOT IN
+            <foreach collection="array" item="sid" open="(" separator="," close=")">
+                #{id}
+            </foreach>
         </if>
     </select>
 

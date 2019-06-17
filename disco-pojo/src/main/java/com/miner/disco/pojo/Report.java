@@ -1,8 +1,10 @@
 package com.miner.disco.pojo;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -11,11 +13,13 @@ import java.util.Date;
  * @Date: 2019/6/16 17:00
  * @Description: TODO
  */
-@Getter
-@Setter
+@Table(name = "report")
+@Entity
+@Data
 public class Report {
 
 
+    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     /**
      * 举报人id

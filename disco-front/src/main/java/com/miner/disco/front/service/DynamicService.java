@@ -19,5 +19,8 @@ public interface DynamicService {
 
     List<String> photos(MemberPhotosRequest request) throws BusinessException;
 
+//    void del(Long id);
+
+
     void del(Long id);
 }

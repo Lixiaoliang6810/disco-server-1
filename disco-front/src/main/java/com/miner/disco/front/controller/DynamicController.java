@@ -51,7 +51,7 @@ public class DynamicController {
     }
     @PostMapping("/dynamic/delete")
     public ViewData dynamicDel(@RequestParam("id") Long id) {
-        dynamicService.del(id);
+       dynamicService.del(id);
         return ViewData.builder().message("删除动态成功").build();
     }
 

@@ -1,7 +1,9 @@
 package com.miner.disco.front.service.impl;
 
 import com.google.common.collect.Lists;
+import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.constants.DeleteStatus;
+import com.miner.disco.basic.exception.BasicException;
 import com.miner.disco.basic.util.JsonParser;
 import com.miner.disco.front.dao.DynamicMapper;
 import com.miner.disco.front.exception.BusinessException;
@@ -70,8 +72,12 @@ public class DynamicServiceImpl implements DynamicService {
         return temps.subList(request.getOffset(), temps.size() < index ? temps.size() - 1 : index);
     }
 
+
+
     @Override
     public void del(Long id) {
+        Dynamic dynamic = dynamicMapper.queryByPrimaryKey(id);
+        Assert.notNull(dynamic,new BasicException("该动态已删除"));
         Dynamic del = new Dynamic();
         del.setId(id);
         del.setDeleted(DeleteStatus.DELETE.getKey());

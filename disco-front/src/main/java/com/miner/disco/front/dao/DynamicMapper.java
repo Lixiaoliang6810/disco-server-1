@@ -18,4 +18,6 @@ public interface DynamicMapper extends BasicMapper<Dynamic> {
 
     List<String> queryImagesByUserId(@Param("userId") Long userId);
 
+    void updateDeleted(Dynamic del);
+
 }

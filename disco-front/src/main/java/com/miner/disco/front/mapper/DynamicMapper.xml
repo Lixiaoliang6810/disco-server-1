@@ -30,5 +30,8 @@
         AND d.deleted = ${_DELETE_STATUS_NORMAL}
         ORDER BY d.create_date DESC
     </select>
+    <update id="updateDeleted" parameterType="com.miner.disco.pojo.Dynamic">
+        update ds_dynamic set deleted =2 where id =#{id}
+    </update>
 
 </mapper>

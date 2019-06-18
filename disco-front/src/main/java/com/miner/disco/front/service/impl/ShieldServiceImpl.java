@@ -56,4 +56,5 @@ public class ShieldServiceImpl implements ShieldService {
         criteria.andEqualTo("mid", currentUserId);
         return shieldMapper.selectByExample(example);
     }
+
 }

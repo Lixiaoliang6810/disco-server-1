@@ -352,7 +352,7 @@ public class OrdersServiceImpl implements OrdersService {
             throw new BusinessException(BusinessExceptionCode.CANNOT_JOIN_MYSELF_ASSEMBLE.getCode(), "不能加入自己发起的拼座");
         }
         OrdersInvitation ordersInvitation = ordersInvitationMapper.queryJoinedByUserIdAndOrdersId(userId, ordersId);
-        Assert.notNull(ordersInvitation, BusinessExceptionCode.REPEAT_APPLY_ASSEMBLE.getCode(), "该订单已申请，请勿重复申请");
+        Assert.isNull(ordersInvitation, BusinessExceptionCode.REPEAT_APPLY_ASSEMBLE.getCode(), "该订单已申请，请勿重复申请");
 
         orders = ordersMapper.queryByPrimaryKeyForUpdate(ordersId);
         if (orders.getAssembleSeatsSurplus() <= 0) {

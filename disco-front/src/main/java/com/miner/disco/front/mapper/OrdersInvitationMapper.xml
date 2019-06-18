@@ -23,6 +23,7 @@
           ds_orders_invitation oi
         WHERE oi.member_id = #{userId}
           AND oi.orders_id = #{ordersId}
+          AND oi.owner =2
           AND oi.status IN (1,2)
         LIMIT 1
     </select>

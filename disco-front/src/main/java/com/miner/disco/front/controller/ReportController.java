@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @ClassName ReportController
- * @Auther: wz1016_vip@163.com
+ * @Author: wz1016_vip@163.com
  * @Date: 2019/6/16 17:05
  * @Description: TODO
  */

@@ -4,7 +4,6 @@ import com.miner.disco.basic.model.response.ViewData;
 import com.miner.disco.front.consts.Const;
 import com.miner.disco.front.model.request.MemberInfoModifyRequest;
 import com.miner.disco.front.model.request.MemberRegisterRequest;
-import com.miner.disco.front.model.request.ShieldRequest;
 import com.miner.disco.front.model.request.VipMemberListRequest;
 import com.miner.disco.front.model.response.MemberMeCenterResponse;
 import com.miner.disco.front.model.response.MemberTaCenterResponse;
@@ -12,18 +11,14 @@ import com.miner.disco.front.model.response.VipMemberListResponse;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
 import com.miner.disco.front.service.MemberService;
 import com.miner.disco.front.service.ShieldService;
-import com.miner.disco.pojo.Shield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -78,7 +73,6 @@ public class MemberController {
     }
 
     @GetMapping(value = "/member/vip/list", headers = Const.API_VERSION_1_0_0)
-//    @SuppressWarnings({"unchecked"})
     public ViewData vips(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,VipMemberListRequest request){
         // 获取附近广场玩家
         List<VipMemberListResponse> vips =vips(request);

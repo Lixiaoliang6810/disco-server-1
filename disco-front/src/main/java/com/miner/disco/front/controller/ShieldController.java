@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @ClassName ShieldController
- * @Auther: wz1016_vip@163.com
+ * @Author: wz1016_vip@163.com
  * @Date: 2019/6/17 16:10
  * @Description: TODO
  */

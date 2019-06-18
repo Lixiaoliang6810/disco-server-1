@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 /**
  * @author Created by lubycoder@163.com 2018/11/15
  */
+
 public interface BasicMapper<T> {
 
     @InsertProvider(method = "insert", type = BasicSqlProvider.class)

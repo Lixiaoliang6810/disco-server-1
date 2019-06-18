@@ -76,6 +76,7 @@
             LEFT JOIN ds_merchant m ON o.seller = m.id
         WHERE o.assemble_seats = ${_BOOLEAN_STATUS_YES}
           AND o.assemble_seats_surplus > 0
+          AND o.status=2
         <if test="classifyId != null">
             AND m.classify_id = #{classifyId}
         </if>

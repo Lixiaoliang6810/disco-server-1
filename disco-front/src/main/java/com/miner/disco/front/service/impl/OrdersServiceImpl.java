@@ -254,6 +254,9 @@ public class OrdersServiceImpl implements OrdersService {
             saveMerchant.setFrozenBalance(merchant.getFrozenBalance().subtract(orders.getTotalMoney()));
             merchantMapper.updateByPrimaryKey(saveMerchant);
 
+            // 更新当前订单对应的拼桌详情（包括发起人和受邀人的拼桌信息）为已过期
+//            ordersInvitationMapper.updateByPrimaryKey();
+
         } catch (AlipayApiException e) {
             log.error("call ali pay sdk error", e);
             throw new BusinessException(BusinessExceptionCode.ORDERS_REFUND_FAILURE.getCode(), "退款失败");
@@ -314,11 +317,13 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public List<AssembleOrdersListResponse> assembleList(AssembleOrdersListRequest request) throws BusinessException {
         List<AssembleOrdersListResponse> responses = ordersMapper.queryAssembleList(request);
+        // 只显示拼桌状态未结束的列表--退款时。订单完成时，更新拼桌状态为已结束
         responses.forEach(o -> {
             List<OrdersInvitationResponse> invitationResponses = ordersInvitationMapper.queryJoinedByOrdersId(o.getOrdersId(),
                     String.valueOf(OrdersInvitation.STATUS.AGREE_JOIN.getKey()));
             o.setAssembleMembers(invitationResponses);
         });
+
         return responses;
     }
 

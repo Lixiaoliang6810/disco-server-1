@@ -9,6 +9,8 @@ import com.miner.disco.front.model.request.MemberPhotosRequest;
 import com.miner.disco.front.model.response.DynamicsListResponse;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
 import com.miner.disco.front.service.DynamicService;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

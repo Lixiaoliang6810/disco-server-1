@@ -61,13 +61,16 @@ public class OrdersController {
     private String paymentCallbackUrl;
 
     @PostMapping(value = "/orders/purchase", headers = Const.API_VERSION_1_0_0)
-    public ViewData purchase(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
-                             HttpServletRequest servletRequest,
+    public ViewData purchase(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication, HttpServletRequest servletRequest,
                              OrdersPurchaseRequest request) {
+        //根据请求头的名字获取对应的请求头的值
         UserAgent userAgent = UserAgent.parseUserAgentString(servletRequest.getHeader("User-Agent"));
+        //获取浏览器
         Browser browser = userAgent.getBrowser();
+        //获取操作系统
         OperatingSystem os = userAgent.getOperatingSystem();
         request.setChannel(browser, os);
+        //获取当前登录用户id
         Long uid = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
         request.setUserId(uid);
         Long ordersId = ordersService.purchase(request);

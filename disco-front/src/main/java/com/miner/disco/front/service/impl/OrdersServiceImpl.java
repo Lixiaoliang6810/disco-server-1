@@ -79,8 +79,9 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Long purchase(OrdersPurchaseRequest request) throws BusinessException {
+        //判断商品是否存在
         MerchantGoods merchantGoods = merchantGoodsMapper.queryByPrimaryKey(request.getGoodsId());
-        Assert.notNull(merchantGoods, BusinessExceptionCode.OBJECT_NOT_FOUND.getCode(), "商品不存在");
+        Assert.notNull(merchantGoods, BusinessExceptionCode.OBJECT_NOT_FOUND.getCode(),"商品不存在");
         Orders orders = (Orders) DtoTransition.trans(Orders.class, request);
         Assert.notNull(orders, BusinessExceptionCode.OBJECT_CONVERSION_ERROR.getCode(), "数据转换错误");
         String no = orderNo(request.getChannel(), request.getUserId(), merchantGoods.getMerchantId(), merchantGoods.getId());

@@ -13,7 +13,7 @@ import java.util.Date;
  * @Date: 2019/6/20 15:03
  * @Description: TODO 日期工具
  */
-public class DateUtils {
+public class DateHelper {
 
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String MINUTE_PATTERN = "yyyy-MM-dd HH:mm";
@@ -37,7 +37,7 @@ public class DateUtils {
             date = new Date();
         }
         if(!includeTime){
-            SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DATE_PATTERN);
+            SimpleDateFormat sdf = new SimpleDateFormat(DateHelper.DATE_PATTERN);
             date = sdf.parse(sdf.format(date));
         }
         Calendar cal = Calendar.getInstance();
@@ -55,7 +55,7 @@ public class DateUtils {
      */
     public static String dateFormat(Date date, String pattern) throws ParseException{
         if(StringUtils.isBlank(pattern)){
-            pattern = DateUtils.DATE_PATTERN;
+            pattern = DateHelper.DATE_PATTERN;
         }
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         return sdf.format(date);
@@ -70,7 +70,7 @@ public class DateUtils {
      */
     public static Date dateParse(String dateTimeString, String pattern) throws ParseException{
         if(StringUtils.isBlank(pattern)){
-            pattern = DateUtils.DATE_PATTERN;
+            pattern = DateHelper.DATE_PATTERN;
         }
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         return sdf.parse(dateTimeString);
@@ -83,7 +83,7 @@ public class DateUtils {
      * @throws ParseException
      */
     public static String dateTimeToDateString(Date dateTime) throws ParseException{
-        String dateTimeString = DateUtils.dateFormat(dateTime, DateUtils.DATE_TIME_PATTERN);
+        String dateTimeString = DateHelper.dateFormat(dateTime, DateHelper.DATE_TIME_PATTERN);
         return dateTimeString.substring(0, 10);
     }
 
@@ -95,7 +95,7 @@ public class DateUtils {
      * @throws ParseException
      */
     public static String dateTimeToDateStringIfTimeEndZero(Date dateTime) throws ParseException{
-        String dateTimeString = DateUtils.dateFormat(dateTime, DateUtils.DATE_TIME_PATTERN);
+        String dateTimeString = DateHelper.dateFormat(dateTime, DateHelper.DATE_TIME_PATTERN);
         if(dateTimeString.endsWith("00:00:00")){
             return dateTimeString.substring(0, 10);
         }else{

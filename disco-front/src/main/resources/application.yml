@@ -21,8 +21,7 @@ spring:
       poolPreparedStatements: true
       maxOpenPreparedStatements: 20
   profiles:
-#    active: '@spring.profiles.active@'
-    active: dev
+    active: '@spring.profiles.active@'
   jackson:
     #date-format: 'yyyy-MM-dd HH:mm:ss'
     #time-zone: "GMT+8"

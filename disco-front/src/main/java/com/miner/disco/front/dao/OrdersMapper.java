@@ -28,4 +28,5 @@ public interface OrdersMapper extends BasicMapper<Orders> {
 
     List<ApplyAssembleOrdersListResponse> queryApplyAssembleList(ApplyAssembleOrdersListRequest request);
 
+    void deleteOrders(String no);
 }

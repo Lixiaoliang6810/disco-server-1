@@ -47,6 +47,11 @@
         <if test="name != null and name != ''">
             AND m.name LIKE CONCAT('%',#{name},'%')
         </if>
+        ORDER BY
+        m.recommend DESC,
+        m.sort DESC,
+        m.score DESC,
+        m.update_date DESC
     </select>
 
     <select id="queryByPrimaryKeyFroUpdate" resultType="com.miner.disco.pojo.Merchant">

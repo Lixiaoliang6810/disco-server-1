@@ -15,6 +15,10 @@ import java.util.Date;
  */
 public class DateHelper {
 
+    public enum PATTERN{
+
+    }
+
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String MINUTE_PATTERN = "yyyy-MM-dd HH:mm";
     public static final String HOUR_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -29,10 +33,8 @@ public class DateHelper {
      * @param date 如果为Null，则为当前时间
      * @param days 加减天数
      * @param includeTime 是否包括时分秒,true表示包含
-     * @return
-     * @throws ParseException
      */
-    public static Date dateAdd(Date date, int days, boolean includeTime) throws ParseException{
+    public static Date addDays(Date date, int days, boolean includeTime) throws ParseException{
         if(date == null){
             date = new Date();
         }
@@ -50,10 +52,8 @@ public class DateHelper {
      * 时间格式化成字符串
      * @param date Date
      * @param pattern StrUtils.DATE_TIME_PATTERN || StrUtils.DATE_PATTERN， 如果为空，则为yyyy-MM-dd
-     * @return
-     * @throws ParseException
      */
-    public static String dateFormat(Date date, String pattern) throws ParseException{
+    public static String dateToStr(Date date, String pattern) throws ParseException{
         if(StringUtils.isBlank(pattern)){
             pattern = DateHelper.DATE_PATTERN;
         }
@@ -65,10 +65,8 @@ public class DateHelper {
      * 字符串解析成时间对象
      * @param dateTimeString String
      * @param pattern StrUtils.DATE_TIME_PATTERN || StrUtils.DATE_PATTERN，如果为空，则为yyyy-MM-dd
-     * @return
-     * @throws ParseException
      */
-    public static Date dateParse(String dateTimeString, String pattern) throws ParseException{
+    public static Date strToDate(String dateTimeString, String pattern) throws ParseException{
         if(StringUtils.isBlank(pattern)){
             pattern = DateHelper.DATE_PATTERN;
         }
@@ -83,7 +81,7 @@ public class DateHelper {
      * @throws ParseException
      */
     public static String dateTimeToDateString(Date dateTime) throws ParseException{
-        String dateTimeString = DateHelper.dateFormat(dateTime, DateHelper.DATE_TIME_PATTERN);
+        String dateTimeString = DateHelper.dateToStr(dateTime, DateHelper.DATE_TIME_PATTERN);
         return dateTimeString.substring(0, 10);
     }
 
@@ -95,7 +93,7 @@ public class DateHelper {
      * @throws ParseException
      */
     public static String dateTimeToDateStringIfTimeEndZero(Date dateTime) throws ParseException{
-        String dateTimeString = DateHelper.dateFormat(dateTime, DateHelper.DATE_TIME_PATTERN);
+        String dateTimeString = DateHelper.dateToStr(dateTime, DateHelper.DATE_TIME_PATTERN);
         if(dateTimeString.endsWith("00:00:00")){
             return dateTimeString.substring(0, 10);
         }else{
@@ -279,8 +277,8 @@ public class DateHelper {
      * @throws ParseException
      */
     public static int dateBetween(Date startDate, Date endDate) throws ParseException {
-        Date dateStart = dateParse(dateFormat(startDate, DATE_PATTERN), DATE_PATTERN);
-        Date dateEnd = dateParse(dateFormat(endDate, DATE_PATTERN), DATE_PATTERN);
+        Date dateStart = strToDate(dateToStr(startDate, DATE_PATTERN), DATE_PATTERN);
+        Date dateEnd = strToDate(dateToStr(endDate, DATE_PATTERN), DATE_PATTERN);
         return (int) ((dateEnd.getTime() - dateStart.getTime())/1000/60/60/24);
     }
 
@@ -363,7 +361,7 @@ public class DateHelper {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int value = cal.getActualMaximum(Calendar.DATE);
-        return dateParse(dateFormat(date, MONTH_PATTERN) + "-" + value, null);
+        return strToDate(dateToStr(date, MONTH_PATTERN) + "-" + value, null);
     }
 
     /**
@@ -376,7 +374,7 @@ public class DateHelper {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int value = cal.getActualMinimum(Calendar.DATE);
-        return dateParse(dateFormat(date, MONTH_PATTERN) + "-" + value, null);
+        return strToDate(dateToStr(date, MONTH_PATTERN) + "-" + value, null);
     }
 
     public static void main(String[] args) throws Exception {
@@ -393,7 +391,7 @@ public class DateHelper {
         //System.out.println(dateFormat(dateAddMonths(dateParse("2017-02-07", StrUtils.MONTH_PATTERN), -12), StrUtils.MONTH_PATTERN));
         /*System.out.println(dateFormat(maxDateOfMonth(dateParse("2016-02", "yyyy-MM")), null));*/
 //        System.out.println(dateFormat(minDateOfMonth(dateParse("2016-03-31", null)), null));
-        String s = dateFormat(dateAddMinutes(null, 15), DATE_TIME_PATTERN);
+        String s = dateToStr(dateAddMinutes(null, 15), DATE_TIME_PATTERN);
         Long timestamp = Timestamp.valueOf(s).getTime();
         System.out.println(timestamp);
 

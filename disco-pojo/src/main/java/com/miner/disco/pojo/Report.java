@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @ClassName Report
- * @Auther: wz1016_vip@163.com
+ * @Author: wz1016_vip@163.com
  * @Date: 2019/6/16 17:00
  * @Description: TODO
  */
@@ -25,10 +25,10 @@ public class Report {
      */
     private Long reporterId;
     /**
-     * 被举报人id
+     * 被举报的动态id
      *
      */
-    private Long reportedId;
+    private Long dynamicId;
     /**
      * 举报内容
      *
@@ -45,8 +45,8 @@ public class Report {
      */
     private Date createDate;
 
-//    public Report(){
-//        super();
-//        this.createDate = new Date();
-//    }
+    public Report(){
+        super();
+        this.createDate = new Date();
+    }
 }

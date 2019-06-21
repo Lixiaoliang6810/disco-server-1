@@ -22,7 +22,7 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/oauth/**", "/sms/code", "/member/register", "/error").permitAll()
-                .antMatchers("/index","/merchant/list","/member/vip/list","/dynamic/list","/orders/assemble/list").permitAll()
+                .antMatchers("/index","/merchant/**","/member/vip/**","/dynamic/list","/orders/assemble/list","/member/ta/center").permitAll()
                 .antMatchers("/member/login/password/reset", "/alipay/orders/notify").permitAll()
                 .antMatchers("/wxpay/orders/notify", "/version/check", "/alipay/sweep/notify", "/wxpay/sweep/notify").permitAll()
                 .anyRequest().authenticated()

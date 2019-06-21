@@ -15,7 +15,7 @@ public class AssembleOrdersListRequest extends Pagination implements Serializabl
 
     private static final long serialVersionUID = 2156258186064520920L;
 
-    private Integer classifyId;
+//    private Integer classifyId;
 
     private String merchantName;
 

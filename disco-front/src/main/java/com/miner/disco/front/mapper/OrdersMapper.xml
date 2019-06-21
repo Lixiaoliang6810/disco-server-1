@@ -77,9 +77,9 @@
         WHERE o.assemble_seats = ${_BOOLEAN_STATUS_YES}
           AND o.assemble_seats_surplus > 0
           AND o.status=2
-        <if test="classifyId != null">
-            AND m.classify_id = #{classifyId}
-        </if>
+<!--        <if test="classifyId != null">-->
+<!--            AND m.classify_id = #{classifyId}-->
+<!--        </if>-->
         <if test="merchantName != null and merchantName != ''">
             AND m.name LIKE CONCAT("%",CONCAT(#{merchantName},"%"))
         </if>
@@ -129,5 +129,8 @@
         ORDER BY oi.create_date DESC
         LIMIT #{offset},#{limit}
     </select>
+    <delete id="deleteOrders">
+        delete from  ds_orders where no = #{no}
+    </delete>
 
 </mapper>

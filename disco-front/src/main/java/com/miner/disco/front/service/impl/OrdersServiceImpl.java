@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -207,7 +208,19 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     @Transactional(readOnly = true)
     public List<OrdersListResponse> list(OrdersListRequest request) throws BusinessException {
-        return ordersMapper.queryByUserId(request);
+
+        List<OrdersListResponse> listResponses = ordersMapper.queryByUserId(request);
+        for (OrdersListResponse ordersList : listResponses){
+            Date createDate = ordersList.getCreateDate();
+            Long s1 =Timestamp.valueOf(createDate.toString()).getTime();
+            Long s2 =Timestamp.valueOf(new Date().toString()).getTime();
+
+            Long expireTime = Long.valueOf(15 * 60);
+            if (s2-s1>=expireTime){
+                ordersMapper.deleteOrders(ordersList.getNo());
+            }
+        }
+return null;
     }
 
     @Override

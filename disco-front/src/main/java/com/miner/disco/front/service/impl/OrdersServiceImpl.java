@@ -7,6 +7,7 @@ import com.miner.disco.alipay.support.model.request.AlipayRefundRequest;
 import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.BooleanStatus;
+import com.miner.disco.basic.util.DateHelper;
 import com.miner.disco.basic.util.DtoTransition;
 import com.miner.disco.basic.util.JsonParser;
 import com.miner.disco.basic.util.UidMaskUtils;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +66,7 @@ public class OrdersServiceImpl implements OrdersService {
     private CallbackNotifyMapper callbackNotifyMapper;
 
     @Resource(name = "redisTemplate")
+
     private ValueOperations<String, String> vOps;
 
     @Autowired
@@ -205,8 +209,25 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(rollbackFor = RuntimeException.class)
     public List<OrdersListResponse> list(OrdersListRequest request) throws BusinessException {
+
+        List<OrdersListResponse> list = ordersMapper.queryByUserId(request);
+        for (OrdersListResponse orders : list) {
+            if (orders.getStatus().equals(1)) {
+                //订单创建时间
+                Long creationTime  = orders.getCreateDate().getTime();
+                //当前系统时间
+                Long currentTime  = new Date().getTime();
+                Long l = currentTime - creationTime;
+                Long aLong = (long) (15 * 60 * 1000);
+                if (l-aLong>0){
+                    ordersMapper.deleteOrders(orders.getNo());
+
+                }
+            }
+
+        }
         return ordersMapper.queryByUserId(request);
     }
 

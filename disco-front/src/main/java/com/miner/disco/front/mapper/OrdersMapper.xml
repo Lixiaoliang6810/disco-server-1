@@ -129,5 +129,8 @@
         ORDER BY oi.create_date DESC
         LIMIT #{offset},#{limit}
     </select>
+   <delete id="deleteOrders">
+       DELETE FROM ds_orders WHERE no = #{no}
+   </delete>
 
 </mapper>

@@ -50,7 +50,10 @@ public class MemberController {
     @GetMapping(value = "/member/ta/center", headers = Const.API_VERSION_1_0_0)
     public ViewData homepage(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                              @RequestParam("userId") Long userId) {
-        Long currentUserId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
+        Long currentUserId = 0L;
+        if(oAuth2Authentication!=null){
+            currentUserId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
+        }
         MemberTaCenterResponse response = memberService.taCenter(currentUserId, userId);
         return ViewData.builder().data(response).message("他的主页").build();
     }
@@ -74,6 +77,10 @@ public class MemberController {
 
     @GetMapping(value = "/member/vip/list", headers = Const.API_VERSION_1_0_0)
     public ViewData vips(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,VipMemberListRequest request){
+        if(oAuth2Authentication==null){
+            List<VipMemberListResponse> vips = vips(request);
+            return ViewData.builder().data(vips).message("玩家列表").build();
+        }
         // 获取附近广场玩家
         List<VipMemberListResponse> vips =vips(request);
 

@@ -54,8 +54,10 @@ public class MerchantServiceImpl implements MerchantService {
         Assert.notNull(merchant, BusinessExceptionCode.OBJECT_NOT_FOUND.getCode(), "商家不存在");
         MerchantDetailsResponse response = (MerchantDetailsResponse) DtoTransition.trans(MerchantDetailsResponse.class, merchant);
         Assert.notNull(response, BusinessExceptionCode.OBJECT_CONVERSION_ERROR.getCode(), "数据转换错误");
-        Collect collect = collectMapper.queryByMerchantIdAndUserId(merchant.getId(), userId);
-        response.setCollected(collect == null ? BooleanStatus.NO.getKey() : BooleanStatus.YES.getKey());
+        if(userId!=null && userId!=0L){
+            Collect collect = collectMapper.queryByMerchantIdAndUserId(merchant.getId(), userId);
+            response.setCollected(collect == null ? BooleanStatus.NO.getKey() : BooleanStatus.YES.getKey());
+        }
         Integer totalEvaluate = merchantEvaluateMapper.countByMerchantId(merchantId);
         response.setTotalEvaluateCount(totalEvaluate != null ? totalEvaluate : 0);
         Calendar calendar = Calendar.getInstance();

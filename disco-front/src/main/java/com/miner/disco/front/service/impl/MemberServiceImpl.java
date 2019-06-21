@@ -216,8 +216,10 @@ public class MemberServiceImpl implements MemberService {
         Assert.notNull(member, BusinessExceptionCode.OBJECT_NOT_FOUND.getCode(), "该用户不存在");
         MemberTaCenterResponse response = (MemberTaCenterResponse) DtoTransition.trans(MemberTaCenterResponse.class, member);
         Assert.notNull(response, BusinessExceptionCode.OBJECT_CONVERSION_ERROR.getCode(), "数据转换错误");
-        Friend friend = friendMapper.queryByOwnAndHim(currentUserId, userId);
-        response.setFriended(friend != null ? BooleanStatus.YES.getKey() : BooleanStatus.NO.getKey());
+        if(userId!=0L){
+            Friend friend = friendMapper.queryByOwnAndHim(currentUserId, userId);
+            response.setFriended(friend != null ? BooleanStatus.YES.getKey() : BooleanStatus.NO.getKey());
+        }
         return response;
     }
 

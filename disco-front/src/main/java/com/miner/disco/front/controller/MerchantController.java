@@ -28,7 +28,10 @@ public class MerchantController {
     @GetMapping(value = "/merchant/details", headers = Const.API_VERSION_1_0_0)
     public ViewData details(@AuthenticationPrincipal OAuth2Authentication auth2Authentication,
                             @RequestParam("merchantId") Long merchantId) {
-        Long uid = ((CustomUserDetails) auth2Authentication.getPrincipal()).getId();
+        Long uid =0L;
+        if(auth2Authentication!=null){
+            uid = ((CustomUserDetails) auth2Authentication.getPrincipal()).getId();
+        }
         MerchantDetailsResponse detailsResponse = merchantService.details(uid, merchantId);
         return ViewData.builder().data(detailsResponse).message("商家详情").build();
     }

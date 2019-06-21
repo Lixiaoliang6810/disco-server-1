@@ -16,14 +16,14 @@ spring:
 
 ali:
   oss:
-    domain:
-    backname:
-    endpoint:
+    domain: http://mlfl-dev.oss-cn-shenzhen.aliyuncs.com/
+    backname: mlfl-dev
+    endpoint: http://oss-cn-shenzhen.aliyuncs.com
     sts:
-      access-key-id:
-      access-key-secret:
-      endpoint:
-      role-arn:
+      access-key-id: LTAIpASKuW140WkA
+      access-key-secret: crcjfvoEtGZkK4W3Y41mjPkLYBaoTq
+      endpoint: sts.aliyuncs.com
+      role-arn: acs:ram::1337245281555207:role/oss
   pay:
     pid:
     appid:

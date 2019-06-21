@@ -1,6 +1,7 @@
 package com.miner.disco.front.controller;
 
 import com.alipay.api.AlipayApiException;
+import com.aliyuncs.exceptions.ClientException;
 import com.miner.disco.alipay.support.AlipayService;
 import com.miner.disco.alipay.support.model.request.AlipayPreorderRequest;
 import com.miner.disco.alipay.support.model.response.AlipayPreorderResponse;
@@ -8,13 +9,20 @@ import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.Environment;
 import com.miner.disco.basic.model.response.ViewData;
+import com.miner.disco.basic.util.DateHelper;
+import com.miner.disco.basic.util.SMSHelper;
 import com.miner.disco.front.consts.Const;
+import com.miner.disco.front.dao.MerchantMapper;
 import com.miner.disco.front.exception.BusinessException;
 import com.miner.disco.front.exception.BusinessExceptionCode;
 import com.miner.disco.front.model.request.*;
 import com.miner.disco.front.model.response.*;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
+import com.miner.disco.front.service.MerchantService;
 import com.miner.disco.front.service.OrdersService;
+import com.miner.disco.front.service.SmsService;
+import com.miner.disco.front.service.impl.SmsServiceImpl;
+import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.Orders;
 import com.miner.disco.wxpay.support.WxpayService;
 import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
@@ -33,9 +41,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,6 +64,16 @@ public class OrdersController {
 
     @Autowired
     private WxpayService wxpayService;
+
+    @Autowired
+    private MerchantMapper merchantMapper;
+
+    private final SmsServiceImpl smsService;
+    @Autowired
+    public OrdersController(SmsServiceImpl smsService){
+        this.smsService = smsService;
+    }
+
 
     @Value("${server.environment}")
     private Environment environment;
@@ -78,23 +99,39 @@ public class OrdersController {
     }
 
     @PostMapping(value = "/orders/payment", headers = Const.API_VERSION_1_0_0)
-    public ViewData payment(HttpServletRequest servletRequest, OrdersPaymentRequest request) throws UnsupportedEncodingException {
+    public ViewData payment(HttpServletRequest servletRequest, OrdersPaymentRequest request) throws IOException, ClientException, ParseException {
         Orders orders = ordersService.queryByPrimaryKey(request.getOrdersId());
         Assert.notNull(orders, BusinessExceptionCode.ILLEGAL_OPERATION.getCode(), "非法操作");
         if (orders.getStatus().intValue() != Orders.STATUS.WAIT_PAYMENT.getKey()) {
             return ViewData.builder().data(BusinessExceptionCode.ORDERS_REPEATED_PAYMENT.getCode()).message("请勿重复支付").build();
         }
         String callbackParam = URLEncoder.encode(String.format("ordersId=%s&env=%s", orders.getId(), environment), BasicConst.UTF_8.displayName());
+        /*短信内容*/
+        String mobile = orders.getMobile();
+        String arrivalTime = DateHelper.dateToStr(orders.getArrivalTime(), DateHelper.MMDD_HHMM);
+        int assembleSeatsCount = orders.getAssembleSeatsCount()==0?1:orders.getAssembleSeatsCount()+1;
+        String amount = Integer.toString(assembleSeatsCount);
+        // 查店家手机
+        Long sellerId = orders.getSeller();
+        Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(sellerId);
+        String merchantMobile = merchant.getMobile();
         switch (request.getPm()) {
             case ALIPAY:
                 AlipayPreorderResponse appResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
-                return ViewData.builder().data(appResponse).message("支付宝预支付").build();
+                /*短信服务*/
+//                SMSHelper.sendChinaMessage(content,merchantMobile);
+                smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
+                return ViewData.builder().data(null).message("支付宝预支付").build();
             case WXPAY:
                 WxpayPreorderResponse response = wxpay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
+//                SMSHelper.sendChinaMessage(content,merchantMobile);
+                smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
                 return ViewData.builder().data(response).message("微信预支付").build();
             case WAP_ALIPAY:
                 AlipayPreorderResponse wapResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
-                return ViewData.builder().data(wapResponse).message("支付宝预支付").build();
+//                SMSHelper.sendChinaMessage(content,merchantMobile);
+                smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
+                return ViewData.builder().data(wapResponse).message("支付宝网页预支付").build();
             default:
                 return ViewData.builder().message("请选择支付方式").build();
         }

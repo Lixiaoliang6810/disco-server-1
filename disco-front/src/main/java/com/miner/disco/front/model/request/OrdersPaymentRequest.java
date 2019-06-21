@@ -3,6 +3,7 @@ package com.miner.disco.front.model.request;
 import com.miner.disco.basic.constants.BasicEnum;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.Serializable;
 
@@ -17,6 +18,10 @@ public class OrdersPaymentRequest implements Serializable {
 
     private Long ordersId;
     private PAYMENT_METHOD pm;
+
+    private String phoneNumbers;
+    private String arrivalTime;
+    private String amount;
 
 
     public enum PAYMENT_METHOD implements BasicEnum {

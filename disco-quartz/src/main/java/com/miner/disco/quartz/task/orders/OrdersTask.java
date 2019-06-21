@@ -43,6 +43,7 @@ public class OrdersTask {
             //当前订单集合
             List<Object> idList = redisTemplate.opsForHash().values(BasicConst.ORDERS_OVERTIME_LIST+":"+currentIndex);
             for (Object id : idList) {
+                assert threadPoolTaskExecutor != null;
                 threadPoolTaskExecutor.execute(new OrdersRunnable(ordersService, Long.parseLong(id.toString())));
             }
             //订单集合下标指向下一个集合

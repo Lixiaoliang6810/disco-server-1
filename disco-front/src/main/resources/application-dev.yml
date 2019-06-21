@@ -23,7 +23,7 @@ ali:
       access-key-id: LTAIpASKuW140WkA
       access-key-secret: crcjfvoEtGZkK4W3Y41mjPkLYBaoTq
       endpoint: sts.aliyuncs.com
-      role-arn: acs:ram::1337245281555207:role/oss
+      role-arn: acs:ram::1491560009961662:role/guest
   pay:
     pid:
     appid:
@@ -33,6 +33,9 @@ ali:
     sign-type:
     private-key:
     public-key:
+  sms:
+    access-key-id: LTAIuJYj6v2HApmG
+    access-key-secret: Q8vgnc9cgturX8nuaOul3IpSNY3BK3
 
 wechat:
   pay:

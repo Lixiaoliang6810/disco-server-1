@@ -74,6 +74,10 @@ public class MemberController {
 
     @GetMapping(value = "/member/vip/list", headers = Const.API_VERSION_1_0_0)
     public ViewData vips(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,VipMemberListRequest request){
+        if(oAuth2Authentication==null){
+            List<VipMemberListResponse> vips = vips(request);
+            return ViewData.builder().data(vips).message("玩家列表").build();
+        }
         // 获取附近广场玩家
         List<VipMemberListResponse> vips =vips(request);
 

@@ -125,7 +125,10 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant merchant = merchantMapper.queryByPrimaryKey(merchantId);
         String salt = Encrypt.MD5.encrypt(String.valueOf(merchantId));
         String key = UUID.randomUUID().toString().replaceAll("-", "");
-        BigDecimal discountPrice = amount.subtract(amount.multiply(merchant.getMemberRatio()));
+        BigDecimal discountPrice = amount;
+        if(merchant.getMemberRatio()!=null){
+            discountPrice = amount.subtract(amount.multiply(merchant.getMemberRatio()));
+        }
         String plaintext = String.format("disco://merchant/receivables?mchId=%s&amount=%s&coupon=%s&key=%s&salt=%s",
                 merchantId, discountPrice, coupon != null ? coupon : BasicConst.EMPTY, key, salt);
         String sign = Encrypt.HMACSHA.hmacSha1(plaintext, salt);

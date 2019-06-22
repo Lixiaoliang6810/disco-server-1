@@ -81,6 +81,9 @@ public class OrdersController {
     @Value("${server.payment-callback-url}")
     private String paymentCallbackUrl;
 
+    /**
+     * 点击‘立即支付’ 时生成订单，状态为 未支付：WAIT_PAYMENT
+     */
     @PostMapping(value = "/orders/purchase", headers = Const.API_VERSION_1_0_0)
     public ViewData purchase(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication, HttpServletRequest servletRequest,
                              OrdersPurchaseRequest request) {
@@ -98,6 +101,9 @@ public class OrdersController {
         return ViewData.builder().data(ordersId).message("下单成功").build();
     }
 
+    /**
+     * 点击‘立即支付’ 完成后，订单变为 已支付
+     */
     @PostMapping(value = "/orders/payment", headers = Const.API_VERSION_1_0_0)
     public ViewData payment(HttpServletRequest servletRequest, OrdersPaymentRequest request) throws IOException, ClientException, ParseException {
         Orders orders = ordersService.queryByPrimaryKey(request.getOrdersId());
@@ -121,7 +127,7 @@ public class OrdersController {
                 /*短信服务*/
 //                SMSHelper.sendChinaMessage(content,merchantMobile);
                 smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
-                return ViewData.builder().data(null).message("支付宝预支付").build();
+                return ViewData.builder().data(appResponse).message("支付宝预支付").build();
             case WXPAY:
                 WxpayPreorderResponse response = wxpay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
 //                SMSHelper.sendChinaMessage(content,merchantMobile);

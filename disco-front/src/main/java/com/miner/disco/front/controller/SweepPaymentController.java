@@ -70,6 +70,7 @@ public class SweepPaymentController {
         if (receivablesQrcode.getStatus().intValue() != MerchantReceivablesQrcode.STATUS.WAIT_PAYMENT.getKey()) {
             return ViewData.builder().status(BusinessExceptionCode.ORDERS_REPEATED_PAYMENT.getCode()).message("请勿重复支付").build();
         }
+        // 引导员id
         Long vipId = StringUtils.isNotBlank(coupon) ? ShareCodeUtils.codeToId(coupon) : -1;
         String callbackParam = URLEncoder.encode(String.format("qrcodeId=%s&mchId=%s&vipId=%s&memberId=%s&env=%s",
                 receivablesQrcode.getId(), receivablesQrcode.getMchId(), vipId, memberId, environment), BasicConst.UTF_8.displayName());

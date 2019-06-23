@@ -1,7 +1,6 @@
 package com.miner.disco.mch.controller;
 
 import com.miner.disco.basic.model.response.ViewData;
-import com.miner.disco.basic.util.Encrypt;
 import com.miner.disco.mch.consts.Const;
 import com.miner.disco.mch.model.request.MerchantApplyRequest;
 import com.miner.disco.mch.model.request.MerchantInfoModifyRequest;
@@ -19,9 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.security.Principal;
 
 /**
  * @author Created by lubycoder@163.com 2019/1/8
@@ -70,6 +67,7 @@ public class MerchantController {
     public ViewData receivablesQrcode(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                                       @RequestParam("amount") BigDecimal amount,
                                       @RequestParam(value = "coupon", required = false) String coupon) {
+        assert oAuth2Authentication!=null;
         Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
         ReceivablesQrcodeResponse response = merchantService.receivablesQrcode(merchantId, amount, coupon);
         return ViewData.builder().data(response).build();

@@ -2,7 +2,6 @@ package com.miner.disco.basic.util;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,11 +12,29 @@ import java.util.Date;
  * @Date: 2019/6/20 15:03
  * @Description: TODO 日期工具
  */
-public class DateHelper {
+public class DateHelper{
 
     public enum PATTERN{
+        YYYY_MM_DD_HH_MM_SS("yyyy-MM-dd HH:mm:ss"),
+        YYYY_MM_DD_HH_MM("yyyy-MM-dd HH:mm"),
+        YYYY_MM_DD("yyyy-MM-dd"),
+        YYYY_MM("yyyy-MM"),
+        MM_DD_HH_MM ("MM-dd HH:mm"),
+        YEAR("yyyy"),
+        HOUR("HH"),
+        MINUTE("mm"),
 
+        ;
+
+        String value;
+        PATTERN(String value) {
+            this.value = value;
+        }
+        public String value() {
+            return this.value;
+        }
     }
+
 
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String MINUTE_PATTERN = "yyyy-MM-dd HH:mm";
@@ -28,6 +45,8 @@ public class DateHelper {
     public static final String YEAR_PATTERN = "yyyy";
     public static final String MINUTE_ONLY_PATTERN = "mm";
     public static final String HOUR_ONLY_PATTERN = "HH";
+
+
 
     /**
      * 日期相加减天数
@@ -124,7 +143,7 @@ public class DateHelper {
      * @param hours 加减的小时
      * @return Date
      */
-    public static Date dateAddHours(Date startDate, int hours) {
+    public static Date addHours(Date startDate, int hours) {
         if (startDate == null) {
             startDate = new Date();
         }
@@ -140,7 +159,7 @@ public class DateHelper {
      * @param minutes 加减的分钟
      * @return
      */
-    public static Date dateAddMinutes(Date startDate, int minutes) {
+    public static Date addMinutes(Date startDate, int minutes) {
         if (startDate == null) {
             startDate = new Date();
         }
@@ -156,7 +175,7 @@ public class DateHelper {
      * @param seconds 加减的秒数
      * @return
      */
-    public static Date dateAddSeconds(Date startDate, int seconds) {
+    public static Date addSeconds(Date startDate, int seconds) {
         if (startDate == null) {
             startDate = new Date();
         }
@@ -172,7 +191,7 @@ public class DateHelper {
      * @param days 加减的天数
      * @return Date
      */
-    public static Date dateAddDays(Date startDate, int days) {
+    public static Date addDays(Date startDate, int days) {
         if (startDate == null) {
             startDate = new Date();
         }
@@ -188,7 +207,7 @@ public class DateHelper {
      * @param months 加减的月数
      * @return Date
      */
-    public static Date dateAddMonths(Date startDate, int months) {
+    public static Date addMonths(Date startDate, int months) {
         if (startDate == null) {
             startDate = new Date();
         }
@@ -204,7 +223,7 @@ public class DateHelper {
      * @param years 加减的年数
      * @return Date
      */
-    public static Date dateAddYears(Date startDate, int years) {
+    public static Date addYears(Date startDate, int years) {
         if (startDate == null) {
             startDate = new Date();
         }
@@ -378,25 +397,9 @@ public class DateHelper {
         return strToDate(dateToStr(date, MONTH_PATTERN) + "-" + value, null);
     }
 
-    public static void main(String[] args) throws Exception {
-//        System.out.println(dateTimeToDate(new Date()));
-//        System.out.println(dateParse("2017-02-04 14:58:20", null));
-//        System.out.println(dateTimeToDateStringIfTimeEndZero(new Date()));
-//        System.out.println(dateTimeToDateStringIfTimeEndZero(dateTimeToDate(new Date())));
-        //System.out.println(dateBetween(dateParse("2017-01-30", null), dateParse("2017-02-01", null)));
-        //System.out.println(dateBetweenIncludeToday(dateParse("2017-01-30", null), dateParse("2017-02-01", null)));
-//        System.out.println(getDate(dateParse("2017-01-17", null)));
-        /*
-        System.out.println(getDaysOfMonth(dateParse("2017-02-01", null)));
-        System.out.println(getDaysOfYear(dateParse("2017-01-30", null)));*/
-        //System.out.println(dateFormat(dateAddMonths(dateParse("2017-02-07", StrUtils.MONTH_PATTERN), -12), StrUtils.MONTH_PATTERN));
-        /*System.out.println(dateFormat(maxDateOfMonth(dateParse("2016-02", "yyyy-MM")), null));*/
-//        System.out.println(dateFormat(minDateOfMonth(dateParse("2016-03-31", null)), null));
-        String s = dateToStr(dateAddMinutes(null, 15), DATE_TIME_PATTERN);
-        Long timestamp = Timestamp.valueOf(s).getTime();
-        System.out.println(timestamp);
-
+    public static void main(String[] args) {
+        Date add = DateTime.on(new Date()).reduce(DateTime.HOUR, 1);
+        System.out.println(DateTime.format(add,DateTime.PATTERN.YYYY_MM_DD_HH_MM_SS.value));
     }
-
 
 }

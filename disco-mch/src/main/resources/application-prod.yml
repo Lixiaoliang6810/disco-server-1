@@ -1,6 +1,6 @@
 server:
   environment: RELEASE
-  payment-callback-url: http://127.0.01
+  payment-callback-url: http://127.0.0.1
 
 spring:
   datasource:

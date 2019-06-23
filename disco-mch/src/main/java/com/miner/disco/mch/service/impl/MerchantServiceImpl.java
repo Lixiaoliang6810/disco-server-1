@@ -119,6 +119,14 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantMapper.queryByMobile(mobile) != null;
     }
 
+    /**
+     * 生成收款码--确认优惠折扣
+     * @param merchantId
+     * @param amount
+     * @param coupon
+     * @return
+     * @throws MchBusinessException
+     */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public ReceivablesQrcodeResponse receivablesQrcode(Long merchantId, BigDecimal amount, String coupon) throws MchBusinessException {
@@ -126,8 +134,11 @@ public class MerchantServiceImpl implements MerchantService {
         String salt = Encrypt.MD5.encrypt(String.valueOf(merchantId));
         String key = UUID.randomUUID().toString().replaceAll("-", "");
         BigDecimal discountPrice = amount;
-        if(merchant.getMemberRatio()!=null){
-            discountPrice = amount.subtract(amount.multiply(merchant.getMemberRatio()));
+        // 扫描引导员优惠码时才折扣
+        if(StringUtils.isNotBlank(coupon)){
+            if(merchant.getMemberRatio()!=null){
+                discountPrice = amount.subtract(amount.multiply(merchant.getMemberRatio()));
+            }
         }
         String plaintext = String.format("disco://merchant/receivables?mchId=%s&amount=%s&coupon=%s&key=%s&salt=%s",
                 merchantId, discountPrice, coupon != null ? coupon : BasicConst.EMPTY, key, salt);

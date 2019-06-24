@@ -83,23 +83,19 @@ public class SmsController {
 //     * @param amount 人数
 //     */
 //    @GetMapping(value = "/sms/orderNotify",headers = Const.API_VERSION_1_0_0)
-//    public ViewData newOrderSmsNotify(@RequestParam("mobile") String phoneNumbers,
+//    public ViewData newOrderSmsNotify(@RequestParam("receivePhone") String receivePhone,
+//                                      @RequestParam("mobile") String phoneNumbers,
 //                                      @RequestParam("arrivalTime") String arrivalTime,
 //                                      @RequestParam("amount") String amount) throws ClientException {
 //
-//        SendSmsResponse sendSmsResponse = smsService.newOrderSmsNotify(phoneNumbers, arrivalTime, amount);
+//        SendSmsResponse sendSmsResponse = smsService.newOrderSmsNotify(receivePhone,phoneNumbers, arrivalTime, amount);
 //
 //        if (null != sendSmsResponse.getCode() && "OK".equals(sendSmsResponse.getCode())) {
-//            //请求成功
-//            System.out.println("=====success====");
 //            return ViewData.builder().message("新订单短信提醒成功").build();
 //        } else {
-//            System.out.println("=====fail=======");
-//            return ViewData.builder().message("短信发送超时").build();
+//            return ViewData.builder().message(sendSmsResponse.getMessage()).build();
 //        }
 //    }
 
-    public static void main(String[] args) throws ClientException {
-//         newOrderSmsNotify("17316290556","18:00",2);
-    }
+
 }

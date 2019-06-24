@@ -9,8 +9,7 @@ import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.Environment;
 import com.miner.disco.basic.model.response.ViewData;
-import com.miner.disco.basic.util.DateHelper;
-import com.miner.disco.basic.util.SMSHelper;
+import com.miner.disco.basic.util.DateTime;
 import com.miner.disco.front.consts.Const;
 import com.miner.disco.front.dao.MerchantMapper;
 import com.miner.disco.front.exception.BusinessException;
@@ -18,9 +17,7 @@ import com.miner.disco.front.exception.BusinessExceptionCode;
 import com.miner.disco.front.model.request.*;
 import com.miner.disco.front.model.response.*;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
-import com.miner.disco.front.service.MerchantService;
 import com.miner.disco.front.service.OrdersService;
-import com.miner.disco.front.service.SmsService;
 import com.miner.disco.front.service.impl.SmsServiceImpl;
 import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.Orders;
@@ -42,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -114,8 +110,8 @@ public class OrdersController {
         String callbackParam = URLEncoder.encode(String.format("ordersId=%s&env=%s", orders.getId(), environment), BasicConst.UTF_8.displayName());
         /*短信内容*/
         String mobile = orders.getMobile();
-        String arrivalTime = DateHelper.dateToStr(orders.getArrivalTime(), DateHelper.MMDD_HHMM);
-        int assembleSeatsCount = orders.getAssembleSeatsCount()==0?1:orders.getAssembleSeatsCount()+1;
+        String arrivalTime = DateTime.format(orders.getArrivalTime(),DateTime.PATTERN.MM_DD_HH_MM.value());
+        int assembleSeatsCount = (orders.getAssembleSeatsCount()==null|| orders.getAssembleSeatsCount()==0)?1:orders.getAssembleSeatsCount()+1;
         String amount = Integer.toString(assembleSeatsCount);
         // 查店家手机
         Long sellerId = orders.getSeller();
@@ -132,7 +128,7 @@ public class OrdersController {
                 WxpayPreorderResponse response = wxpay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
 //                SMSHelper.sendChinaMessage(content,merchantMobile);
                 smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
-                return ViewData.builder().data(response).message("微信预支付").build();
+                return ViewData.builder().data(response).message("0").build();
             case WAP_ALIPAY:
                 AlipayPreorderResponse wapResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
 //                SMSHelper.sendChinaMessage(content,merchantMobile);

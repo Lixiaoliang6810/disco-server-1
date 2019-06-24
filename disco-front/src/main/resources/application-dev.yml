@@ -33,9 +33,9 @@ ali:
     sign-type:
     private-key:
     public-key:
-  sms:
-    access-key-id: LTAIuJYj6v2HApmG
-    access-key-secret: Q8vgnc9cgturX8nuaOul3IpSNY3BK3
+#  sms:
+#    access-key-id: LTAIuJYj6v2HApmG
+#    access-key-secret: Q8vgnc9cgturX8nuaOul3IpSNY3BK3
 
 wechat:
   pay:

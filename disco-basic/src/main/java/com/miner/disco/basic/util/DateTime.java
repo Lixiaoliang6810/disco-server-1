@@ -44,6 +44,11 @@ public class DateTime implements Serializable {
         PATTERN(String value) {
             this.value = value;
         }
+
+        public String value() {
+            return this.value;
+        }
+
     }
 
     /** 年 <p>可以通过DateTime.now().get(DateTime.YEAR)来获取当前时间的年</p>*/

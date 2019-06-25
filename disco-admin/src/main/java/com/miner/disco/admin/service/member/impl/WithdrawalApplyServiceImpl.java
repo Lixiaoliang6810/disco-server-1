@@ -3,6 +3,7 @@ package com.miner.disco.admin.service.member.impl;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayFundTransToaccountTransferResponse;
 import com.miner.disco.admin.dao.member.MemberBankDao;
+import com.miner.disco.admin.dao.member.MemberDao;
 import com.miner.disco.admin.dao.member.WithdrawalApplyDao;
 import com.miner.disco.admin.exception.AdminBuzException;
 import com.miner.disco.admin.exception.AdminBuzExceptionCode;
@@ -15,11 +16,13 @@ import com.miner.disco.alipay.support.model.request.AlipayTransferRequest;
 import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.model.response.PageResponse;
 import com.miner.disco.basic.util.JsonParser;
+import com.miner.disco.pojo.Member;
 import com.miner.disco.pojo.MemberBank;
 import com.miner.disco.pojo.WithdrawalApply;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +43,8 @@ public class WithdrawalApplyServiceImpl implements WithdrawalApplyService {
     @Autowired
     private MemberBankDao memberBankDao;
 
+    @Autowired
+    private MemberDao memberDao;
     @Override
     public PageResponse findPage(WithdrawalApplyRequest search) throws AdminBuzException {
         List<WithdrawalApplyResponse> dates = withdrawalApplyDao.queryPage(search);
@@ -79,6 +84,7 @@ public class WithdrawalApplyServiceImpl implements WithdrawalApplyService {
         update.setStatus(status);
         update.setReviewUserId(reviewUserId);
 
+        // 审核通过后才更改余额
         if (status == WithdrawalApply.STATUS.ADOPT_APPLY.getKey()){
             log.info("================ start ali pay applyId = {}, reviewUserId={} ======================", id, reviewUserId);
             AlipayTransferRequest alipayTransferRequest = new AlipayTransferRequest();
@@ -94,6 +100,13 @@ public class WithdrawalApplyServiceImpl implements WithdrawalApplyService {
                 String matadata = JsonParser.serializeToJson(response.getBody());
                 log.info(" response matadata = {} ", matadata);
                 update.setMatadata(matadata);
+
+                // 更改余额
+                Member member = memberDao.queryByPrimaryKeyForUpdate(withdrawalApply.getUserId());
+                Member updateMember = new Member();
+                BeanUtils.copyProperties(member,updateMember);
+                updateMember.setBalance(updateMember.getBalance().subtract(withdrawalApply.getAmount()));
+                memberDao.updateByPrimaryKey(updateMember);
                 if (!response.isSuccess()){
                     String subCode = response.getSubCode();
                     message = AliPayErrorCode.ERROR_CODE.get(subCode);

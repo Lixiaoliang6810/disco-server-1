@@ -45,10 +45,10 @@ public class WithdrawalApplyServiceImpl implements WithdrawalApplyService {
         }
         member = memberMapper.queryByPrimaryKeyForUpdate(request.getUserId());
 
-        Member saveMember = new Member();
-        saveMember.setId(member.getId());
-        saveMember.setBalance(member.getBalance().subtract(request.getAmount()));
-        memberMapper.updateByPrimaryKey(saveMember);
+//        Member saveMember = new Member();
+//        saveMember.setId(member.getId());
+//        saveMember.setBalance(member.getBalance().subtract(request.getAmount()));
+//        memberMapper.updateByPrimaryKey(saveMember);
 
         WithdrawalApply withdrawalApply = new WithdrawalApply();
         withdrawalApply.setUserId(member.getId());

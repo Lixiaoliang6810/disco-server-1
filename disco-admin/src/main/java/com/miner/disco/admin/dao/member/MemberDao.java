@@ -16,4 +16,6 @@ public interface MemberDao extends BasicMapper<Member> {
     List<MemberListResponse> memberList(@Param("search") MemberSearchRequest search);
 
     int countMember(@Param("search") MemberSearchRequest search);
+
+    Member queryByPrimaryKeyForUpdate(@Param("id") Long id);
 }

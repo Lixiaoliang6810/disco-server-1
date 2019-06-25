@@ -4,20 +4,20 @@
 
     <select id="memberList" resultType="com.miner.disco.admin.model.response.member.MemberListResponse">
         SELECT dm.id,
-                dm.mobile,
-                dm.nickname,
-                dm.realname,
-                dm.invite_code,
-                dm.gender,
-                dm.balance,
-                dm.integral,
-                dm.vip,
-                dm.recommend,
-                dm.leader,
-                dm.last_login_date,
-                dm.update_date,
-                dm.create_date
-          FROM ds_member dm
+        dm.mobile,
+        dm.nickname,
+        dm.realname,
+        dm.invite_code,
+        dm.gender,
+        dm.balance,
+        dm.integral,
+        dm.vip,
+        dm.recommend,
+        dm.leader,
+        dm.last_login_date,
+        dm.update_date,
+        dm.create_date
+        FROM ds_member dm
         <include refid="conditionSql" />
         ORDER BY dm.${search.property} ${search.order}
         LIMIT #{search.offset}, #{search.limit}
@@ -27,7 +27,7 @@
         SELECT COUNT(1) FROM ds_member dm
         <include refid="conditionSql" />
     </select>
-    
+
     <sql id="conditionSql">
         <where>
             <if test="search.mobile != null and search.mobile != ''">
@@ -44,5 +44,7 @@
             </if>
         </where>
     </sql>
-
+    <select id="queryByPrimaryKeyForUpdate" resultType="com.miner.disco.pojo.Member">
+        SELECT * FROM ds_member WHERE id = #{id} FOR UPDATE
+    </select>
 </mapper>

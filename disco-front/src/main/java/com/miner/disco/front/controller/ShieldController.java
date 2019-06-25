@@ -38,9 +38,11 @@ public class ShieldController {
     public ViewData shield(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication, ShieldRequest request){
         Long currentUserId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
         assert request.getId()!=null;
+//        request.setId(1247L);
         if(currentUserId.intValue() == request.getId().intValue()){
             return ViewData.builder().message("不能屏蔽自己").build();
         }
+
         // 获取当前用户屏蔽的用户id
         shieldService.shield(currentUserId,request);
         return ViewData.builder().message("屏蔽成功").build();

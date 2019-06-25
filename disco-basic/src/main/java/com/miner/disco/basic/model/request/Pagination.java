@@ -9,9 +9,9 @@ public class Pagination implements Serializable {
 
     private static final long serialVersionUID = -6918683184646606870L;
 
-    private Integer offset;
+    private Integer offset=1;
 
-    private Integer limit;
+    private Integer limit=20;
 
     private String order = "DESC";
 

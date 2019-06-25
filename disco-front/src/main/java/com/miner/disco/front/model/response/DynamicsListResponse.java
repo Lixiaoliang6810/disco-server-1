@@ -1,5 +1,6 @@
 package com.miner.disco.front.model.response;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
+@EqualsAndHashCode
 public class DynamicsListResponse implements Serializable {
 
     private static final long serialVersionUID = -5260315560270882659L;

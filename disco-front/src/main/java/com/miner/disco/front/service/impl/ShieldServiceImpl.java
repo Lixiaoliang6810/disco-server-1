@@ -50,7 +50,8 @@ public class ShieldServiceImpl implements ShieldService {
 //        reduce.parallelStream().forEach(System.out :: println);
     }
 
-    private List<Shield> getShieldList(Long currentUserId) {
+    @Override
+    public List<Shield> getShieldList(Long currentUserId) {
         Example example = new Example(Shield.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("mid", currentUserId);

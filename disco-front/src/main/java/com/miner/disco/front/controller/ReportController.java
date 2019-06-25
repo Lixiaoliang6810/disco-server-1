@@ -2,10 +2,13 @@ package com.miner.disco.front.controller;
 
 import com.miner.disco.basic.model.response.ViewData;
 import com.miner.disco.front.consts.Const;
+import com.miner.disco.front.dao.DynamicMapper;
 import com.miner.disco.front.model.request.ReportRequest;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
+import com.miner.disco.front.service.DynamicService;
 import com.miner.disco.front.service.ReportService;
 import com.miner.disco.front.service.impl.ReportServiceImpl;
+import com.miner.disco.pojo.Dynamic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -38,9 +41,9 @@ public class ReportController {
     @PostMapping(value = "/dynamic/report", headers = Const.API_VERSION_1_0_0)
     public ViewData report(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                            ReportRequest request) {
+        assert request.getDynamicId()!=null && request.getDynamicId()>0L;
         Long reporterId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
-        reportService.report(reporterId,request);
-        return ViewData.builder().message("举报成功").build();
+        return reportService.report(reporterId,request);
     }
 
 }

@@ -5,6 +5,7 @@ import com.miner.disco.front.model.request.DynamicsListRequest;
 import com.miner.disco.front.model.request.MemberPhotosRequest;
 import com.miner.disco.front.model.request.ReportRequest;
 import com.miner.disco.front.model.response.DynamicsListResponse;
+import com.miner.disco.front.model.response.VipMemberListResponse;
 
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface DynamicService {
 
 
     void del(Long id);
+
+    List<DynamicsListResponse> screenList(Long currentUserId, List<DynamicsListResponse> dynamics);
 }

@@ -24,10 +24,6 @@ ali:
       access-key-secret: crcjfvoEtGZkK4W3Y41mjPkLYBaoTq
       endpoint: sts.aliyuncs.com
       role-arn: acs:ram::1491560009961662:role/guest
-
-
-
-
   pay:
     pid: 2088431105730903
     appid: 2019010462858024

@@ -11,19 +11,25 @@ import com.miner.disco.front.model.request.DynamicsListRequest;
 import com.miner.disco.front.model.request.MemberPhotosRequest;
 import com.miner.disco.front.model.request.ReportRequest;
 import com.miner.disco.front.model.response.DynamicsListResponse;
+import com.miner.disco.front.model.response.VipMemberListResponse;
+import com.miner.disco.front.service.ShieldService;
 import com.miner.disco.pojo.Dynamic;
 import com.miner.disco.front.service.DynamicService;
 import com.miner.disco.pojo.Report;
+import com.miner.disco.pojo.Shield;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Created by lubycoder@163.com 2018/12/24
@@ -34,6 +40,9 @@ public class DynamicServiceImpl implements DynamicService {
 
     @Autowired
     private DynamicMapper dynamicMapper;
+
+    @Autowired
+    private ShieldService shieldService;
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -84,4 +93,21 @@ public class DynamicServiceImpl implements DynamicService {
         del.setUpdateDate(new Date());
         dynamicMapper.updateByPrimaryKey(del);
     }
+
+    @Override
+    public List<DynamicsListResponse> screenList(Long currentUserId, List<DynamicsListResponse> dynamics) {
+        // 获取当前用户的屏蔽列表
+        List<Shield> shieldList = shieldService.getShieldList(currentUserId);
+        // 获取 屏蔽列表中的人 的所有动态
+        HashSet<DynamicsListResponse> dynamicSet = new HashSet<>();
+        DynamicsListRequest request = new DynamicsListRequest();
+        shieldList.forEach(shield -> {
+            request.setUserId(shield.getSid());
+            List<DynamicsListResponse> responses = dynamicMapper.queryList(request);
+            dynamicSet.addAll(responses);
+        });
+        return dynamics.stream().filter(m->!dynamicSet.stream().map(DynamicsListResponse::getId).collect(Collectors.toList()).contains(m.getId())).collect(Collectors.toList());
+    }
+
+
 }

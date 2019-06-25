@@ -14,12 +14,14 @@ import java.util.Date;
 public class DynamicsListResponse implements Serializable {
 
     private static final long serialVersionUID = -5260315560270882659L;
-
+    /**
+     * 动态ID
+     */
+    private Long id;
     /**
      * 用户ID
      */
     private Long userId;
-
     /**
      * 头像
      */

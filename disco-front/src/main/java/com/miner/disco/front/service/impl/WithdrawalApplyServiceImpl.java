@@ -51,7 +51,7 @@ public class WithdrawalApplyServiceImpl implements WithdrawalApplyService {
 //        memberMapper.updateByPrimaryKey(saveMember);
 
         WithdrawalApply withdrawalApply = new WithdrawalApply();
-        withdrawalApply.setUserId(member.getId());
+        withdrawalApply.setUserId(request.getUserId());
         withdrawalApply.setBankId(request.getBankId());
         withdrawalApply.setAmount(request.getAmount());
         withdrawalApply.setCreateDate(new Date());
@@ -64,6 +64,7 @@ public class WithdrawalApplyServiceImpl implements WithdrawalApplyService {
                 UidMaskUtils.idToCode(member.getId()),
                 System.currentTimeMillis());
         MemberBill memberBill = new MemberBill();
+        memberBill.setUserId(member.getId());
         memberBill.setSerialNo(sno);
         memberBill.setType(MemberBill.TYPE.OUT.getKey());
         memberBill.setSourceId(withdrawalApply.getId());

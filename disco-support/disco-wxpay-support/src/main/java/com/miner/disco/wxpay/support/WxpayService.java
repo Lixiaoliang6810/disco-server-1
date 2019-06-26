@@ -49,7 +49,7 @@ public class WxpayService {
         wechatParam.put("spbill_create_ip", "127.0.0.1");
         wechatParam.put("notify_url", request.getCallbackUrl());
         wechatParam.put("out_trade_no", request.getOutTradeNo());
-        wechatParam.put("trade_type", "APP");
+        wechatParam.put("trade_type", request.getTradeType());
         wechatParam.put("attach", request.getCallbackParam());
         wechatParam.put("sign_type", WXPayConstants.MD5);
         try {

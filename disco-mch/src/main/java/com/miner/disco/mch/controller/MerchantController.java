@@ -35,6 +35,9 @@ public class MerchantController {
         return ViewData.builder().data(merchantId).message("注册成功").build();
     }
 
+    /**
+     * 商家入驻申请
+     */
     @PostMapping(value = "/merchant/apply", headers = Const.API_VERSION_1_0_0)
     public ViewData apply(MerchantApplyRequest request) {
         merchantService.apply(request);

@@ -20,5 +20,7 @@ public class WxpayPreorderResponse implements Serializable {
     private String paySign;
     private String partnerid;
     private String prepayid;
+    private String codeUrl;
+    private String returnCode;
 
 }

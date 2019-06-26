@@ -1,11 +1,10 @@
 package com.miner.disco.mch.controller;
 
 import com.miner.disco.basic.model.response.ViewData;
+import com.miner.disco.basic.util.Encrypt;
 import com.miner.disco.mch.consts.Const;
-import com.miner.disco.mch.model.request.MerchantApplyRequest;
-import com.miner.disco.mch.model.request.MerchantInfoModifyRequest;
-import com.miner.disco.mch.model.request.MerchantRegisterRequest;
-import com.miner.disco.mch.model.request.MerchantRestPasswordRequest;
+import com.miner.disco.mch.model.request.*;
+import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
 import com.miner.disco.mch.oauth.model.CustomUserDetails;
@@ -18,7 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.security.Principal;
 
 /**
  * @author Created by lubycoder@163.com 2019/1/8
@@ -35,9 +37,6 @@ public class MerchantController {
         return ViewData.builder().data(merchantId).message("注册成功").build();
     }
 
-    /**
-     * 商家入驻申请
-     */
     @PostMapping(value = "/merchant/apply", headers = Const.API_VERSION_1_0_0)
     public ViewData apply(MerchantApplyRequest request) {
         merchantService.apply(request);
@@ -68,20 +67,27 @@ public class MerchantController {
 
     @PostMapping(value = "/merchant/receivables/qrcode", headers = Const.API_VERSION_1_0_0)
     public ViewData receivablesQrcode(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
-                                      @RequestParam("amount") BigDecimal amount,
-                                      @RequestParam(value = "coupon", required = false) String coupon) {
-        assert oAuth2Authentication!=null;
-        Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
-        ReceivablesQrcodeResponse response = merchantService.receivablesQrcode(merchantId, amount, coupon);
+                                      @RequestParam("winePrice") BigDecimal winePrice,
+                                      @RequestParam("foodPrice") BigDecimal foodPrice,
+                                      @RequestParam(value = "coupon", required = false) String coupon,
+                                      HttpServletRequest servletRequest) throws UnsupportedEncodingException {
+        Long merchantId = 31L;
+//        Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
+        ReceivablesQrcodeRequest receivablesQrcodeRequest = new ReceivablesQrcodeRequest();
+        receivablesQrcodeRequest.setMerchantId(merchantId);
+        receivablesQrcodeRequest.setCoupon(coupon);
+        receivablesQrcodeRequest.setWinePrice(winePrice);
+        receivablesQrcodeRequest.setFoodPrice(foodPrice);
+        ReceivablesQrcodeResponse response = merchantService.receivablesQrcode(receivablesQrcodeRequest, servletRequest);
         return ViewData.builder().data(response).build();
     }
 
     @GetMapping(value = "/merchant/receivables/status", headers = Const.API_VERSION_1_0_0)
     public ViewData receivablesStatus(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
-                                      @RequestParam("key") String key) {
+                                      @RequestParam("outTradeNo") String outTradeNo) {
         Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
-        Integer status = merchantService.receivablesStatus(merchantId, key);
-        return ViewData.builder().data(status).build();
+        CheckReceivablesStatusResponse checkReceivablesStatusResponse = merchantService.receivablesStatus(merchantId, outTradeNo);
+        return ViewData.builder().data(checkReceivablesStatusResponse).build();
     }
 
 }

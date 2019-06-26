@@ -19,5 +19,6 @@ public class MerchantGoodsCreateRequest implements Serializable {
     private String images;
     private Long merchantId;
     private BigDecimal price;
+    private BigDecimal minimumCharge;
 
 }

@@ -41,7 +41,7 @@ public class MerchantGoodsServiceImpl implements MerchantGoodsService {
         Assert.notNull(merchantGoods, MchBusinessExceptionCode.OBJECT_CONVERSION_ERROR.getCode(), "数据转换错误");
         merchantGoods.setStatus(MerchantGoods.STATUS.UPPER.getKey());
         merchantGoods.setDeleted(DeleteStatus.NORMAL.getKey());
-        merchantGoods.setMinimumCharge(request.getPrice());
+        merchantGoods.setMinimumCharge(request.getMinimumCharge());
         merchantGoods.setSalesVolume(0);
         merchantGoods.setCreateDate(new Date());
         merchantGoods.setUpdateDate(new Date());

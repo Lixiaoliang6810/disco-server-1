@@ -15,6 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -81,6 +82,8 @@ public class WxpayService {
 
             WxpayPreorderResponse response = new WxpayPreorderResponse();
             response.setPrepayid(wechatResultMap.get("prepay_id"));
+            response.setCodeUrl(wechatResultMap.get("code_url"));
+            response.setReturnCode(wechatResultMap.get("return_code"));
             response.setAppId(appid);
             response.setTimeStamp(resultMap.get("timestamp"));
             response.setNonceStr(resultMap.get("noncestr"));

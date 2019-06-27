@@ -9,23 +9,17 @@ import com.miner.disco.front.dao.DynamicMapper;
 import com.miner.disco.front.exception.BusinessException;
 import com.miner.disco.front.model.request.DynamicsListRequest;
 import com.miner.disco.front.model.request.MemberPhotosRequest;
-import com.miner.disco.front.model.request.ReportRequest;
 import com.miner.disco.front.model.response.DynamicsListResponse;
-import com.miner.disco.front.model.response.VipMemberListResponse;
+import com.miner.disco.front.service.DynamicService;
 import com.miner.disco.front.service.ShieldService;
 import com.miner.disco.pojo.Dynamic;
-import com.miner.disco.front.service.DynamicService;
-import com.miner.disco.pojo.Report;
 import com.miner.disco.pojo.Shield;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Example;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -69,14 +63,24 @@ public class DynamicServiceImpl implements DynamicService {
     public List<String> photos(MemberPhotosRequest request) throws BusinessException {
         log.error("uid {} offset {} limit {}", request.getUserId(), request.getOffset(), request.getLimit());
         List<String> images = dynamicMapper.queryImagesByUserId(request.getUserId());
-        if (images.isEmpty()) return Lists.newArrayList();
+        if (images.isEmpty()) {
+            return Lists.newArrayList();
+        }
         List<String> temps = Lists.newArrayList();
         images.forEach(img -> {
-            if (StringUtils.isNotBlank(img)) temps.addAll(JsonParser.deserializeByJson(img, List.class));
+            if (StringUtils.isNotBlank(img)) {
+                temps.addAll(JsonParser.deserializeByJson(img, List.class));
+            }
         });
-        if (temps.isEmpty()) return temps;
-        if (request.getOffset() <= 0 && temps.size() <= request.getLimit()) return temps;
-        if (temps.size() <= request.getOffset()) return Lists.newArrayList();
+        if (temps.isEmpty()) {
+            return temps;
+        }
+        if (request.getOffset() <= 0 && temps.size() <= request.getLimit()) {
+            return temps;
+        }
+        if (temps.size() <= request.getOffset()) {
+            return Lists.newArrayList();
+        }
         int index = request.getOffset() + request.getLimit();
         return temps.subList(request.getOffset(), temps.size() < index ? temps.size() - 1 : index);
     }
@@ -106,7 +110,7 @@ public class DynamicServiceImpl implements DynamicService {
             List<DynamicsListResponse> responses = dynamicMapper.queryList(request);
             dynamicSet.addAll(responses);
         });
-        return dynamics.stream().filter(m->!dynamicSet.stream().map(DynamicsListResponse::getId).collect(Collectors.toList()).contains(m.getId())).collect(Collectors.toList());
+        return dynamics.stream().filter(m->!dynamicSet.stream().map(DynamicsListResponse::getDynamicId).collect(Collectors.toList()).contains(m.getDynamicId())).collect(Collectors.toList());
     }
 
 

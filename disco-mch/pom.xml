@@ -140,6 +140,17 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.miner.disco</groupId>
+            <artifactId>disco-alipay-support</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.miner.disco</groupId>
+            <artifactId>disco-wxpay-support</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>

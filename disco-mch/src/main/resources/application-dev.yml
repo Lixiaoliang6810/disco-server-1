@@ -15,14 +15,14 @@ spring:
 
 ali:
   oss:
-    domain: http://disco-dev.oss-cn-shenzhen.aliyuncs.com/
-    backname: disco-dev
+    domain: http://mlfl.oss-cn-shenzhen.aliyuncs.com/
+    backname: mlfl
     endpoint: http://oss-cn-shenzhen.aliyuncs.com
     sts:
-      access-key-id: LTAIEf95IGNR4GHP
-      access-key-secret: n6pQmoYV7XdXrSOyX1oT403gXt8i1g
+      access-key-id: LTAIxMYVXASvQxNG
+      access-key-secret: PYNzn9YBTgHSRsDJrFqAJ9plD6T9y4
       endpoint: sts.aliyuncs.com
-      role-arn: acs:ram::1404459949468992:role/oss
+      role-arn: acs:ram::1337245281555207:role/oss
   pay:
     pid: 2088431105730903
     appid: 2019010462858024

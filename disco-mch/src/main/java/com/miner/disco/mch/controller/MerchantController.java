@@ -71,8 +71,7 @@ public class MerchantController {
                                       @RequestParam("foodPrice") BigDecimal foodPrice,
                                       @RequestParam(value = "coupon", required = false) String coupon,
                                       HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-        Long merchantId = 31L;
-//        Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
+        Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
         ReceivablesQrcodeRequest receivablesQrcodeRequest = new ReceivablesQrcodeRequest();
         receivablesQrcodeRequest.setMerchantId(merchantId);
         receivablesQrcodeRequest.setCoupon(coupon);

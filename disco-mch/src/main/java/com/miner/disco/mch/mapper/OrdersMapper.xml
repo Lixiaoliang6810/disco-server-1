@@ -15,6 +15,7 @@
             o.total_money,
             o.create_date,
             o.payment_date,
+            o.number,
             m.`name` AS merchantName,
             mg.`name` AS goodsName
         FROM
@@ -43,6 +44,7 @@
             o.create_date,
             o.payment_date,
             o.refund_date,
+            o.number,
             m.`name` as merchantName,
             m.address,
             m.latitude,

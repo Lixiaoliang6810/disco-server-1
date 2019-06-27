@@ -18,5 +18,6 @@ public class WxpayPreorderRequest implements Serializable {
     private String outTradeNo;
     private String callbackUrl;
     private String callbackParam;
+    private String tradeType = "NATIVE";
 
 }

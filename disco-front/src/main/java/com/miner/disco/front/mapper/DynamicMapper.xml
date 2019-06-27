@@ -4,7 +4,7 @@
 
     <select id="queryList" parameterType="com.miner.disco.front.model.request.DynamicsListRequest" resultType="com.miner.disco.front.model.response.DynamicsListResponse">
         SELECT
-            dy.id,
+            dy.id as dynamicId,
             dy.user_id,
             dy.content,
             dy.images,

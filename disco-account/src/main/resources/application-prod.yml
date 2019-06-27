@@ -1,0 +1,44 @@
+server:
+  environment: RELEASE
+  payment-callback-url: http://127.0.0.1
+
+spring:
+  datasource:
+    url: jdbc:mysql://47.111.183.12:3306/disco?characterEncoding=utf-8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: mlfl#disco&MySQl7789!
+  redis:
+    host: 47.111.183.12
+    port: 6379
+    password: mlfl#disco@reDis7789!
+
+ali:
+  oss:
+    domain: http://mlfl.oss-cn-shenzhen.aliyuncs.com/
+    backname: mlfl
+    endpoint: http://oss-cn-shenzhen.aliyuncs.com
+    sts:
+      access-key-id: LTAIxMYVXASvQxNG
+      access-key-secret: PYNzn9YBTgHSRsDJrFqAJ9plD6T9y4
+      endpoint: sts.aliyuncs.com
+      role-arn: acs:ram::1337245281555207:role/oss
+  pay:
+    pid: 2088431105730903
+    appid: 2019010462858024
+    format: json
+    charset: UTF-8
+    gateway: https://openapi.alipay.com/gateway.do
+    sign-type: RSA2
+    private-key: MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCUeqKaiUrsCcRvaI6iVZCiQV9xekkasSeIYSnPc44Ed2FypviGAjcrDIj16Dnbz7+H3uo1iZESadAAPZkUIcXnfL9vTzSSXLd64t58NvZz0mC6d4KZgfT6zGYW4G+zlfdATLzDw44dvGJDUevOryhvqPLYZvW0Fv24IAMirtKzfWtc4M4CPrw224Jv5lA1mXgOBc2IR1w1juXO4XF9efDEgxLkhkWm5hBRi8eLn9AZ36gDh6zffhoG54VvJTAqjyYxrNaK3X/h2/Sobqw9SnRmlbclr3c7pWQqGCiDL9G8wufwi6PYhSCJaomfg6SVbMBVi1iRuk+gpz9ckM6Q362RAgMBAAECggEAGsbfCjWWUGkWhuz5RCdgNRLLDqD6DBlEwuCa9LGnPAD3jwCzsx81KctR698ciBq4NN2rqUoM4qA4hcKWF75bfXrO31kOZxLXeA7wBsC2w35+OUKSR/La5lv0UU3ady2lcHAmXrumppAxvGhKuXR3O2Phn8s5pme7C/ih+CBFGV9PhIJ6q9gmFV0HJEvPMmV4FwkUEsPI9qhS4pvn4b4ohsbdQ6RbFqDSJ8aql6YTXop0+k+ik9Y1bF7EH+AbPYD6ClZkuLsyPDa2e2zEv3jsvh22xQM4OBe8/BuWPuL/UzmITC57fmxj+GdudKu3mi0MXmhy6G+U0eqavSwYoRu/0QKBgQDQA0NZui4v9JcDm0cXogvbdmWZK8q5oBsnfPEYMbipg8zXfe+12JSNWowr6KwVgI5fJv7GQKmNUOPorxaMVYjOOxUh4SQo+8gzhl2/1zRvrwHaPDp4Ltt5FocrUIa893mO5DKwCGvVBRfESMvt6UjsfRJ6HJJt6f6LoULKCSxeJQKBgQC2u3QZ7jN3JqB/D9HlEo2fcMOYPTZ77sWbTBhdrcmXBzIrfcXJVdjkOiYA003xTH49V+WmzLuG1B4R9eCcIS1BQbjNDKs3w66hWtTmVCiZG/C41Q2xzbGoR7um1D01pVHDJTJAwFq+O5+fq3KtVtmsZI0zbrZQBG5V8tKwkkMn/QKBgCIUNsePghunNcqIeQg9KzYkWpbSnt70hR5eEN3G35seFcRERK6FMilKaWaUMwU+z5R1Pg5a76xQUVaAwO/y33vyIA8x5Iu2XGFcpSVV66hUgrgvX+DqxFg9QZ3uDnUNEmQ/rLI8XvZCZFdrGcX7j0/3WbyZy7+oM2TK4bdZ82PlAoGAJLlJnQh9OV3+9WpFgacX5UoxVQBAWenjttE1OGZ71ClzEMCHJm5lV4DEMHhG+s6ntEZc9gfBTFiG7o8eo+IbCTlfHX6FToC6MN1jWiLhwduWpl7TEL/JC4vXD7Ep2AUwiGqKTe8ajY7IBrvbITEKMBZJNmPyqeQqFIXnh+rtKjUCgYB6bfPvLdNKGcs6gtQf9fuF5+MOCNbbwfVhH5HSfhwgn0s5EcqsdjzLbOGhPVqnXGOE83EYmL44gt1/Lf/GlB27wWIZgrXwugCE/53lWp+X1A5aJ2sdYPlERmVS5nYjsbHJR2g+uZtIQUc5BXkD/Y+LuYwygt2YYZVP5N6j0NDrWA==
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkhBGwFKqJ+RQuSVSEM1s6olSyty+HwZvApPlJ2zm8EM616aLOEYF5kjeOCNP6mDP0Ryg+zCb5XUF2FfNMwaKpOmZ4XmWHaY4AYmafUBQzrEzKrU7/mYtEW9wXfsJgdoc46UzbdDpK6QxywhsgPbv9sI0WV/eLDauOwhvP7lwtpb/P38/x6iS5yKTpEq7mwWA786eVQkdETuvOsXIGynvRH5WgBNjk4E4ZbNfQURJOrWAMiugh6raVPwj2jQ+7GjVWaUlj8YCxLoUGsAOqjKWfR5alfpfcLMJV2jlB6q52wcs5zKFsUHSlqzH4pSK+2nPc0co04ByLTG9u9WspKFADwIDAQAB
+
+wechat:
+  pay:
+    app-id: wx1ef5fd586908e6cc
+    mch-id: 1523752031
+    api-secret: wXcKfRudjBpVfmcHSNjOpIzn8DCHj5Ov
+
+netease:
+  im:
+    app-key: 03647a4a7b3c324cc5d0b0520d9a48ad
+    app-secret: e28abf902b40

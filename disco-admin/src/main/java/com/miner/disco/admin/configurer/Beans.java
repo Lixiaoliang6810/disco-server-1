@@ -3,6 +3,7 @@ package com.miner.disco.admin.configurer;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.miner.disco.alipay.support.AlipayService;
+import com.miner.disco.wxpay.support.WxpayService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class Beans {
-
     @Value("${ali.pay.gateway}")
     String gateway;
     @Value("${ali.pay.appid}")
@@ -29,6 +29,8 @@ public class Beans {
     String charset;
 
 
+
+
     @Bean(name = "alipayClient")
     public AlipayClient alipayClient() {
         return new DefaultAlipayClient(gateway, appid, privateKey, format, charset, publicKey, signType);
@@ -39,4 +41,6 @@ public class Beans {
     public AlipayService alipayService() {
         return new AlipayService().setAlipayClient(alipayClient());
     }
+
+
 }

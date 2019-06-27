@@ -75,6 +75,7 @@ public class MerchantServiceImpl implements MerchantService {
         List<MerchantListResponse> responses = merchantMapper.search(request);
         DecimalFormat df = new DecimalFormat("######0.00");
         SpatialContext spatialContext = SpatialContext.GEO;
+        // 计算定位点与 responses 的所有商家计算距离
         responses.forEach(m -> {
             Double distance = spatialContext.calcDistance(spatialContext.makePoint(request.getLongitude(), request.getLatitude()),
                     spatialContext.makePoint(m.getLongitude(), m.getLatitude())) * DistanceUtils.DEG_TO_KM;
@@ -94,4 +95,5 @@ public class MerchantServiceImpl implements MerchantService {
         int index = request.getOffset() + request.getLimit();
         return responses.subList(request.getOffset(), responses.size() < index ? responses.size() - 1 : index);
     }
+
 }

@@ -96,5 +96,9 @@ public class OrdersDetailsResponse implements Serializable {
      * 订单二维码
      */
     private String qrcode;
+    /**
+     * 预定人数
+     */
+    private Integer number;
 
 }

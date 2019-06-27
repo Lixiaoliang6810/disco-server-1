@@ -19,7 +19,7 @@ public class DynamicsListResponse implements Serializable {
     /**
      * 动态ID
      */
-    private Long id;
+    private Long dynamicId;
     /**
      * 用户ID
      */

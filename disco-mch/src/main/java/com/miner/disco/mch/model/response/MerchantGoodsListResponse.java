@@ -28,6 +28,10 @@ public class MerchantGoodsListResponse implements Serializable {
      */
     private BigDecimal price;
     /**
+     * 最低消费
+     */
+    private BigDecimal minimumCharge;
+    /**
      * 商品图片
      */
     private String images;

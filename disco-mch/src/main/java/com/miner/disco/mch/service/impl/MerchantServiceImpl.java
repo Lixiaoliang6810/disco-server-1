@@ -158,8 +158,8 @@ public class MerchantServiceImpl implements MerchantService {
         }else if (useragent!=null && useragent.contains("MicroMessenger")){
             return wxpayment(receivablesQrcodeRequest,servletRequest);
         }else {
-            return alipayment(receivablesQrcodeRequest,servletRequest);
-//            return wxpayment(receivablesQrcodeRequest,servletRequest);
+//            return alipayment(receivablesQrcodeRequest,servletRequest);
+            return wxpayment(receivablesQrcodeRequest,servletRequest);
         }
     }
 
@@ -169,7 +169,9 @@ public class MerchantServiceImpl implements MerchantService {
         wxpayPreorderRequest.setDetail("线上预定");
         wxpayPreorderRequest.setOutTradeNo(sn);
 //        wxpayPreorderRequest.setCallbackParam(callbackParam);
-        wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
+        // 线上记得打开
+//        wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
+        wxpayPreorderRequest.setTotalFee(amount.toPlainString());
 //        String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
         wxpayPreorderRequest.setCallbackUrl(String.format("%s%s", callbackUrl, "/wxpay/orders/notify"));
         return wxpayPreorderRequest;
@@ -209,7 +211,7 @@ public class MerchantServiceImpl implements MerchantService {
         response.setOriginalPrice(totalPrice);
         BigDecimal responseDiscountPrice = discountPrice;
         response.setDiscountPrice(new BigDecimal(decimalFormat.format(responseDiscountPrice)));
-        System.out.println("收款码："+response.getQrcode());
+//        System.out.println("收款码："+response.getQrcode());
         return response;
     }
 
@@ -255,7 +257,7 @@ public class MerchantServiceImpl implements MerchantService {
         try {
             alipayTradePrecreateResponse = alipayService.qrcodePreorder(alipayPreorderRequest);
             log.info(alipayTradePrecreateResponse.getBody());
-            if (!alipayTradePrecreateResponse.getCode().equals("10000")) {
+            if (!"10000".equals(alipayTradePrecreateResponse.getCode())) {
                 throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
             }
         } catch (AlipayApiException e) {

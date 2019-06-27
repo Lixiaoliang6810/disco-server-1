@@ -22,7 +22,7 @@ public class WebResponseExceptionTranslator extends DefaultWebResponseExceptionT
                     .status(oAuth2Exception.getHttpErrorCode())
                     .body(new CustomOauthException(oAuth2Exception.getMessage()));
         }
-        return this.translate(e);
+        return null;
     }
 
 }

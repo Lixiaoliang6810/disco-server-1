@@ -11,8 +11,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class WxpayPreorderResponse implements Serializable {
-
-
     private String packageStr = "Sign=WXPay";
     private String appId;
     private String timeStamp;
@@ -22,5 +20,6 @@ public class WxpayPreorderResponse implements Serializable {
     private String prepayid;
     private String codeUrl;
     private String returnCode;
+    private String returnMsg;
 
 }

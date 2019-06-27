@@ -82,8 +82,20 @@ public class AlipayService {
         model.setPayeeRealName(request.getPayeeRealname());
         model.setPayeeType(request.getPayeeType().name());
         alipayFundTransToaccountTransferRequest.setBizModel(model);
-        AlipayFundTransToaccountTransferResponse response = alipayClient.execute(alipayFundTransToaccountTransferRequest);
-        return response;
+        return alipayClient.execute(alipayFundTransToaccountTransferRequest);
+    }
+
+    public AlipayTradePrecreateResponse qrcodePreorder(AlipayPreorderRequest request) throws AlipayApiException {
+        AlipayTradePrecreateRequest alipayTradePrecreateRequest = new AlipayTradePrecreateRequest();
+        AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
+        model.setOutTradeNo(request.getOutTradeNo());
+        model.setTotalAmount(request.getTotalAmount());
+        model.setTimeoutExpress(request.getTimeoutExpress());
+        model.setBody(request.getBody());
+        model.setSubject(request.getSubject());
+        alipayTradePrecreateRequest.setBizModel(model);
+        alipayTradePrecreateRequest.setNotifyUrl(request.getCallbackUrl());
+        return alipayClient.execute(alipayTradePrecreateRequest);
     }
 
 }

@@ -22,6 +22,7 @@ public class OrdersListResponse implements Serializable {
     private String merchantName;
     private String fullname;
     private String mobile;
+    private Integer number;
     private BigDecimal totalMoney;
     private String salutation;
     private Date arrivalTime;

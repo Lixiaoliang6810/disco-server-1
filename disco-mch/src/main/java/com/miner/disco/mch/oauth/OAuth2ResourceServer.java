@@ -23,6 +23,8 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
                 .antMatchers("/oauth/**", "/sms/code", "/error").permitAll()
                 .antMatchers("/merchant/register", "/version/check", "/oss/authorize").permitAll()
                 .antMatchers("/classify/selector", "/merchant/apply", "/merchant/password/reset").permitAll()
+                .antMatchers("/aggregate/alipay/sweep/notify").permitAll()
+                .antMatchers("/merchant/receivables/qrcode").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().permitAll()
                 .and().logout().permitAll()

@@ -49,7 +49,7 @@ public class WxpayService {
         wechatParam.put("spbill_create_ip", "127.0.0.1");
         wechatParam.put("notify_url", request.getCallbackUrl());
         wechatParam.put("out_trade_no", request.getOutTradeNo());
-        wechatParam.put("trade_type", "APP");
+        wechatParam.put("trade_type", request.getTradeType());
         wechatParam.put("attach", request.getCallbackParam());
         wechatParam.put("sign_type", WXPayConstants.MD5);
         try {
@@ -81,6 +81,8 @@ public class WxpayService {
 
             WxpayPreorderResponse response = new WxpayPreorderResponse();
             response.setPrepayid(wechatResultMap.get("prepay_id"));
+            response.setCodeUrl(wechatResultMap.get("code_url"));
+            response.setReturnCode(wechatResultMap.get("return_code"));
             response.setAppId(appid);
             response.setTimeStamp(resultMap.get("timestamp"));
             response.setNonceStr(resultMap.get("noncestr"));

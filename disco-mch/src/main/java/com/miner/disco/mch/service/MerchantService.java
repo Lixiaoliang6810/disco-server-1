@@ -1,13 +1,13 @@
 package com.miner.disco.mch.service;
 
 import com.miner.disco.mch.exception.MchBusinessException;
-import com.miner.disco.mch.model.request.MerchantApplyRequest;
-import com.miner.disco.mch.model.request.MerchantInfoModifyRequest;
-import com.miner.disco.mch.model.request.MerchantRegisterRequest;
-import com.miner.disco.mch.model.request.MerchantRestPasswordRequest;
+import com.miner.disco.mch.model.request.*;
+import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 
 /**
@@ -25,10 +25,10 @@ public interface MerchantService {
 
     boolean exist(String mobile) throws MchBusinessException;
 
-    ReceivablesQrcodeResponse receivablesQrcode(Long merchantId, BigDecimal amount, String coupon) throws MchBusinessException;
+    ReceivablesQrcodeResponse receivablesQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) throws MchBusinessException, UnsupportedEncodingException;
 
     MerchantDetailsResponse details(Long merchantId) throws MchBusinessException;
 
-    Integer receivablesStatus(Long merchantId, String key) throws MchBusinessException;
+    CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException;
 
 }

@@ -83,6 +83,7 @@ public class WxpayService {
             WxpayPreorderResponse response = new WxpayPreorderResponse();
             response.setPrepayid(wechatResultMap.get("prepay_id"));
             response.setCodeUrl(wechatResultMap.get("code_url"));
+            response.setReturnMsg(wechatResultMap.get("return_msg"));
             response.setReturnCode(wechatResultMap.get("return_code"));
             response.setAppId(appid);
             response.setTimeStamp(resultMap.get("timestamp"));

@@ -260,7 +260,7 @@
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
         <!--测试环境-->
@@ -277,7 +277,7 @@
                 <spring.profiles.active>prod</spring.profiles.active>
             </properties>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
         </profile>
     </profiles>

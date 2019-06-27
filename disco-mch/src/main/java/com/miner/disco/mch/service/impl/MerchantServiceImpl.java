@@ -157,6 +157,8 @@ public class MerchantServiceImpl implements MerchantService {
             return alipayment(receivablesQrcodeRequest,servletRequest);
         }else if (useragent!=null && useragent.contains("MicroMessenger")){
             return wxpayment(receivablesQrcodeRequest,servletRequest);
+        }else if (useragent!=null && useragent.contains("Android")){
+            return wxpayment(receivablesQrcodeRequest,servletRequest);
         }else {
 //            return alipayment(receivablesQrcodeRequest,servletRequest);
             return wxpayment(receivablesQrcodeRequest,servletRequest);

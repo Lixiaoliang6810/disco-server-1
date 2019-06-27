@@ -263,7 +263,7 @@ public class MerchantServiceImpl implements MerchantService {
                 throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
             }
         } catch (AlipayApiException e) {
-            log.error("call alipay api error e={}", e.getErrMsg());
+            log.error("call wxpay api error e={}", e.getErrMsg());
             throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
         }
         BigDecimal totalPrice = receivablesQrcodeRequest.getFoodPrice().add(receivablesQrcodeRequest.getWinePrice());

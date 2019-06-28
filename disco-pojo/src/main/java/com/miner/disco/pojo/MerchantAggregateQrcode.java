@@ -58,7 +58,8 @@ public class MerchantAggregateQrcode {
 
     public enum PAYMENT_WAY implements BasicEnum {
 
-        ALIPAY(1, "支付宝");
+        ALIPAY(1, "支付宝"),
+        WXPAY(2, "微信");
 
         Integer key;
         String value;

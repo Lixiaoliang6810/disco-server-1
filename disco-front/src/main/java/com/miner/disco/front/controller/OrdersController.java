@@ -251,6 +251,7 @@ public class OrdersController {
         wxpayPreorderRequest.setBody("麦罗佛伦");
         wxpayPreorderRequest.setDetail("线上预定");
         wxpayPreorderRequest.setOutTradeNo(sn);
+        //  URLEncoder.encode(String.format("ordersId=%s&env=%s", orders.getId(), environment), BasicConst.UTF_8.displayName());
         wxpayPreorderRequest.setCallbackParam(callbackParam);
         wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;

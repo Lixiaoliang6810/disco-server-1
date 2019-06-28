@@ -89,4 +89,7 @@ public class MerchantController {
         return ViewData.builder().data(checkReceivablesStatusResponse).build();
     }
 
+    //
+    public void test(){}
+
 }

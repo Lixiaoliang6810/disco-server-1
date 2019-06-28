@@ -1,7 +1,9 @@
 package com.miner.disco.front.controller;
 
+import com.miner.disco.basic.constants.BooleanStatus;
 import com.miner.disco.basic.model.response.ViewData;
 import com.miner.disco.front.consts.Const;
+import com.miner.disco.front.dao.MemberMapper;
 import com.miner.disco.front.model.request.MemberInfoModifyRequest;
 import com.miner.disco.front.model.request.MemberRegisterRequest;
 import com.miner.disco.front.model.request.VipMemberListRequest;
@@ -11,15 +13,18 @@ import com.miner.disco.front.model.response.VipMemberListResponse;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
 import com.miner.disco.front.service.MemberService;
 import com.miner.disco.front.service.ShieldService;
+import com.miner.disco.pojo.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Created by lubycoder@163.com 2018/12/24
@@ -39,6 +44,19 @@ public class MemberController {
         memberService.register(request);
         return ViewData.builder().message("注册成功").build();
     }
+
+
+//    @PutMapping("/member/init")
+//    @Transactional(rollbackFor = Exception.class)
+//    public void test(){
+//        for(int i=2;i<100;i++){
+//            MemberRegisterRequest memberRegisterRequest = new MemberRegisterRequest();
+//            Long l = Long.valueOf("19911111000") + i;
+//            memberRegisterRequest.setMobile(l.toString());
+//            memberRegisterRequest.setLoginPassword("mlfl999");
+//            memberService.register(memberRegisterRequest);
+//        }
+//    }
 
     @GetMapping(value = "/member/me/center", headers = Const.API_VERSION_1_0_0)
     public ViewData center(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication) {

@@ -28,6 +28,8 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
                 .antMatchers("/member/login/password/reset", "/alipay/orders/notify").permitAll()
                 .antMatchers("/wxpay/orders/notify", "/version/check", "/alipay/sweep/notify", "/wxpay/sweep/notify").permitAll()
 
+//                .antMatchers("/member/test").permitAll()
+
                 .anyRequest().authenticated()
                 .and().formLogin().permitAll()
                 .and().logout().permitAll()

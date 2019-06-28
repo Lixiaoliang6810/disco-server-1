@@ -1,6 +1,7 @@
 server:
   environment: DEV
-  payment-callback-url: http://118.24.17.174:8007
+#  payment-callback-url: http://118.24.17.174:8007
+  payment-callback-url: http://127.0.0.1:8007
 
 spring:
   datasource:

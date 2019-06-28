@@ -160,7 +160,6 @@ public class MerchantServiceImpl implements MerchantService {
         }else if (useragent!=null && useragent.contains("Android")){
             return wxpayment(receivablesQrcodeRequest,servletRequest);
         }else {
-//            return alipayment(receivablesQrcodeRequest,servletRequest);
             return wxpayment(receivablesQrcodeRequest,servletRequest);
         }
     }
@@ -172,8 +171,7 @@ public class MerchantServiceImpl implements MerchantService {
         wxpayPreorderRequest.setOutTradeNo(sn);
 //        wxpayPreorderRequest.setCallbackParam(callbackParam);
         // 线上记得打开
-//        wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
-        wxpayPreorderRequest.setTotalFee(amount.toPlainString());
+        wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
 //        String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
         wxpayPreorderRequest.setCallbackUrl(String.format("%s%s", callbackUrl, "/wxpay/orders/notify"));
         return wxpayPreorderRequest;
@@ -186,9 +184,9 @@ public class MerchantServiceImpl implements MerchantService {
         // discountPrice==打折金额*折扣+不打折金额
         BigDecimal discountPrice = receivablesQrcodeRequest.getFoodPrice().subtract(receivablesQrcodeRequest.getFoodPrice().multiply(merchant.getMemberRatio()));
         discountPrice = receivablesQrcodeRequest.getWinePrice().add(discountPrice);
-
         // 微信预支付请求
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
+        // 微信支付需将金额discountPrice放大100倍
         WxpayPreorderRequest wxpayPreorderRequest = getWxpayPreorderRequest(outTradeNo, discountPrice, callbackUrl);
         WxpayPreorderResponse wxpayPreorderResponse;
         try {
@@ -198,7 +196,7 @@ public class MerchantServiceImpl implements MerchantService {
                 throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
             }
         }catch (WxpayApiException e){
-            log.error("call alipay api error e={}", e.getMessage());
+            log.error("call wxpay api error e={}", e.getMessage());
             throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
         }
         // 生成收款码

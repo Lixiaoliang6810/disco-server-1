@@ -9,7 +9,8 @@ import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.BooleanStatus;
 import com.miner.disco.basic.constants.Environment;
-import com.miner.disco.basic.util.*;
+import com.miner.disco.basic.util.DtoTransition;
+import com.miner.disco.basic.util.UidMaskUtils;
 import com.miner.disco.mch.consts.Const;
 import com.miner.disco.mch.dao.ClassifyMapper;
 import com.miner.disco.mch.dao.MerchantAggregateQrcodeMapper;
@@ -21,18 +22,18 @@ import com.miner.disco.mch.model.request.*;
 import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
-import com.miner.disco.mch.oauth.model.CustomUserDetails;
 import com.miner.disco.mch.service.MerchantService;
 import com.miner.disco.pojo.Classify;
 import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.MerchantAggregateQrcode;
-import com.miner.disco.pojo.MerchantReceivablesQrcode;
 import com.miner.disco.wxpay.support.WxpayService;
 import com.miner.disco.wxpay.support.exception.WxpayApiException;
 import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
+import com.miner.disco.wxpay.support.utils.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
@@ -44,9 +45,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -158,7 +160,7 @@ public class MerchantServiceImpl implements MerchantService {
         }else if (useragent!=null && useragent.contains("MicroMessenger")){
             return wxpayment(receivablesQrcodeRequest,servletRequest);
         }else {
-            return wxpayment(receivablesQrcodeRequest,servletRequest);
+            return alipayment(receivablesQrcodeRequest,servletRequest);
         }
     }
 
@@ -179,9 +181,9 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant merchant = merchantMapper.queryByPrimaryKey(receivablesQrcodeRequest.getMerchantId());
         String mchUidMask = UidMaskUtils.idToCode(merchant.getId());
         String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
-        System.out.println("=========账单流水号::"+outTradeNo);
+//        System.out.println("=========账单流水号::"+outTradeNo);
         // discountPrice==打折金额*折扣+不打折金额
-        BigDecimal discountPrice = receivablesQrcodeRequest.getFoodPrice().subtract(receivablesQrcodeRequest.getFoodPrice().multiply(merchant.getMemberRatio()));
+        BigDecimal discountPrice = receivablesQrcodeRequest.getFoodPrice().subtract(receivablesQrcodeRequest.getFoodPrice().multiply(merchant.getMemberRatio()==null?BigDecimal.ZERO:merchant.getMemberRatio()));
         discountPrice = receivablesQrcodeRequest.getWinePrice().add(discountPrice);
         // 微信预支付请求
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
@@ -306,4 +308,7 @@ public class MerchantServiceImpl implements MerchantService {
     private String getPath(HttpServletRequest request) {
         return String.format("%s://%s:%s", request.getScheme(), request.getServerName(), request.getServerPort());
     }
+
+
+
 }

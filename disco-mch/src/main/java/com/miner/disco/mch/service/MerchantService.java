@@ -30,5 +30,4 @@ public interface MerchantService {
     MerchantDetailsResponse details(Long merchantId) throws MchBusinessException;
 
     CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException;
-
 }

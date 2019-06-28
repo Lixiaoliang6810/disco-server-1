@@ -37,3 +37,4 @@ wechat:
     app-id: wx1ef5fd586908e6cc
     mch-id: 1523752031
     api-secret: wXcKfRudjBpVfmcHSNjOpIzn8DCHj5Ov
+    orderquery: https://api.mch.weixin.qq.com/pay/orderquery

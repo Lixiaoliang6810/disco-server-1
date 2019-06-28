@@ -28,12 +28,15 @@ import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.MerchantAggregateQrcode;
 import com.miner.disco.wxpay.support.WxpayService;
 import com.miner.disco.wxpay.support.exception.WxpayApiException;
+import com.miner.disco.wxpay.support.model.request.WxpayAfterOrderRequest;
 import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
+import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
 import com.miner.disco.wxpay.support.utils.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
@@ -160,7 +163,7 @@ public class MerchantServiceImpl implements MerchantService {
         }else if (useragent!=null && useragent.contains("MicroMessenger")){
             return wxpayment(receivablesQrcodeRequest,servletRequest);
         }else {
-            return alipayment(receivablesQrcodeRequest,servletRequest);
+            return wxpayment(receivablesQrcodeRequest,servletRequest);
         }
     }
 
@@ -174,6 +177,7 @@ public class MerchantServiceImpl implements MerchantService {
         wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
 //        String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
         wxpayPreorderRequest.setCallbackUrl(String.format("%s%s", callbackUrl, "/aggregate/wxpay/sweep/notify"));
+
         return wxpayPreorderRequest;
     }
 
@@ -216,6 +220,30 @@ public class MerchantServiceImpl implements MerchantService {
         response.setDiscountPrice(new BigDecimal(decimalFormat.format(responseDiscountPrice)));
 //        System.out.println("收款码："+response.getQrcode());
         return response;
+    }
+
+    @Override
+    public WxpayAfterOrderResponse afterOrder(String outTradeNo){
+        WxpayAfterOrderResponse wxpayAfterOrderResponse=null;
+        WxpayAfterOrderRequest wxpayAfterOrderRequest = new WxpayAfterOrderRequest();
+        wxpayAfterOrderRequest.setOutTradeNo(outTradeNo);
+        try {
+            wxpayAfterOrderResponse = wxpayService.afterOrder(wxpayAfterOrderRequest);
+            String tradeState = wxpayAfterOrderResponse.getTradeState();
+            if("SUCCESS".equals(tradeState)){
+                MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
+                MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
+                BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
+                merchantAggregateQrcode.setStatus(MerchantAggregateQrcode.STATUS.PAY_SUCCESS.getKey());
+                merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
+                System.out.println("====================交易成功");
+            }else {
+                System.out.println("====================未支付");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return wxpayAfterOrderResponse;
     }
 
     private void genMchAggregateQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest,Merchant merchant,String outTradeNo,BigDecimal totalPrice,String qrcode,BigDecimal discountPrice,Integer payway){
@@ -296,9 +324,10 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException {
         MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
+        this.afterOrder(outTradeNo);
         CheckReceivablesStatusResponse receivablesStatusResponse = new CheckReceivablesStatusResponse();
         receivablesStatusResponse.setStatus(aggregateQrcode != null ? aggregateQrcode.getStatus() : -1);
         receivablesStatusResponse.setAmount(aggregateQrcode == null ? BigDecimal.ZERO : aggregateQrcode.getDiscountPrice());

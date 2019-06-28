@@ -1,7 +1,9 @@
 package com.miner.disco.wxpay.support;
 
 import com.miner.disco.wxpay.support.exception.WxpayApiException;
+import com.miner.disco.wxpay.support.model.request.WxpayAfterOrderRequest;
 import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
+import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
 import com.miner.disco.wxpay.support.utils.WXPayConstants;
 import com.miner.disco.wxpay.support.utils.WXPayUtil;
@@ -95,4 +97,49 @@ public class WxpayService {
         }
     }
 
+    public WxpayAfterOrderResponse afterOrder(WxpayAfterOrderRequest request) throws Exception {
+        Map<String, String> wechatParam = new HashMap<>();
+        wechatParam.put("appid", appid);
+        wechatParam.put("mch_id", mchid);
+        wechatParam.put("nonce_str", WXPayUtil.generateNonceStr());
+        wechatParam.put("out_trade_no", request.getOutTradeNo());
+        String sign = WXPayUtil.generateSignature(wechatParam, secret);
+        wechatParam.put("sign", sign);
+        String data = WXPayUtil.mapToXml(wechatParam);
+
+        HttpPost httpPost = new HttpPost(String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.ORDERQUERY_URL_SUFFIX));
+        StringEntity postEntity = new StringEntity(data, Charset.forName("UTF-8"));
+        httpPost.addHeader(HTTP.CONTENT_TYPE, "text/xml");
+        httpPost.setEntity(postEntity);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpResponse callWechatResponse = httpClient.execute(httpPost);
+        HttpEntity httpEntity = callWechatResponse.getEntity();
+        String result = EntityUtils.toString(httpEntity, Charset.forName("UTF-8"));
+        log.info("wechat afterorder result {}", result.replaceAll("\\n", ""));
+        Map<String, String> wechatResultMap = WXPayUtil.xmlToMap(result);
+        if (wechatResultMap.containsKey("return_code") && StringUtils.equals("FAIL", wechatResultMap.get("return_code"))) {
+            throw new WxpayApiException("afterorder error");
+        }
+        SortedMap<String, String> resultMap = new TreeMap<>();
+        resultMap.put("appid", appid);
+        resultMap.put("partnerid", mchid);
+        resultMap.put("noncestr", WXPayUtil.generateNonceStr());
+        resultMap.put("timestamp", String.valueOf(WXPayUtil.getCurrentTimestamp()));
+        resultMap.put("package", "Sign=WXPay");
+
+        WxpayAfterOrderResponse response = new WxpayAfterOrderResponse();
+        response.setCodeUrl(wechatResultMap.get("code_url"));
+        response.setReturnCode(wechatResultMap.get("return_code"));
+        response.setAppId(appid);
+        response.setTimeStamp(resultMap.get("timestamp"));
+        response.setNonceStr(resultMap.get("noncestr"));
+        response.setPartnerid(mchid);
+        response.setPaySign(WXPayUtil.generateSignature(resultMap, secret));
+        response.setBankType(wechatResultMap.get("bank_type"));
+        response.setTotalFee(wechatResultMap.get("total_fee"));
+        response.setTradeState(wechatResultMap.get("trade_state"));
+        response.setTradeType(wechatResultMap.get("trade_type"));
+        return response;
+    }
 }

@@ -5,6 +5,7 @@ import com.miner.disco.mch.model.request.*;
 import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
+import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -30,4 +31,6 @@ public interface MerchantService {
     MerchantDetailsResponse details(Long merchantId) throws MchBusinessException;
 
     CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException;
+
+    WxpayAfterOrderResponse afterOrder(String outTradeNo);
 }

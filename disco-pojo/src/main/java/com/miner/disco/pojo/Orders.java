@@ -52,6 +52,10 @@ public class Orders {
      */
     private String mobile;
     /**
+     * 人数
+     */
+    private Integer number;
+    /**
      * 定金
      */
     private BigDecimal earnestMoney;

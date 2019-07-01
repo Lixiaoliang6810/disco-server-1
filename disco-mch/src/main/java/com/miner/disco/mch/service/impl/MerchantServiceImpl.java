@@ -10,12 +10,10 @@ import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.BooleanStatus;
 import com.miner.disco.basic.constants.Environment;
 import com.miner.disco.basic.util.DtoTransition;
+import com.miner.disco.basic.util.ShareCodeUtils;
 import com.miner.disco.basic.util.UidMaskUtils;
 import com.miner.disco.mch.consts.Const;
-import com.miner.disco.mch.dao.ClassifyMapper;
-import com.miner.disco.mch.dao.MerchantAggregateQrcodeMapper;
-import com.miner.disco.mch.dao.MerchantMapper;
-import com.miner.disco.mch.dao.MerchantReceivablesQrcodeMapper;
+import com.miner.disco.mch.dao.*;
 import com.miner.disco.mch.exception.MchBusinessException;
 import com.miner.disco.mch.exception.MchBusinessExceptionCode;
 import com.miner.disco.mch.model.request.*;
@@ -24,6 +22,7 @@ import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
 import com.miner.disco.mch.service.MerchantService;
 import com.miner.disco.pojo.Classify;
+import com.miner.disco.pojo.Member;
 import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.MerchantAggregateQrcode;
 import com.miner.disco.wxpay.support.WxpayService;
@@ -63,6 +62,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Autowired
     private MerchantMapper merchantMapper;
+
+    @Autowired
+    private MemberMapper memberMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -187,8 +189,30 @@ public class MerchantServiceImpl implements MerchantService {
         String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
 //        System.out.println("=========账单流水号::"+outTradeNo);
         // discountPrice==打折金额*折扣+不打折金额
-        BigDecimal discountPrice = receivablesQrcodeRequest.getFoodPrice().subtract(receivablesQrcodeRequest.getFoodPrice().multiply(merchant.getMemberRatio()==null?BigDecimal.ZERO:merchant.getMemberRatio()));
-        discountPrice = receivablesQrcodeRequest.getWinePrice().add(discountPrice);
+        /**
+         * 有引导员优惠码时才打折，折扣继承于商家设定的折扣；
+         * 优惠码需要校验
+         */
+        BigDecimal discountPrice;
+        String receivedCoupon = receivablesQrcodeRequest.getCoupon();
+        boolean isEffectiveCoupon = false;
+        if(StringUtils.isNotBlank(receivedCoupon)) {
+            // 校验 coupon
+            Long memberId = ShareCodeUtils.codeToId(receivedCoupon);
+            Member member = memberMapper.queryByPrimaryKey(memberId);
+            if (member != null) {
+                String coupon = member.getCoupon();
+                if (receivedCoupon.compareTo(coupon) == 0) {
+                    isEffectiveCoupon = true;
+                }
+            }
+        }
+        if(isEffectiveCoupon){
+            discountPrice = receivablesQrcodeRequest.getFoodPrice().subtract(receivablesQrcodeRequest.getFoodPrice().multiply(merchant.getMemberRatio()==null?BigDecimal.ZERO:merchant.getMemberRatio()));
+            discountPrice = receivablesQrcodeRequest.getWinePrice().add(discountPrice);
+        }else {
+            discountPrice = receivablesQrcodeRequest.getWinePrice().add(receivablesQrcodeRequest.getFoodPrice());
+        }
         // 微信预支付请求
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
         // 微信支付需将金额discountPrice放大100倍
@@ -253,7 +277,6 @@ public class MerchantServiceImpl implements MerchantService {
         ratioMetadata.addProperty("platformRatio", merchant.getPlatformRatio());
         MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
         merchantAggregateQrcode.setOutTradeNo(outTradeNo);
-        merchantAggregateQrcode.setQrcode(qrcode);
         merchantAggregateQrcode.setTotalPrice(totalPrice);
         merchantAggregateQrcode.setWinePrice(receivablesQrcodeRequest.getWinePrice());
         merchantAggregateQrcode.setFoodPrice(receivablesQrcodeRequest.getFoodPrice());
@@ -261,6 +284,8 @@ public class MerchantServiceImpl implements MerchantService {
         merchantAggregateQrcode.setMchId(merchant.getId());
         merchantAggregateQrcode.setMetadata(ratioMetadata.toString());
         merchantAggregateQrcode.setCoupon(receivablesQrcodeRequest.getCoupon());
+        // 生成收款二维码
+        merchantAggregateQrcode.setQrcode(qrcode);
         if(1==payway){
             merchantAggregateQrcode.setPaymentWay(MerchantAggregateQrcode.PAYMENT_WAY.ALIPAY.getKey());
         }else if(2==payway){

@@ -2,6 +2,7 @@ package com.miner.disco.mch.controller;
 
 import com.miner.disco.basic.model.response.ViewData;
 import com.miner.disco.basic.util.Encrypt;
+import com.miner.disco.basic.util.ShareCodeUtils;
 import com.miner.disco.mch.consts.Const;
 import com.miner.disco.mch.model.request.*;
 import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
@@ -90,7 +91,6 @@ public class MerchantController {
         return ViewData.builder().data(checkReceivablesStatusResponse).build();
     }
 
-    //
-    public void test(){}
+
 
 }

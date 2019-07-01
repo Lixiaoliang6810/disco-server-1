@@ -116,7 +116,7 @@ public class WxpayService {
         HttpResponse callWechatResponse = httpClient.execute(httpPost);
         HttpEntity httpEntity = callWechatResponse.getEntity();
         String result = EntityUtils.toString(httpEntity, Charset.forName("UTF-8"));
-        log.info("wechat afterorder result {}", result.replaceAll("\\n", ""));
+        log.info("wxpay afterorder result {}", result.replaceAll("\\n", ""));
         Map<String, String> wechatResultMap = WXPayUtil.xmlToMap(result);
         if (wechatResultMap.containsKey("return_code") && StringUtils.equals("FAIL", wechatResultMap.get("return_code"))) {
             throw new WxpayApiException("afterorder error");

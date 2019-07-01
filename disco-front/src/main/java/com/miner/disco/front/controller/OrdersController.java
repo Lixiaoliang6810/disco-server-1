@@ -78,7 +78,10 @@ public class OrdersController {
     private String paymentCallbackUrl;
 
     /**
+     * 预定
      * 点击‘立即支付’ 时生成订单，状态为 未支付：WAIT_PAYMENT
+     *
+     *
      */
     @PostMapping(value = "/orders/purchase", headers = Const.API_VERSION_1_0_0)
     public ViewData purchase(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication, HttpServletRequest servletRequest,

@@ -16,6 +16,8 @@ public class ReceivablesQrcodeResponse implements Serializable {
     private static final long serialVersionUID = 7452617459642350522L;
 
     private String qrcode;
+//    private String aliQrcode;
+//    private String wxiQrcode;
     private String outTradeNo;
     private BigDecimal originalPrice;
     private BigDecimal discountPrice;

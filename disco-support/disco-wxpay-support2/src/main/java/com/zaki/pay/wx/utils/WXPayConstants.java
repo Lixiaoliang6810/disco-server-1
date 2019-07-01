@@ -1,4 +1,4 @@
-package com.miner.disco.wxpay.support.utils;
+package com.zaki.pay.wx.utils;
 
 /**
  * 常量

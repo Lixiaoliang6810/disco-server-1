@@ -18,6 +18,7 @@
         <module>disco-boot-support</module>
         <module>disco-alipay-support</module>
         <module>disco-wxpay-support</module>
+        <module>disco-wxpay-support2</module>
     </modules>
 
 

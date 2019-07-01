@@ -31,10 +31,8 @@ import com.miner.disco.wxpay.support.model.request.WxpayAfterOrderRequest;
 import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
 import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
-import com.miner.disco.wxpay.support.utils.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.HttpClientUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,8 +47,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**

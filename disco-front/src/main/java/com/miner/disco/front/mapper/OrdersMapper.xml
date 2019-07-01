@@ -13,6 +13,7 @@
             o.total_money,
             o.create_date,
             o.assemble_seats,
+            o.number,
             m.`name` as merchantName,
             mg.`name` as goodsName,
             m.address,

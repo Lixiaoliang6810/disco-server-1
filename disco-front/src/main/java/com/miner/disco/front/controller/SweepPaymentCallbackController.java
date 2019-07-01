@@ -127,7 +127,7 @@ public class SweepPaymentCallbackController {
             Map<String, String> params = WXPayUtil.xmlToMap(result);
 
             String sign = WXPayUtil.generateSignature(params, wxpaySecret);
-            log.info("wxpay callback sign {}", sign);
+            log.info("wechat callback sign {}", sign);
             if (!StringUtils.equals(sign, params.get("sign"))) {
                 response.getWriter().write(CALL_WECHAT_STATUS_FAILURE);
                 return;

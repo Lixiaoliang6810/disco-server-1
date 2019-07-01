@@ -19,12 +19,13 @@ public class MerchantAggregateQrcode {
     private Integer status;
     private String outTradeNo;
     private String qrcode;
-//    private String aliQrcode;
-//    private String wxQrcode;
+    private String aliQrcode;
+    private String wxQrcode;
     private String coupon;
     private BigDecimal totalPrice;
     private BigDecimal winePrice;
     private BigDecimal foodPrice;
+    private BigDecimal originalPrice;
     private BigDecimal discountPrice;
     private String metadata;
     private Date createDate;

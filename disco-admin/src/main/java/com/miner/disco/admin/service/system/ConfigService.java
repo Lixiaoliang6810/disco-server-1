@@ -21,7 +21,7 @@ public interface ConfigService {
     PageResponse configList(Pagination pagination) throws AdminBuzException;
 
     /**
-     * 心中配置
+     * 新增配置
      * @param configCreateRequest
      * @throws AdminBuzException
      */

@@ -159,14 +159,18 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public ReceivablesQrcodeResponse receivablesQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) throws MchBusinessException, UnsupportedEncodingException {
-        String useragent = servletRequest.getHeader("user-agent");
-        if(useragent!=null && useragent.contains("AlipayClient")){
-            return alipayment(receivablesQrcodeRequest,servletRequest);
-        }else if (useragent!=null && useragent.contains("MicroMessenger")){
-            return wxpayment(receivablesQrcodeRequest,servletRequest);
-        }else {
-            return wxpayment(receivablesQrcodeRequest,servletRequest);
-        }
+        ReceivablesQrcodeResponse wxpayment = wxpayment(receivablesQrcodeRequest, servletRequest);
+        ReceivablesQrcodeResponse alipayment = alipayment(receivablesQrcodeRequest, servletRequest);
+        wxpayment.setAliQrcode(alipayment.getAliQrcode());
+        return wxpayment;
+//        String useragent = servletRequest.getHeader("user-agent");
+//        if(useragent!=null && useragent.contains("AlipayClient")){
+//            return alipayment(receivablesQrcodeRequest,servletRequest);
+//        }else if (useragent!=null && useragent.contains("MicroMessenger")){
+//            return wxpayment(receivablesQrcodeRequest,servletRequest);
+//        }else {
+//            return wxpayment(receivablesQrcodeRequest,servletRequest);
+//        }
     }
 
     private WxpayPreorderRequest getWxpayPreorderRequest(String sn, BigDecimal amount, String callbackUrl) {

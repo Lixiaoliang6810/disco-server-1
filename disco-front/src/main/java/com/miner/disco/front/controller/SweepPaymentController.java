@@ -16,7 +16,7 @@ import com.miner.disco.front.oauth.model.CustomUserDetails;
 import com.miner.disco.front.service.MerchantReceivablesQrcodeService;
 import com.miner.disco.pojo.MerchantReceivablesQrcode;
 import com.miner.disco.wxpay.support.WxpayService;
-import com.miner.disco.wxpay.support.model.request.WxPayPreOrderRequest;
+import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -105,7 +105,7 @@ public class SweepPaymentController {
     }
 
     private WxpayPreorderResponse wxpay(HttpServletRequest servletRequest, String sn, BigDecimal amount, String callbackParam) {
-        WxPayPreOrderRequest wxpayPreorderRequest = new WxPayPreOrderRequest();
+        WxpayPreorderRequest wxpayPreorderRequest = new WxpayPreorderRequest();
         wxpayPreorderRequest.setBody("麦罗佛伦");
         wxpayPreorderRequest.setDetail("线上预定");
         wxpayPreorderRequest.setOutTradeNo(sn);

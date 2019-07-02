@@ -22,7 +22,7 @@ import com.miner.disco.front.service.impl.SmsServiceImpl;
 import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.Orders;
 import com.miner.disco.wxpay.support.WxpayService;
-import com.miner.disco.wxpay.support.model.request.WxPayPreOrderRequest;
+import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
@@ -249,7 +249,7 @@ public class OrdersController {
     }
 
     private WxpayPreorderResponse wxpay(HttpServletRequest servletRequest, String sn, BigDecimal amount, String callbackParam, OrdersPaymentRequest.PAYMENT_METHOD paymentMethod) {
-        WxPayPreOrderRequest wxpayPreorderRequest = new WxPayPreOrderRequest();
+        WxpayPreorderRequest wxpayPreorderRequest = new WxpayPreorderRequest();
         wxpayPreorderRequest.setBody("麦罗佛伦");
         wxpayPreorderRequest.setDetail("线上预定");
         wxpayPreorderRequest.setOutTradeNo(sn);

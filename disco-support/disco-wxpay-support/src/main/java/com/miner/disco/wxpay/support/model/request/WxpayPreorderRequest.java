@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-public class WxPayPreOrderRequest implements Serializable {
+public class WxpayPreorderRequest implements Serializable {
 
     private String body;
     private String detail;

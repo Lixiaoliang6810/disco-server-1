@@ -1,7 +1,9 @@
 package com.zaki.pay.wx.service;
 
 import com.zaki.pay.wx.model.dto.QrCode;
+import com.zaki.pay.wx.model.request.QrCodeRequest;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
+import com.zaki.pay.wx.model.response.QrCodeResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 
 /**
@@ -13,7 +15,7 @@ public interface WXPayService {
      * 生成二维码
      * @return 二维码对象
      */
-    QrCode genQrCode();
+    QrCodeResponse genQrCode(QrCodeRequest request);
 
     /**
      * 统一下单

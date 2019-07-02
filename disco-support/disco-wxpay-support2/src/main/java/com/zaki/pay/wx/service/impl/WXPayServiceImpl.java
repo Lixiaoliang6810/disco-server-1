@@ -2,7 +2,9 @@ package com.zaki.pay.wx.service.impl;
 
 import com.zaki.pay.wx.constants.WXPayConstants;
 import com.zaki.pay.wx.exception.WXPayApiException;
+import com.zaki.pay.wx.model.request.WXPayOrderQueryRequest;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
+import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 import com.zaki.pay.wx.service.WXPayService;
 import com.zaki.pay.wx.utils.WXPayUtil;
@@ -16,11 +18,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
@@ -61,7 +66,7 @@ public class WXPayServiceImpl implements WXPayService {
         return EntityUtils.toString(httpEntity, Charset.forName("UTF-8"));
     }
     @Override
-    public WXPayUnifiedOrderResponse unifiedOrder(WXPayUnifiedOrderRequest request) {
+    public WXPayUnifiedOrderResponse unifiedOrder(WXPayUnifiedOrderRequest request) throws WXPayApiException {
         Map<String, String> requestMap = new HashMap<>();
         requestMap.put("appid", appId);
         requestMap.put("mch_id", mchId);
@@ -84,7 +89,7 @@ public class WXPayServiceImpl implements WXPayService {
             String data = WXPayUtil.mapToXml(requestMap);
             String url = String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX);
             // 请求接口
-            String result = execute(url, data);
+            String result = this.execute(url, data);
 
             log.info("WXPayService unifiedOrder result {}", result.replaceAll("\\n", ""));
             // 接口响应
@@ -117,6 +122,54 @@ public class WXPayServiceImpl implements WXPayService {
         } catch (Exception e) {
             throw new WXPayApiException("WXPayService unifiedOrder error",e);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WXPayOrderQueryResponse queryOrder(WXPayOrderQueryRequest request) {
+        Map<String, String> requestMap = new HashMap<>();
+        requestMap.put("appid", appId);
+        requestMap.put("mch_id", mchId);
+        requestMap.put("out_trade_no", request.getOutTradeNo());
+        requestMap.put("nonce_str", WXPayUtil.generateNonceStr());
+
+        String sign = null;
+        try {
+            sign = WXPayUtil.generateSignature(requestMap, apiSecret);
+            requestMap.put("sign", sign);
+
+            String data = WXPayUtil.mapToXml(requestMap);
+            String url = String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.ORDERQUERY_URL_SUFFIX);
+            // 请求接口
+            String result = this.execute(url, data);
+            log.info("WXPayService queryOrder result {}", result.replaceAll("\\n", ""));
+            Map<String, String> responseMap = WXPayUtil.xmlToMap(result);
+            if (responseMap.containsKey("return_code") && StringUtils.equals("FAIL", responseMap.get("return_code"))) {
+                throw new WXPayApiException("queryOrder error");
+            }
+
+            WXPayOrderQueryResponse response = new WXPayOrderQueryResponse();
+            response.setReturnCode(responseMap.get("return_code"));
+            response.setReturnMsg(responseMap.get("return_msg"));
+            // 以下字段在return_code为SUCCESS的时候有返回
+            response.setAppId(responseMap.get("appid"));
+            response.setMchId(responseMap.get("mch_id"));
+            response.setNonceStr(responseMap.get("nonce_str"));
+            response.setSign(responseMap.get("sign"));
+            response.setResultCode(responseMap.get("result_code"));
+            // 以下字段在return_code 、result_code、trade_state都为SUCCESS时有返回
+            response.setTradeType(responseMap.get("trade_type"));
+            response.setTradeState(responseMap.get("trade_state"));
+            response.setBankType(responseMap.get("bank_type"));
+            response.setTotalFee(responseMap.get("total_fee"));
+            response.setCashFee(responseMap.get("cash_fee"));
+            response.setTimeEnd(String.valueOf(WXPayUtil.getCurrentTimestamp()));
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.zaki.pay.wx.constants;
 /**
  * @author Created by lubycoder@163.com 2019-2-20
  */
-public enum Payment implements BasicEnum {
+public enum PaymentWay implements BasicEnum {
 
     ALIPAY(1, "支付宝支付"),
     WXPAY(2, "微信支付"),
@@ -13,7 +13,7 @@ public enum Payment implements BasicEnum {
     Integer key;
     String value;
 
-    Payment(Integer key, String value) {
+    PaymentWay(Integer key, String value) {
         this.key = key;
         this.value = value;
     }

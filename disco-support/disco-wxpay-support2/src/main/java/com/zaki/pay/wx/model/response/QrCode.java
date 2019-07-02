@@ -23,15 +23,11 @@ public class QrCode {
      */
     private String outTradeNo;
     /**
-     * 订单总金额
-     */
-    private String totalFee;
-    /**
      * 原价
      */
-    private BigDecimal originalPrice;
+    private String originalPrice;
     /**
      * 折后价
      */
-    private BigDecimal discountPrice;
+    private String discountPrice;
 }

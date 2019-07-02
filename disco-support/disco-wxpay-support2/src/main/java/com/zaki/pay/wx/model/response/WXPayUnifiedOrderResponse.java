@@ -8,15 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class WXPayUnifiedOrderResponse{
-    /**
-     * 返回状态码
-     */
-    private String returnCode;
-    /**
-     * 返回信息
-     */
-    private String returnMsg;
+public class WXPayUnifiedOrderResponse extends BaseResponse{
     /*
      * 以下字段在return_code为SUCCESS的时候有返回
      */

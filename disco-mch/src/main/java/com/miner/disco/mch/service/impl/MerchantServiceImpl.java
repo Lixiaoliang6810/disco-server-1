@@ -13,7 +13,10 @@ import com.miner.disco.basic.util.DtoTransition;
 import com.miner.disco.basic.util.ShareCodeUtils;
 import com.miner.disco.basic.util.UidMaskUtils;
 import com.miner.disco.mch.consts.Const;
-import com.miner.disco.mch.dao.*;
+import com.miner.disco.mch.dao.ClassifyMapper;
+import com.miner.disco.mch.dao.MemberMapper;
+import com.miner.disco.mch.dao.MerchantAggregateQrcodeMapper;
+import com.miner.disco.mch.dao.MerchantMapper;
 import com.miner.disco.mch.exception.MchBusinessException;
 import com.miner.disco.mch.exception.MchBusinessExceptionCode;
 import com.miner.disco.mch.model.request.*;
@@ -25,14 +28,12 @@ import com.miner.disco.pojo.Classify;
 import com.miner.disco.pojo.Member;
 import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.MerchantAggregateQrcode;
-import com.miner.disco.wxpay.support.WxpayService;
 import com.miner.disco.wxpay.support.exception.WxpayApiException;
-import com.miner.disco.wxpay.support.model.request.WxpayAfterOrderRequest;
-import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
-import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
-import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
+import com.zaki.pay.wx.constants.WXOrderStatus;
+import com.zaki.pay.wx.model.request.WXPayOrderQueryRequest;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
 import com.zaki.pay.wx.model.response.QrCode;
+import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 import com.zaki.pay.wx.service.WXPayService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -76,16 +76,10 @@ public class MerchantServiceImpl implements MerchantService {
     private ClassifyMapper classifyMapper;
 
     @Autowired
-    private MerchantReceivablesQrcodeMapper merchantReceivablesQrcodeMapper;
-
-    @Autowired
     private MerchantAggregateQrcodeMapper merchantAggregateQrcodeMapper;
 
     @Autowired
     private AlipayService alipayService;
-
-    @Autowired
-    private WxpayService wxpayService;
 
     @Value("${server.environment}")
     private Environment environment;
@@ -163,62 +157,47 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(rollbackFor = RuntimeException.class)
     public QrCode unifiedOrder(ReceivablesQrcodeRequest request,HttpServletRequest servletRequest){
         WXPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WXPayUnifiedOrderRequest();
-
         Merchant merchant = merchantMapper.queryByPrimaryKey(request.getMerchantId());
+        // body
         wxPayUnifiedOrderRequest.setBody(merchant.getName());
-
+        // outTradeNo
         String mchUidMask = UidMaskUtils.idToCode(merchant.getId());
         String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
         wxPayUnifiedOrderRequest.setOutTradeNo(outTradeNo);
-
+        // originalPrice
         BigDecimal originalPrice = request.getWinePrice().add(request.getFoodPrice());
         wxPayUnifiedOrderRequest.setTotalFee(environment == Environment.RELEASE ? originalPrice.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
-        // 计算折价
-
+        // discountPrice
+        BigDecimal discountPrice = calculatePrice(request);
+        // notifyUrl
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
         wxPayUnifiedOrderRequest.setNotifyUrl(callbackUrl);
 
-        WXPayUnifiedOrderResponse response = wxPayService.unifiedOrder(wxPayUnifiedOrderRequest);
+        WXPayUnifiedOrderResponse response;
+        try {
+            // 支付预备
+            response =wxPayService.unifiedOrder(wxPayUnifiedOrderRequest);
+            if (!"SUCCESS".equals(response.getReturnCode())) {
+                throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
+            }
+        }catch (WxpayApiException e){
+            log.error("call wxpay api error e={}", e.getMessage());
+            throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
+        }
+        // 生成收款码
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        genMchAggregateQrcode(request,merchant,outTradeNo,response.getCodeUrl(),originalPrice,new BigDecimal(decimalFormat.format(discountPrice)),2);
 
         QrCode qrCode = new QrCode();
         qrCode.setQrcode(response.getCodeUrl());
         qrCode.setOutTradeNo(outTradeNo);
-        qrCode.setOriginalPrice(originalPrice);
+        qrCode.setOriginalPrice(originalPrice.toPlainString());
 
-        BigDecimal discountPrice = calculatePrice(request);
-        qrCode.setDiscountPrice(discountPrice);
+
+        qrCode.setDiscountPrice(discountPrice.toPlainString());
         return qrCode;
     }
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public ReceivablesQrcodeResponse receivablesQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) throws MchBusinessException, UnsupportedEncodingException {
-        ReceivablesQrcodeResponse wxpayment = wxpayment(receivablesQrcodeRequest, servletRequest);
-        ReceivablesQrcodeResponse alipayment = alipayment(receivablesQrcodeRequest, servletRequest);
-        wxpayment.setAliQrcode(alipayment.getAliQrcode());
-        return wxpayment;
-//        String useragent = servletRequest.getHeader("user-agent");
-//        if(useragent!=null && useragent.contains("AlipayClient")){
-//            return alipayment(receivablesQrcodeRequest,servletRequest);
-//        }else if (useragent!=null && useragent.contains("MicroMessenger")){
-//            return wxpayment(receivablesQrcodeRequest,servletRequest);
-//        }else {
-//            return wxpayment(receivablesQrcodeRequest,servletRequest);
-//        }
-    }
 
-    private WxpayPreorderRequest getWxpayPreorderRequest(String sn, BigDecimal amount, String callbackUrl) {
-        WxpayPreorderRequest wxpayPreorderRequest = new WxpayPreorderRequest();
-        wxpayPreorderRequest.setBody("麦罗佛伦");
-        wxpayPreorderRequest.setDetail("线上预定");
-        wxpayPreorderRequest.setOutTradeNo(sn);
-//        wxpayPreorderRequest.setCallbackParam(callbackParam);
-        // 线上记得打开
-        wxpayPreorderRequest.setTotalFee(environment == Environment.RELEASE ? amount.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
-//        String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
-        wxpayPreorderRequest.setCallbackUrl(String.format("%s%s", callbackUrl, "/aggregate/wxpay/sweep/notify"));
-
-        return wxpayPreorderRequest;
-    }
 
     /**
      * 计算客户实际应付金额
@@ -253,75 +232,35 @@ public class MerchantServiceImpl implements MerchantService {
         }
         return discountPrice;
     }
-    private ReceivablesQrcodeResponse wxpayment(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) {
-        Merchant merchant = merchantMapper.queryByPrimaryKey(receivablesQrcodeRequest.getMerchantId());
-        String mchUidMask = UidMaskUtils.idToCode(merchant.getId());
-        String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
-//        System.out.println("=========账单流水号::"+outTradeNo);
-        // discountPrice==打折金额*折扣+不打折金额
-        /**
-         * 有引导员优惠码时才打折，折扣继承于商家设定的折扣；
-         * 优惠码需要校验
-         */
-        BigDecimal discountPrice = calculatePrice(receivablesQrcodeRequest);
-        // 微信预支付请求
-        String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
-        // 微信支付需将金额discountPrice放大100倍
-        WxpayPreorderRequest wxpayPreorderRequest = getWxpayPreorderRequest(outTradeNo, discountPrice, callbackUrl);
-        WxpayPreorderResponse wxpayPreorderResponse;
-        try {
-            // 支付预备
-            wxpayPreorderResponse = wxpayService.preorder(wxpayPreorderRequest);
-
-            log.info(wxpayPreorderResponse.getPackageStr());
-            if (!"SUCCESS".equals(wxpayPreorderResponse.getReturnCode())) {
-                throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
-            }
-        }catch (WxpayApiException e){
-            log.error("call wxpay api error e={}", e.getMessage());
-            throw new MchBusinessException(MchBusinessExceptionCode.QRCODE_GENERATE_ERROR.getCode(), "生成二维码失败");
-        }
-        // 生成收款码
-        BigDecimal totalPrice = receivablesQrcodeRequest.getFoodPrice().add(receivablesQrcodeRequest.getWinePrice());
-        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
-
-        genMchAggregateQrcode(receivablesQrcodeRequest,merchant,outTradeNo,totalPrice,wxpayPreorderResponse.getCodeUrl(),new BigDecimal(decimalFormat.format(discountPrice)),2);
-
-        ReceivablesQrcodeResponse response = new ReceivablesQrcodeResponse();
-        response.setQrcode(wxpayPreorderResponse.getCodeUrl());
-        response.setOutTradeNo(outTradeNo);
-        response.setOriginalPrice(totalPrice);
-        BigDecimal responseDiscountPrice = discountPrice;
-        response.setDiscountPrice(new BigDecimal(decimalFormat.format(responseDiscountPrice)));
-//        System.out.println("收款码："+response.getQrcode());
-        return response;
-    }
 
     @Override
-    public WxpayAfterOrderResponse afterOrder(String outTradeNo){
-        WxpayAfterOrderResponse wxpayAfterOrderResponse=null;
-        WxpayAfterOrderRequest wxpayAfterOrderRequest = new WxpayAfterOrderRequest();
-        wxpayAfterOrderRequest.setOutTradeNo(outTradeNo);
+    public WXPayOrderQueryResponse queryOrder(String outTradeNo) {
+        WXPayOrderQueryResponse response=null;
+        WXPayOrderQueryRequest request = new WXPayOrderQueryRequest();
+        request.setOutTradeNo(outTradeNo);
         try {
-            wxpayAfterOrderResponse = wxpayService.afterOrder(wxpayAfterOrderRequest);
-            String tradeState = wxpayAfterOrderResponse.getTradeState();
+            response = wxPayService.queryOrder(request);
+            if(response==null) return null;
+            String tradeState = response.getTradeState();
             if("SUCCESS".equals(tradeState)){
                 MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
                 MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
-                BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
-                merchantAggregateQrcode.setStatus(MerchantAggregateQrcode.STATUS.PAY_SUCCESS.getKey());
-                merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
-                System.out.println("====================交易成功");
-            }else {
-                System.out.println("====================未支付");
+                if(aggregateQrcode!=null){
+                    BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
+                    merchantAggregateQrcode.setStatus(WXOrderStatus.PAY_SUCCESS.getKey());
+                    merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return wxpayAfterOrderResponse;
+        return response;
     }
 
-    private void genMchAggregateQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest,Merchant merchant,String outTradeNo,BigDecimal totalPrice,String qrcode,BigDecimal discountPrice,Integer payway){
+    /**
+     * 生成收款二维码
+     */
+    private void genMchAggregateQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest,Merchant merchant,String outTradeNo,String qrcode,BigDecimal totalPrice,BigDecimal discountPrice,Integer payway){
         JsonObject ratioMetadata = new JsonObject();
         ratioMetadata.addProperty("vipRatio", merchant.getVipRatio());
         ratioMetadata.addProperty("memberRatio", merchant.getMemberRatio());
@@ -342,7 +281,7 @@ public class MerchantServiceImpl implements MerchantService {
         }else if(2==payway){
             merchantAggregateQrcode.setPaymentWay(MerchantAggregateQrcode.PAYMENT_WAY.WXPAY.getKey());
         }
-        merchantAggregateQrcode.setStatus(MerchantAggregateQrcode.STATUS.WAIT_PAYMENT.getKey());
+        merchantAggregateQrcode.setStatus(WXOrderStatus.WAIT_PAYMENT.getKey());
         merchantAggregateQrcode.setCreateDate(new Date());
         merchantAggregateQrcode.setUpdateDate(new Date());
         merchantAggregateQrcodeMapper.insert(merchantAggregateQrcode);
@@ -377,7 +316,7 @@ public class MerchantServiceImpl implements MerchantService {
         }
         BigDecimal totalPrice = receivablesQrcodeRequest.getFoodPrice().add(receivablesQrcodeRequest.getWinePrice());
         // 生成收款码
-        genMchAggregateQrcode(receivablesQrcodeRequest,merchant,outTradeNo,totalPrice,alipayTradePrecreateResponse.getQrCode(),new BigDecimal(decimalFormat.format(discountPrice)),1);
+        genMchAggregateQrcode(receivablesQrcodeRequest,merchant,outTradeNo,alipayTradePrecreateResponse.getQrCode(),totalPrice,new BigDecimal(decimalFormat.format(discountPrice)),1);
 
         ReceivablesQrcodeResponse response = new ReceivablesQrcodeResponse();
         response.setQrcode(alipayTradePrecreateResponse.getQrCode());
@@ -403,7 +342,7 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(readOnly = false)
     public CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException {
         MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
-        this.afterOrder(outTradeNo);
+        this.queryOrder(outTradeNo);
         CheckReceivablesStatusResponse receivablesStatusResponse = new CheckReceivablesStatusResponse();
         receivablesStatusResponse.setStatus(aggregateQrcode != null ? aggregateQrcode.getStatus() : -1);
         receivablesStatusResponse.setAmount(aggregateQrcode == null ? BigDecimal.ZERO : aggregateQrcode.getDiscountPrice());

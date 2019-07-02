@@ -3,7 +3,7 @@ package com.zaki.pay.wx.constants;
 /**
  * @author: wz1016_vip@163.com  2019/7/2
  */
-public enum PayStatus implements BasicEnum{
+public enum WXOrderStatus implements BasicEnum{
 
     WAIT_PAYMENT(1, "等待支付"),
 
@@ -38,7 +38,7 @@ public enum PayStatus implements BasicEnum{
         return this.value;
     }
 
-    PayStatus(Integer key, String value) {
+    WXOrderStatus(Integer key, String value) {
         this.key = key;
         this.value = value;
     }

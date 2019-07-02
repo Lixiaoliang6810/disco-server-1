@@ -1,32 +1,26 @@
-//package com.zaki.pay.wx.configuration;
-//
-//
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//
-///**
-// * @author Created by lubycoder@163.com 2019/1/7
-// */
-//@Configuration
-//public class Beans {
-//
-//    @Value("${wechat.pay.app-id}")
-//    String wxAppId;
-//    @Value("${wechat.pay.mch-id}")
-//    String mchid;
-//    @Value("${wechat.pay.api-secret}")
-//    String secret;
-//
-//
-//
-//    @Bean(name = "alipayService")
-//    public AlipayService alipayService() {
-//        return new AlipayService().setAlipayClient(alipayClient());
-//    }
-//
-//    @Bean(name = "wxpayService")
-//    public WxpayService wxpayService() {
-//        return new WxpayService(wxAppId,mchid,secret);
-//    }
-//}
+package com.zaki.pay.wx.configuration;
+
+
+import com.zaki.pay.wx.service.impl.WXPayServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @author Created by lubycoder@163.com 2019/1/7
+ */
+@Configuration
+public class Beans {
+
+    @Value("${wechat.pay.app-id}")
+    String wxAppId;
+    @Value("${wechat.pay.mch-id}")
+    String mchid;
+    @Value("${wechat.pay.api-secret}")
+    String secret;
+
+    @Bean(name = "wxPayService")
+    public WXPayServiceImpl wxPayService() {
+        return new WXPayServiceImpl(wxAppId,mchid,secret);
+    }
+}

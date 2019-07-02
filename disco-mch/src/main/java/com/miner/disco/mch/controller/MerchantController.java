@@ -84,6 +84,7 @@ public class MerchantController {
 //        ReceivablesQrcodeResponse response = merchantService.receivablesQrcode(receivablesQrcodeRequest, servletRequest);
         QrCode qrCode = merchantService.unifiedOrder(receivablesQrcodeRequest, servletRequest);
         return ViewData.builder().data(qrCode).build();
+
     }
 
     @GetMapping(value = "/merchant/receivables/status", headers = Const.API_VERSION_1_0_0)

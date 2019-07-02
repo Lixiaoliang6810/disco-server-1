@@ -11,26 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class WXPayUnifiedOrderRequest {
-    /*
-     * 以下是必填参数--非驼峰命名，方便对应
-     */
-    /**
-     * 公众账号ID
-     */
-    private String appId;
-    /**
-     * 商户号
-     */
-    private String mchId;
-    /**
-     * 随机字符串
-     */
-    private String nonceStr;
-    /**
-     * 签名
-     */
-    private String sign;
+public class WXPayUnifiedOrderRequest extends BaseRequest{
     /**
      * 商品描述-
      */
@@ -43,10 +24,7 @@ public class WXPayUnifiedOrderRequest {
      * 附加数据
      */
     private String attach;
-    /**
-     * 商户订单号-
-     */
-    private String outTradeNo;
+
     /**
      * 标价金额-
      */

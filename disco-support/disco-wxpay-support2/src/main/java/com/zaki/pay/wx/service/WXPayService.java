@@ -1,6 +1,8 @@
 package com.zaki.pay.wx.service;
 
+import com.zaki.pay.wx.model.request.WXPayOrderQueryRequest;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
+import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 
 import java.util.function.Function;
@@ -17,6 +19,11 @@ public interface WXPayService<T,R> {
      * @return 返回参数体
      */
     WXPayUnifiedOrderResponse unifiedOrder(WXPayUnifiedOrderRequest request);
+
+    WXPayOrderQueryResponse queryOrder(WXPayOrderQueryRequest request);
+
+
+
 
     /**
      * 接口调用之后的业务逻辑

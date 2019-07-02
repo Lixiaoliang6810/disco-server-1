@@ -17,6 +17,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,17 @@ public class WXPayServiceImpl implements WXPayService {
         return unifiedOrder(request).getCodeUrl();
     }
 
+    private String execute(String url,String data) throws IOException {
+        HttpPost httpPost = new HttpPost(url);
+        StringEntity postEntity = new StringEntity(data, Charset.forName("UTF-8"));
+        httpPost.addHeader(HTTP.CONTENT_TYPE, "text/xml");
+        httpPost.setEntity(postEntity);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpResponse callWeChatResponse = httpClient.execute(httpPost);
+        HttpEntity httpEntity = callWeChatResponse.getEntity();
+        return EntityUtils.toString(httpEntity, Charset.forName("UTF-8"));
+    }
     @Override
     public WXPayUnifiedOrderResponse unifiedOrder(WXPayUnifiedOrderRequest request) {
         Map<String, String> requestMap = new HashMap<>();
@@ -62,29 +74,18 @@ public class WXPayServiceImpl implements WXPayService {
         requestMap.put("out_trade_no", request.getOutTradeNo());
         requestMap.put("total_fee", request.getTotalFee());
         requestMap.put("spbill_create_ip", "127.0.0.1");
-        requestMap.put("notify_url", "127.0.0.1");
+        requestMap.put("notify_url", request.getNotifyUrl());
         requestMap.put("trade_type", request.getTradeType());
 
         try {
             String sign = WXPayUtil.generateSignature(requestMap, apiSecret);
             requestMap.put("sign", sign);
 
-
             String data = WXPayUtil.mapToXml(requestMap);
-            HttpPost httpPost = new HttpPost(String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX));
-            StringEntity postEntity = new StringEntity(data, Charset.forName("UTF-8"));
-            httpPost.addHeader(HTTP.CONTENT_TYPE, "text/xml");
-            httpPost.setEntity(postEntity);
-
-            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-            HttpResponse callWechatResponse = httpClient.execute(httpPost);
-            HttpEntity httpEntity = callWechatResponse.getEntity();
-            String result = EntityUtils.toString(httpEntity, Charset.forName("UTF-8"));
-
-
-
+            String url = String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX);
             // 请求接口
-//            String result = HttpClientUtil.doPost(String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX), WXPayUtil.xmlToMap(toXml));
+            String result = execute(url, data);
+
             log.info("WXPayService unifiedOrder result {}", result.replaceAll("\\n", ""));
             // 接口响应
             Map<String, String> responseMap = WXPayUtil.xmlToMap(result);

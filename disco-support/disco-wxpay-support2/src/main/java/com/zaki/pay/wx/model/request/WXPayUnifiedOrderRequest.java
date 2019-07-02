@@ -18,15 +18,15 @@ public class WXPayUnifiedOrderRequest {
     /**
      * 公众账号ID
      */
-    private String appid;
+    private String appId;
     /**
      * 商户号
      */
-    private String mch_id;
+    private String mchId;
     /**
      * 随机字符串
      */
-    private String nonce_str;
+    private String nonceStr;
     /**
      * 签名
      */
@@ -36,25 +36,33 @@ public class WXPayUnifiedOrderRequest {
      */
     private String body;
     /**
+     * 商品详情
+     */
+    private String detail;
+    /**
+     * 附加数据
+     */
+    private String attach;
+    /**
      * 商户订单号
      */
-    private String out_trade_no;
+    private String outTradeNo;
     /**
      * 标价金额
      */
-    private String total_fee;
+    private String totalFee;
     /**
      * 终端IP
      */
-    private String spbill_create_ip;
+    private String spbillCreateIp;
     /**
      * 通知地址
      */
-    private String notify_url;
+    private String notifyUrl;
     /**
-     * 交易类型
+     * 交易类型--默认扫码支付
      */
-    private String trade_type = TRADE_TYPE.NATIVE.name();
+    private String tradeType = TRADE_TYPE.NATIVE.name();
 
     public enum TRADE_TYPE{
         JSAPI,

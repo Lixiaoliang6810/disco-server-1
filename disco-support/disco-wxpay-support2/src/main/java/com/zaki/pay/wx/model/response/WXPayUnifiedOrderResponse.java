@@ -12,26 +12,26 @@ public class WXPayUnifiedOrderResponse {
     /**
      * 返回状态码
      */
-    private String return_code;
+    private String returnCode;
     /**
      * 返回信息
      */
-    private String return_msg;
+    private String returnMsg;
     /*
      * 以下字段在return_code为SUCCESS的时候有返回
      */
     /**
      * 公众账号ID
      */
-    private String appid;
+    private String appId;
     /**
      * 商户号
      */
-    private String mch_id;
+    private String mchId;
     /**
      * 随机字符串
      */
-    private String nonce_str;
+    private String nonceStr;
     /**
      * 签名
      */
@@ -39,7 +39,7 @@ public class WXPayUnifiedOrderResponse {
     /**
      * 业务结果
      */
-    private String result_code;
+    private String resultCode;
 
     /*
      * 以下字段在return_code 和result_code都为SUCCESS的时候有返回
@@ -47,16 +47,16 @@ public class WXPayUnifiedOrderResponse {
     /**
      * 交易类型
      */
-    private String trade_type;
+    private String tradeType;
     /**
      * 预支付交易会话标识--有效期为2小时
      */
-    private String prepay_id;
+    private String prepayId;
 
     /**
      * 二维码链接--trade_type=NATIVE时有返回
      */
-    private String code_url;
+    private String codeUrl;
 
 
 }

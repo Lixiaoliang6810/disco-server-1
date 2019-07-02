@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class WXPayUnifiedOrderResponse {
+public class WXPayUnifiedOrderResponse{
     /**
      * 返回状态码
      */

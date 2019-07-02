@@ -1,8 +1,6 @@
 package com.zaki.pay.wx.utils;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -109,7 +107,6 @@ public class HttpClientUtil {
 
         return resultString;
     }
-
 
     public static String doPost(String url) {
         return doPost(url, null);

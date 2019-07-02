@@ -31,6 +31,10 @@ import com.miner.disco.wxpay.support.model.request.WxpayAfterOrderRequest;
 import com.miner.disco.wxpay.support.model.request.WxpayPreorderRequest;
 import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
 import com.miner.disco.wxpay.support.model.response.WxpayPreorderResponse;
+import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
+import com.zaki.pay.wx.model.response.QrCode;
+import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
+import com.zaki.pay.wx.service.WXPayService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -152,6 +156,39 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantMapper.queryByMobile(mobile) != null;
     }
 
+    @Autowired
+    private WXPayService wxPayService;
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public QrCode unifiedOrder(ReceivablesQrcodeRequest request,HttpServletRequest servletRequest){
+        WXPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WXPayUnifiedOrderRequest();
+
+        Merchant merchant = merchantMapper.queryByPrimaryKey(request.getMerchantId());
+        wxPayUnifiedOrderRequest.setBody(merchant.getName());
+
+        String mchUidMask = UidMaskUtils.idToCode(merchant.getId());
+        String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
+        wxPayUnifiedOrderRequest.setOutTradeNo(outTradeNo);
+
+        BigDecimal originalPrice = request.getWinePrice().add(request.getFoodPrice());
+        wxPayUnifiedOrderRequest.setTotalFee(environment == Environment.RELEASE ? originalPrice.multiply(BigDecimal.valueOf(100)).toPlainString() : "1");
+        // 计算折价
+
+        String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
+        wxPayUnifiedOrderRequest.setNotifyUrl(callbackUrl);
+
+        WXPayUnifiedOrderResponse response = wxPayService.unifiedOrder(wxPayUnifiedOrderRequest);
+
+        QrCode qrCode = new QrCode();
+        qrCode.setQrcode(response.getCodeUrl());
+        qrCode.setOutTradeNo(outTradeNo);
+        qrCode.setOriginalPrice(originalPrice);
+
+        BigDecimal discountPrice = calculatePrice(request);
+        qrCode.setDiscountPrice(discountPrice);
+        return qrCode;
+    }
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public ReceivablesQrcodeResponse receivablesQrcode(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) throws MchBusinessException, UnsupportedEncodingException {
@@ -183,13 +220,14 @@ public class MerchantServiceImpl implements MerchantService {
         return wxpayPreorderRequest;
     }
 
-    private ReceivablesQrcodeResponse wxpayment(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) {
+    /**
+     * 计算客户实际应付金额
+     * @return 应付金额
+     */
+    private BigDecimal calculatePrice(ReceivablesQrcodeRequest receivablesQrcodeRequest){
         Merchant merchant = merchantMapper.queryByPrimaryKey(receivablesQrcodeRequest.getMerchantId());
-        String mchUidMask = UidMaskUtils.idToCode(merchant.getId());
-        String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
-//        System.out.println("=========账单流水号::"+outTradeNo);
         // discountPrice==打折金额*折扣+不打折金额
-        /**
+        /*
          * 有引导员优惠码时才打折，折扣继承于商家设定的折扣；
          * 优惠码需要校验
          */
@@ -213,6 +251,19 @@ public class MerchantServiceImpl implements MerchantService {
         }else {
             discountPrice = receivablesQrcodeRequest.getWinePrice().add(receivablesQrcodeRequest.getFoodPrice());
         }
+        return discountPrice;
+    }
+    private ReceivablesQrcodeResponse wxpayment(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest) {
+        Merchant merchant = merchantMapper.queryByPrimaryKey(receivablesQrcodeRequest.getMerchantId());
+        String mchUidMask = UidMaskUtils.idToCode(merchant.getId());
+        String outTradeNo = String.format("%s%s", mchUidMask, UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 18));
+//        System.out.println("=========账单流水号::"+outTradeNo);
+        // discountPrice==打折金额*折扣+不打折金额
+        /**
+         * 有引导员优惠码时才打折，折扣继承于商家设定的折扣；
+         * 优惠码需要校验
+         */
+        BigDecimal discountPrice = calculatePrice(receivablesQrcodeRequest);
         // 微信预支付请求
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
         // 微信支付需将金额discountPrice放大100倍

@@ -4,6 +4,7 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.miner.disco.alipay.support.AlipayService;
 import com.miner.disco.wxpay.support.WxpayService;
+import com.zaki.pay.wx.service.impl.WXPayServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,5 +50,10 @@ public class Beans {
     @Bean(name = "wxpayService")
     public WxpayService wxpayService() {
         return new WxpayService(wxAppId,mchid,secret);
+    }
+
+    @Bean(name = "wxPayService")
+    public WXPayServiceImpl wxPayService() {
+        return new WXPayServiceImpl(wxAppId,mchid,secret);
     }
 }

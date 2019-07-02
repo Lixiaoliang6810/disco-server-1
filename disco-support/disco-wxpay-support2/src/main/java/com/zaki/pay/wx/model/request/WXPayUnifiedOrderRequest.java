@@ -32,7 +32,7 @@ public class WXPayUnifiedOrderRequest {
      */
     private String sign;
     /**
-     * 商品描述
+     * 商品描述-
      */
     private String body;
     /**
@@ -44,11 +44,11 @@ public class WXPayUnifiedOrderRequest {
      */
     private String attach;
     /**
-     * 商户订单号
+     * 商户订单号-
      */
     private String outTradeNo;
     /**
-     * 标价金额
+     * 标价金额-
      */
     private String totalFee;
     /**
@@ -56,7 +56,8 @@ public class WXPayUnifiedOrderRequest {
      */
     private String spbillCreateIp;
     /**
-     * 通知地址
+     * 异步接收微信支付结果通知的回调地址-
+     * 通知url必须为外网可访问的url，不能携带参数
      */
     private String notifyUrl;
     /**

@@ -5,11 +5,19 @@ import com.zaki.pay.wx.exception.WXPayApiException;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 import com.zaki.pay.wx.service.WXPayService;
-import com.zaki.pay.wx.utils.HttpClientUtil;
 import com.zaki.pay.wx.utils.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,8 +34,19 @@ public class WXPayServiceImpl implements WXPayService {
      */
     private String appId;
     private String mchId;
-    private String secret;
+    private String apiSecret;
 
+    public WXPayServiceImpl(String appId, String mchId, String apiSecret) {
+        this.appId = appId;
+        this.mchId = mchId;
+        this.apiSecret = apiSecret;
+    }
+
+
+    @Override
+    public String getCodeUrl(WXPayUnifiedOrderRequest request) {
+        return unifiedOrder(request).getCodeUrl();
+    }
 
     @Override
     public WXPayUnifiedOrderResponse unifiedOrder(WXPayUnifiedOrderRequest request) {
@@ -43,21 +62,34 @@ public class WXPayServiceImpl implements WXPayService {
         requestMap.put("out_trade_no", request.getOutTradeNo());
         requestMap.put("total_fee", request.getTotalFee());
         requestMap.put("spbill_create_ip", "127.0.0.1");
-        requestMap.put("notify_url", request.getNotifyUrl());
+        requestMap.put("notify_url", "127.0.0.1");
         requestMap.put("trade_type", request.getTradeType());
 
         try {
-            String sign = WXPayUtil.generateSignature(requestMap, secret);
+            String sign = WXPayUtil.generateSignature(requestMap, apiSecret);
             requestMap.put("sign", sign);
 
+
+            String data = WXPayUtil.mapToXml(requestMap);
+            HttpPost httpPost = new HttpPost(String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX));
+            StringEntity postEntity = new StringEntity(data, Charset.forName("UTF-8"));
+            httpPost.addHeader(HTTP.CONTENT_TYPE, "text/xml");
+            httpPost.setEntity(postEntity);
+
+            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+            HttpResponse callWechatResponse = httpClient.execute(httpPost);
+            HttpEntity httpEntity = callWechatResponse.getEntity();
+            String result = EntityUtils.toString(httpEntity, Charset.forName("UTF-8"));
+
+
+
             // 请求接口
-            String result = HttpClientUtil.doPost(String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX), requestMap);
+//            String result = HttpClientUtil.doPost(String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.UNIFIEDORDER_URL_SUFFIX), WXPayUtil.xmlToMap(toXml));
             log.info("WXPayService unifiedOrder result {}", result.replaceAll("\\n", ""));
             // 接口响应
             Map<String, String> responseMap = WXPayUtil.xmlToMap(result);
 
             if (responseMap.containsKey("return_code") && StringUtils.equals("FAIL", responseMap.get("return_code"))) {
-                System.out.println("微信支付api调用错误>>"+ responseMap.get("err_code") + "::"+ responseMap.get("err_code_des"));
                 throw new WXPayApiException("WXPayService unifiedOrder error");
             }
 

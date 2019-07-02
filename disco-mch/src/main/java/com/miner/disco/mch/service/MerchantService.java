@@ -6,6 +6,8 @@ import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
 import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
+import com.zaki.pay.wx.model.response.QrCode;
+import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -33,4 +35,6 @@ public interface MerchantService {
     CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException;
 
     WxpayAfterOrderResponse afterOrder(String outTradeNo);
+
+    QrCode unifiedOrder(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest);
 }

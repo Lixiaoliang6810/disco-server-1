@@ -1,6 +1,5 @@
 package com.zaki.pay.wx.service;
 
-import com.zaki.pay.wx.model.dto.QrCode;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 
@@ -11,6 +10,7 @@ import java.util.function.Function;
  */
 public interface WXPayService<T,R> {
 
+    String getCodeUrl(WXPayUnifiedOrderRequest request);
     /**
      * 统一下单--通过响应的 code_url 生成二维码
      * @param request 请求参数体

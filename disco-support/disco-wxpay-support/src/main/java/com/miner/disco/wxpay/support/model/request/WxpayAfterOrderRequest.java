@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class WxpayAfterOrderRequest {
+public class WxPayAfterOrderRequest {
     private String appid;
     private String mchid;
     private String outTradeNo;

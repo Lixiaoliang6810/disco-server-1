@@ -1,4 +1,4 @@
-package com.zaki.pay.wx.utils;
+package com.zaki.pay.wx.constants;
 
 /**
  * 常量

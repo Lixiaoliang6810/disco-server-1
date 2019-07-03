@@ -78,8 +78,7 @@ public class OrdersController {
 
     /**
      * 预定
-     * 点击‘立即支付’ 时生成订单，状态为 未支付：WAIT_PAYMENT
-     *
+     * 点击‘立即支付’ 时生成订单，ordersMapper.insert(orders)==状态为 未支付：WAIT_PAYMENT
      *
      */
     @PostMapping(value = "/orders/purchase", headers = Const.API_VERSION_1_0_0)
@@ -100,7 +99,8 @@ public class OrdersController {
     }
 
     /**
-     * 点击‘立即支付’ 完成后，订单变为 已支付
+     * 选择支付方式->‘确认支付’ 完成后，订单变为 已支付
+     * 由此--
      */
     @PostMapping(value = "/orders/payment", headers = Const.API_VERSION_1_0_0)
     public ViewData payment(HttpServletRequest servletRequest, OrdersPaymentRequest request) throws IOException, ClientException, ParseException {
@@ -117,7 +117,7 @@ public class OrdersController {
         String amount = Integer.toString(assembleSeatsCount);
         // 查店家手机
         Long sellerId = orders.getSeller();
-        Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(sellerId);
+        Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(sellerId);
         String merchantMobile = merchant.getMobile();
         switch (request.getPm()) {
             case ALIPAY:
@@ -130,7 +130,7 @@ public class OrdersController {
                 WxpayPreorderResponse response = wxpay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
 //                SMSHelper.sendChinaMessage(content,merchantMobile);
                 smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
-                return ViewData.builder().data(response).message("0").build();
+                return ViewData.builder().data(response).message("微信预支付").build();
             case WAP_ALIPAY:
                 AlipayPreorderResponse wapResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
 //                SMSHelper.sendChinaMessage(content,merchantMobile);
@@ -147,6 +147,11 @@ public class OrdersController {
         return ViewData.builder().data(response).message("订单详情").build();
     }
 
+    /**
+     * 预订订金可以极速退款--
+     * @param ordersId
+     * @return
+     */
     @PostMapping(value = "/orders/refund", headers = Const.API_VERSION_1_0_0)
     public ViewData refund(@RequestParam("ordersId") Long ordersId) {
         ordersService.refund(ordersId);

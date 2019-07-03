@@ -147,7 +147,7 @@ public class WXPayServiceImpl implements WXPayService {
     @Transactional(readOnly = true)
     public WXPayOrderQueryResponse queryOrder(WXPayOrderQueryRequest request) {
         Map<String, String> requestMap = getPublicParameters();
-
+        requestMap.put("out_trade_no",request.getOutTradeNo());
         WXPayOrderQueryResponse response = new WXPayOrderQueryResponse();
         try {
             String sign = WXPayUtil.generateSignature(requestMap, apiSecret);
@@ -184,7 +184,7 @@ public class WXPayServiceImpl implements WXPayService {
     }
 
     @Override
-    public ApplyRefundResponse applyRefund(ApplyRefundRequest request) {
+    public ApplyRefundResponse refund(ApplyRefundRequest request) {
         Map<String, String> requestMap = getPublicParameters();
 
         String sign = null;
@@ -200,6 +200,7 @@ public class WXPayServiceImpl implements WXPayService {
         requestMap.put("sign", sign);
 
         ApplyRefundResponse response = new ApplyRefundResponse();
+        FileInputStream inputStream = null;
         try {
             String data = WXPayUtil.mapToXml(requestMap);
             String url = String.format("%s%s", WXPayConstants.DOMAIN_API, WXPayConstants.REFUND_URL_SUFFIX);
@@ -207,8 +208,8 @@ public class WXPayServiceImpl implements WXPayService {
             // 证书--------------------
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             String property =System.getProperty("user.dir")+ RELATIVE_PATH;
-            FileInputStream is = new FileInputStream(new File(property));//P12文件目录
-            keyStore.load(is,mchId.toCharArray());
+            inputStream = new FileInputStream(new File(property));//P12文件目录
+            keyStore.load(inputStream,mchId.toCharArray());
             SSLContext sslcontext = SSLContexts.custom().loadKeyMaterial(keyStore, mchId.toCharArray()).build();
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null, SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
             CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
@@ -249,6 +250,14 @@ public class WXPayServiceImpl implements WXPayService {
             response.setErrCodeDes(responseMap.get("err_code_des"));
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            if(inputStream!=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return response;
     }

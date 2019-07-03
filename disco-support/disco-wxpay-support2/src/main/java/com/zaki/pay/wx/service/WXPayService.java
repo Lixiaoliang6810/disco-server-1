@@ -34,7 +34,7 @@ public interface WXPayService<T,R> {
      * @param request
      * @return 退款响应体
      */
-    ApplyRefundResponse applyRefund(ApplyRefundRequest request);
+    ApplyRefundResponse refund(ApplyRefundRequest request);
 
 
 

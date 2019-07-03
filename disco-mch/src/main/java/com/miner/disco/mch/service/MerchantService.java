@@ -34,7 +34,7 @@ public interface MerchantService {
 
     WXPayOrderQueryResponse queryOrder(String outTradeNo);
 
-    ApplyRefundResponse applyRefund(ApplyRefundRequest request);
+    ApplyRefundResponse refund(ApplyRefundRequest request);
 
     QrCodeResponse unifiedOrder(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest);
 }

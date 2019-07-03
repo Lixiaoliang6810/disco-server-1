@@ -71,4 +71,7 @@
         SELECT COUNT(1) as total FROM ds_orders o WHERE o.seller = #{merchantId}
     </select>
 
+    <select id="queryByOutTradeNo" resultType="com.miner.disco.pojo.Orders">
+        SELECT * FROM ds_orders o WHERE o.no = #{outTradeNo} ORDER BY o.create_date DESC LIMIT 1
+    </select>
 </mapper>

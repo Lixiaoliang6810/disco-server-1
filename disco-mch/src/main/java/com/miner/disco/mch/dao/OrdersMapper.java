@@ -24,4 +24,6 @@ public interface OrdersMapper extends BasicMapper<Orders> {
 
     Integer statisticsTotalOrders(@Param("merchantId") Long merchantId);
 
+    Orders queryByOutTradeNo(@Param("outTradeNo") String outTradeNo);
+
 }

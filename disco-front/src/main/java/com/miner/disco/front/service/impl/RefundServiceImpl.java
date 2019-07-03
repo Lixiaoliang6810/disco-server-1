@@ -28,9 +28,6 @@ public class RefundServiceImpl implements RefundService {
     private AlipayService alipayService;
 
     @Autowired
-    private MerchantEvaluateMapper merchantEvaluateMapper;
-
-    @Autowired
     private MerchantBillMapper merchantBillMapper;
 
     @Autowired

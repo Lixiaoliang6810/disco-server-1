@@ -78,7 +78,7 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         saveMerchantReceivablesQrcode.setUpdateDate(new Date());
         merchantReceivablesQrcodeMapper.updateByPrimaryKey(saveMerchantReceivablesQrcode);
 
-        Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(merchantReceivablesQrcode.getMchId());
+        Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(merchantReceivablesQrcode.getMchId());
         BigDecimal merchantAmount = request.getAmount();
         //记录引导员抽成
         if (request.getVipId() != -1) {
@@ -154,7 +154,7 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         merchantBillMapper.insert(merchantBill);
 
         //更新商户余额
-        Merchant saveMerchant = merchantMapper.queryByPrimaryKeyFroUpdate(merchant.getId());
+        Merchant saveMerchant = merchantMapper.queryByPrimaryKeyForUpdate(merchant.getId());
         saveMerchant.setId(merchant.getId());
         saveMerchant.setUsableBalance(merchant.getUsableBalance().add(merchantAmount));
         merchantMapper.updateByPrimaryKey(saveMerchant);

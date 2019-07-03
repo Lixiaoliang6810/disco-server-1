@@ -27,6 +27,7 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
                 .antMatchers("/aggregate/wxpay/sweep/notify").permitAll()
 
                 .antMatchers("/merchant/apply/refund").permitAll()
+                .antMatchers("/wxpay/orders/test").permitAll()
 
                 .anyRequest().authenticated()
                 .and().formLogin().permitAll()

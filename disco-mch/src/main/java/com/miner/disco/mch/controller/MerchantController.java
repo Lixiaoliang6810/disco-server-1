@@ -97,7 +97,7 @@ String outRefundNo;
  String totalFee;amount
  String refundFee;amount
      */
-    @PostMapping(value = "/merchant/apply/refund", headers = Const.API_VERSION_1_0_0)
+    @PostMapping(value = "/merchant/refund", headers = Const.API_VERSION_1_0_0)
     public ViewData receivablesStatusx(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                                        @RequestParam("outTradeNo") String outTradeNo,
                                        @RequestParam("totalFee") String totalFee,
@@ -107,7 +107,7 @@ String outRefundNo;
         applyRefundRequest.setOutRefundNo(outTradeNo);
         applyRefundRequest.setTotalFee(totalFee);
         applyRefundRequest.setRefundFee(refundFee);
-        ApplyRefundResponse applyRefundResponse = merchantService.applyRefund(applyRefundRequest);
+        ApplyRefundResponse applyRefundResponse = merchantService.refund(applyRefundRequest);
         if(StringUtils.isNotBlank(applyRefundResponse.getErrCodeDes())){
             return ViewData.builder().data(applyRefundResponse.getErrCodeDes()).build();
         }

@@ -25,6 +25,11 @@ public class MerchantBillController {
     @Autowired
     private MerchantBillService merchantBillService;
 
+    /**
+     * 资金管理--线上预定+线下扫码
+     * @param request
+     * @return
+     */
     @GetMapping(value = "/merchant/bill/list", headers = Const.API_VERSION_1_0_0)
     public ViewData list(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                          MerchantBillRequest request) {

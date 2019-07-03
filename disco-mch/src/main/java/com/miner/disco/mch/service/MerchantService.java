@@ -4,15 +4,12 @@ import com.miner.disco.mch.exception.MchBusinessException;
 import com.miner.disco.mch.model.request.*;
 import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
-import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
-import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
-import com.zaki.pay.wx.model.response.QrCode;
+import com.zaki.pay.wx.model.request.ApplyRefundRequest;
+import com.zaki.pay.wx.model.response.ApplyRefundResponse;
+import com.zaki.pay.wx.model.response.QrCodeResponse;
 import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
-import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 
 /**
  * @author Created by lubycoder@163.com 2019/1/8
@@ -37,5 +34,7 @@ public interface MerchantService {
 
     WXPayOrderQueryResponse queryOrder(String outTradeNo);
 
-    QrCode unifiedOrder(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest);
+    ApplyRefundResponse applyRefund(ApplyRefundRequest request);
+
+    QrCodeResponse unifiedOrder(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest);
 }

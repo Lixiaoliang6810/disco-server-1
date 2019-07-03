@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.security.KeyStoreException;
+
 /**
  * @author Created by lubycoder@163.com 2019/1/7
  */
@@ -53,7 +55,7 @@ public class Beans {
     }
 
     @Bean(name = "wxPayService")
-    public WXPayServiceImpl wxPayService() {
+    public WXPayServiceImpl wxPayService() throws KeyStoreException {
         return new WXPayServiceImpl(wxAppId,mchid,secret);
     }
 }

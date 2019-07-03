@@ -13,26 +13,9 @@ public class WXPayOrderQueryResponse extends BaseResponse{
      * 以下字段在return_code为SUCCESS的时候有返回
      */
     /**
-     * 公众账号ID
-     */
-    private String appId;
-    /**
-     * 商户号
-     */
-    private String mchId;
-    /**
-     * 随机字符串
-     */
-    private String nonceStr;
-    /**
-     * 签名
-     */
-    private String sign;
-    /**
      * 业务结果
      */
     private String resultCode;
-
     /*
      * 以下字段在return_code 、result_code、trade_state都为SUCCESS时有返回 ，
      * 如trade_state不为 SUCCESS，则只返回out_trade_no（必传）和attach（选传）

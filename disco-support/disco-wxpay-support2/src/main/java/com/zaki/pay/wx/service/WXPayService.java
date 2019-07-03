@@ -1,7 +1,9 @@
 package com.zaki.pay.wx.service;
 
+import com.zaki.pay.wx.model.request.ApplyRefundRequest;
 import com.zaki.pay.wx.model.request.WXPayOrderQueryRequest;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
+import com.zaki.pay.wx.model.response.ApplyRefundResponse;
 import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 
@@ -20,7 +22,19 @@ public interface WXPayService<T,R> {
      */
     WXPayUnifiedOrderResponse unifiedOrder(WXPayUnifiedOrderRequest request);
 
+    /**
+     * 订单查询
+     * @param request
+     * @return 查询响应结果
+     */
     WXPayOrderQueryResponse queryOrder(WXPayOrderQueryRequest request);
+
+    /**
+     * 申请退款
+     * @param request
+     * @return 退款响应体
+     */
+    ApplyRefundResponse applyRefund(ApplyRefundRequest request);
 
 
 

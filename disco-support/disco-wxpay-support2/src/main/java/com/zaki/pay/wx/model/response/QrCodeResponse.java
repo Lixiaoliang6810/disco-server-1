@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-public class QrCode {
+public class QrCodeResponse {
     /**
      * 二维码
      */

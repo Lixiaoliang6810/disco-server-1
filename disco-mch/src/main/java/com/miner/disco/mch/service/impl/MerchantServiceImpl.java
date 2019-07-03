@@ -30,9 +30,11 @@ import com.miner.disco.pojo.Merchant;
 import com.miner.disco.pojo.MerchantAggregateQrcode;
 import com.miner.disco.wxpay.support.exception.WxpayApiException;
 import com.zaki.pay.wx.constants.WXOrderStatus;
+import com.zaki.pay.wx.model.request.ApplyRefundRequest;
 import com.zaki.pay.wx.model.request.WXPayOrderQueryRequest;
 import com.zaki.pay.wx.model.request.WXPayUnifiedOrderRequest;
-import com.zaki.pay.wx.model.response.QrCode;
+import com.zaki.pay.wx.model.response.ApplyRefundResponse;
+import com.zaki.pay.wx.model.response.QrCodeResponse;
 import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 import com.zaki.pay.wx.service.WXPayService;
@@ -80,6 +82,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Autowired
     private AlipayService alipayService;
+
+    @Autowired
+    private WXPayService wxPayService;
 
     @Value("${server.environment}")
     private Environment environment;
@@ -150,12 +155,11 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantMapper.queryByMobile(mobile) != null;
     }
 
-    @Autowired
-    private WXPayService wxPayService;
+
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public QrCode unifiedOrder(ReceivablesQrcodeRequest request,HttpServletRequest servletRequest){
+    public QrCodeResponse unifiedOrder(ReceivablesQrcodeRequest request, HttpServletRequest servletRequest){
         WXPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WXPayUnifiedOrderRequest();
         Merchant merchant = merchantMapper.queryByPrimaryKey(request.getMerchantId());
         // body
@@ -188,14 +192,14 @@ public class MerchantServiceImpl implements MerchantService {
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         genMchAggregateQrcode(request,merchant,outTradeNo,response.getCodeUrl(),originalPrice,new BigDecimal(decimalFormat.format(discountPrice)),2);
 
-        QrCode qrCode = new QrCode();
-        qrCode.setQrcode(response.getCodeUrl());
-        qrCode.setOutTradeNo(outTradeNo);
-        qrCode.setOriginalPrice(originalPrice.toPlainString());
+        QrCodeResponse qrCodeResponse = new QrCodeResponse();
+        qrCodeResponse.setQrcode(response.getCodeUrl());
+        qrCodeResponse.setOutTradeNo(outTradeNo);
+        qrCodeResponse.setOriginalPrice(originalPrice.toPlainString());
 
 
-        qrCode.setDiscountPrice(discountPrice.toPlainString());
-        return qrCode;
+        qrCodeResponse.setDiscountPrice(discountPrice.toPlainString());
+        return qrCodeResponse;
     }
 
 
@@ -255,6 +259,11 @@ public class MerchantServiceImpl implements MerchantService {
             e.printStackTrace();
         }
         return response;
+    }
+
+    @Override
+    public ApplyRefundResponse applyRefund(ApplyRefundRequest request) {
+        return wxPayService.applyRefund(request);
     }
 
     /**

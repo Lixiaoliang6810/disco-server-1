@@ -17,6 +17,19 @@ public class WXPayUnifiedOrderRequest extends BaseRequest{
      */
     private String body;
     /**
+     * 商户订单号-
+     */
+    private String outTradeNo;
+    /**
+     * 标价金额-
+     */
+    private String totalFee;
+    /**
+     * 交易类型--默认扫码支付
+     */
+    private String tradeType = TRADE_TYPE.NATIVE.name();
+
+    /**
      * 商品详情
      */
     private String detail;
@@ -24,11 +37,6 @@ public class WXPayUnifiedOrderRequest extends BaseRequest{
      * 附加数据
      */
     private String attach;
-
-    /**
-     * 标价金额-
-     */
-    private String totalFee;
     /**
      * 终端IP
      */
@@ -38,10 +46,6 @@ public class WXPayUnifiedOrderRequest extends BaseRequest{
      * 通知url必须为外网可访问的url，不能携带参数
      */
     private String notifyUrl;
-    /**
-     * 交易类型--默认扫码支付
-     */
-    private String tradeType = TRADE_TYPE.NATIVE.name();
 
     public enum TRADE_TYPE{
         JSAPI,

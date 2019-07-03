@@ -1,18 +1,16 @@
 package com.miner.disco.mch.controller;
 
 import com.miner.disco.basic.model.response.ViewData;
-import com.miner.disco.basic.util.Encrypt;
-import com.miner.disco.basic.util.ShareCodeUtils;
 import com.miner.disco.mch.consts.Const;
 import com.miner.disco.mch.model.request.*;
 import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
-import com.miner.disco.mch.model.response.ReceivablesQrcodeResponse;
 import com.miner.disco.mch.oauth.model.CustomUserDetails;
 import com.miner.disco.mch.service.MerchantService;
-import com.miner.disco.wxpay.support.model.response.WxpayAfterOrderResponse;
-import com.zaki.pay.wx.model.response.QrCode;
-import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
+import com.zaki.pay.wx.model.request.ApplyRefundRequest;
+import com.zaki.pay.wx.model.response.ApplyRefundResponse;
+import com.zaki.pay.wx.model.response.QrCodeResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.security.Principal;
 
 /**
  * @author Created by lubycoder@163.com 2019/1/8
@@ -82,9 +79,8 @@ public class MerchantController {
         receivablesQrcodeRequest.setWinePrice(winePrice);
         receivablesQrcodeRequest.setFoodPrice(foodPrice);
 //        ReceivablesQrcodeResponse response = merchantService.receivablesQrcode(receivablesQrcodeRequest, servletRequest);
-        QrCode qrCode = merchantService.unifiedOrder(receivablesQrcodeRequest, servletRequest);
-        return ViewData.builder().data(qrCode).build();
-
+        QrCodeResponse qrCodeResponse = merchantService.unifiedOrder(receivablesQrcodeRequest, servletRequest);
+        return ViewData.builder().data(qrCodeResponse).build();
     }
 
     @GetMapping(value = "/merchant/receivables/status", headers = Const.API_VERSION_1_0_0)
@@ -95,6 +91,27 @@ public class MerchantController {
         return ViewData.builder().data(checkReceivablesStatusResponse).build();
     }
 
-
+    /**
+ String outTradeNo;serial_no
+String outRefundNo;
+ String totalFee;amount
+ String refundFee;amount
+     */
+    @PostMapping(value = "/merchant/apply/refund", headers = Const.API_VERSION_1_0_0)
+    public ViewData receivablesStatusx(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
+                                       @RequestParam("outTradeNo") String outTradeNo,
+                                       @RequestParam("totalFee") String totalFee,
+                                       @RequestParam("refundFee") String refundFee){
+        ApplyRefundRequest applyRefundRequest = new ApplyRefundRequest();
+        applyRefundRequest.setOutTradeNo(outTradeNo);
+        applyRefundRequest.setOutRefundNo(outTradeNo);
+        applyRefundRequest.setTotalFee(totalFee);
+        applyRefundRequest.setRefundFee(refundFee);
+        ApplyRefundResponse applyRefundResponse = merchantService.applyRefund(applyRefundRequest);
+        if(StringUtils.isNotBlank(applyRefundResponse.getErrCodeDes())){
+            return ViewData.builder().data(applyRefundResponse.getErrCodeDes()).build();
+        }
+        return ViewData.builder().data(applyRefundResponse).build();
+    }
 
 }

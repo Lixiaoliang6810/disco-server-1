@@ -26,10 +26,6 @@ public class BaseRequest {
      */
     private String sign;
     /**
-     * 商户订单号-
-     */
-    private String outTradeNo;
-    /**
      * 签名类型
      */
     private String signType;

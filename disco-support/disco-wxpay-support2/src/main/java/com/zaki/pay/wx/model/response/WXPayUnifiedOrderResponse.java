@@ -13,26 +13,9 @@ public class WXPayUnifiedOrderResponse extends BaseResponse{
      * 以下字段在return_code为SUCCESS的时候有返回
      */
     /**
-     * 公众账号ID
-     */
-    private String appId;
-    /**
-     * 商户号
-     */
-    private String mchId;
-    /**
-     * 随机字符串
-     */
-    private String nonceStr;
-    /**
-     * 签名
-     */
-    private String sign;
-    /**
      * 业务结果
      */
     private String resultCode;
-
     /*
      * 以下字段在return_code 和result_code都为SUCCESS的时候有返回
      */
@@ -44,7 +27,6 @@ public class WXPayUnifiedOrderResponse extends BaseResponse{
      * 预支付交易会话标识--有效期为2小时
      */
     private String prepayId;
-
     /**
      * 二维码链接--trade_type=NATIVE时有返回
      */

@@ -50,9 +50,7 @@ public class AlipayService {
         refundModel.setRefundAmount(request.getRefundAmount());
         refundModel.setRefundReason(request.getRefundReason());
         refundApplyRequest.setBizModel(refundModel);
-        AlipayTradeRefundResponse alipayTradeRefundApplyResponse;
-        alipayTradeRefundApplyResponse = alipayClient.execute(refundApplyRequest);
-        return alipayTradeRefundApplyResponse;
+        return alipayClient.execute(refundApplyRequest);
     }
 
     public AlipayPreorderResponse wapPreorder(AlipayPreorderRequest request) throws AlipayApiException {

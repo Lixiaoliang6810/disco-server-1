@@ -10,6 +10,10 @@ import lombok.Setter;
 @Setter
 public class WXPayOrderQueryRequest extends BaseRequest{
     /**
+     * 商户订单号-
+     */
+    private String outTradeNo;
+    /**
      * 微信订单号--outTradeNo/transactionId 二选一
      */
     private String transactionId;

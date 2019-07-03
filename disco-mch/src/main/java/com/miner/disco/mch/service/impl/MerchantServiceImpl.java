@@ -285,50 +285,59 @@ public class MerchantServiceImpl implements MerchantService {
             if(response==null) return null;
             String tradeState = response.getTradeState();
             if("SUCCESS".equals(tradeState)){
-                // 更新收款码状态为2
-                MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
-                MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
-                if(aggregateQrcode!=null){
-                    BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
-                    merchantAggregateQrcode.setStatus(WXOrderStatus.PAY_SUCCESS.getKey());
-                    merchantAggregateQrcode.setPaymentDate(new Date());
-                    merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
-                }
-                // ------------------->>>>>>>>>>>>----------------------
+                doUpdateBiz(response,outTradeNo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
 
-                //更新订单信息--支付成功
-                Orders orders = ordersMapper.queryByOutTradeNo(outTradeNo);
+    private void doUpdateBiz(WXPayOrderQueryResponse response,String outTradeNo){
+        // 更新收款码状态为2
+        MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
+        MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
+        if(aggregateQrcode!=null){
+            BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
+            merchantAggregateQrcode.setStatus(WXOrderStatus.PAY_SUCCESS.getKey());
+            merchantAggregateQrcode.setPaymentDate(new Date());
+            merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
+        }
+        // ------------------->>>>>>>>>>>>----------------------
 
-                Orders saveOrders = new Orders();
-                BeanUtils.copyProperties(orders,saveOrders);
-                // 支付成功后将姓名改成微信用户id-- openid
-                saveOrders.setBuyer(-1L);
-                saveOrders.setFullname(StringUtils.isBlank(response.getOpenId())?"微信线下扫码用户-已付款":response.getOpenId());
-                saveOrders.setUpdateDate(new Date());
-                saveOrders.setPaymentDate(new Date());
-                saveOrders.setStatus(Orders.STATUS.COMPLETE.getKey());
-                ordersMapper.updateByPrimaryKey(saveOrders);
-                //更新商品信息
-                MerchantGoods merchantGoods = merchantGoodsMapper.queryByPrimaryKey(orders.getGoodsId());
-                if(merchantGoods!=null){
-                    MerchantGoods saveMerchantGoods = new MerchantGoods();
-                    saveMerchantGoods.setId(orders.getGoodsId());
-                    saveMerchantGoods.setSalesVolume(merchantGoods.getSalesVolume() == null ? 1 : merchantGoods.getSalesVolume() + 1);
-                    merchantGoodsMapper.updateByPrimaryKey(saveMerchantGoods);
-                }
+        //更新订单信息--支付成功
+        Orders orders = ordersMapper.queryByOutTradeNo(outTradeNo);
 
-                //更新商户余额
-                Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(orders.getSeller());
-                Assert.notNull(merchant, MchBusinessExceptionCode.OBJECT_DOES_NOT_EXIST.getCode(), "商户不存在");
-                Merchant saveMerchant = new Merchant();
-                saveMerchant.setId(merchant.getId());
-                saveMerchant.setFrozenBalance(merchant.getFrozenBalance().add(orders.getTotalMoney()));
-                saveMerchant.setUpdateDate(new Date());
-                merchantMapper.updateByPrimaryKey(saveMerchant);
+        Orders saveOrders = new Orders();
+        BeanUtils.copyProperties(orders,saveOrders);
+        // 支付成功后将姓名改成微信用户id-- openid
+        saveOrders.setBuyer(-1L);
+        saveOrders.setFullname(StringUtils.isBlank(response.getOpenId())?"微信线下扫码用户-已付款":response.getOpenId());
+        saveOrders.setUpdateDate(new Date());
+        saveOrders.setPaymentDate(new Date());
+        saveOrders.setStatus(Orders.STATUS.COMPLETE.getKey());
+        ordersMapper.updateByPrimaryKey(saveOrders);
+        //更新商品信息
+        MerchantGoods merchantGoods = merchantGoodsMapper.queryByPrimaryKey(orders.getGoodsId());
+        if(merchantGoods!=null){
+            MerchantGoods saveMerchantGoods = new MerchantGoods();
+            saveMerchantGoods.setId(orders.getGoodsId());
+            saveMerchantGoods.setSalesVolume(merchantGoods.getSalesVolume() == null ? 1 : merchantGoods.getSalesVolume() + 1);
+            merchantGoodsMapper.updateByPrimaryKey(saveMerchantGoods);
+        }
 
-                //记录回调记录
+        //更新商户余额
+        Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(orders.getSeller());
+        Assert.notNull(merchant, MchBusinessExceptionCode.OBJECT_DOES_NOT_EXIST.getCode(), "商户不存在");
+        Merchant saveMerchant = new Merchant();
+        saveMerchant.setId(merchant.getId());
+        saveMerchant.setFrozenBalance(merchant.getFrozenBalance().add(orders.getTotalMoney()));
+        saveMerchant.setUpdateDate(new Date());
+        merchantMapper.updateByPrimaryKey(saveMerchant);
 
-                // 线下扫码用户没有个人流水
+        //记录回调记录
+
+        // 线下扫码用户没有个人流水
 //                //记录用户流水
 //                MemberBill memberBill = new MemberBill();
 //                memberBill.setSerialNo(outTradeNo);
@@ -343,28 +352,22 @@ public class MerchantServiceImpl implements MerchantService {
 //                memberBill.setUpdateDate(new Date());
 //                memberBillMapper.insert(memberBill);
 
-                //记录商户流水
-                MerchantBill merchantBill = new MerchantBill();
-                merchantBill.setAmount(orders.getTotalMoney());
-                merchantBill.setMerchantId(orders.getSeller());
-                // 商户该条流水来源
-                merchantBill.setSourceId(orders.getId());
-                merchantBill.setCreateDate(new Date());
-                merchantBill.setUpdateDate(new Date());
-                // 类型-- 1:收入
-                merchantBill.setType(MerchantBill.STATUS.IN.getKey());
-                // 交易类型-- 2:线下扫码
-                merchantBill.setTradeType(MerchantBill.TRADE_STATUS.OFF_LINE.getKey());
-                merchantBill.setRemark(MerchantBill.TRADE_STATUS.OFF_LINE.getValue());
-                merchantBillMapper.insert(merchantBill);
-                // ------------------->>>>>>>>>>>>----------------------
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
+        //记录商户流水
+        MerchantBill merchantBill = new MerchantBill();
+        merchantBill.setAmount(orders.getTotalMoney());
+        merchantBill.setMerchantId(orders.getSeller());
+        // 商户该条流水来源
+        merchantBill.setSourceId(orders.getId());
+        merchantBill.setCreateDate(new Date());
+        merchantBill.setUpdateDate(new Date());
+        // 类型-- 1:收入
+        merchantBill.setType(MerchantBill.STATUS.IN.getKey());
+        // 交易类型-- 2:线下扫码
+        merchantBill.setTradeType(MerchantBill.TRADE_STATUS.OFF_LINE.getKey());
+        merchantBill.setRemark(MerchantBill.TRADE_STATUS.OFF_LINE.getValue());
+        merchantBillMapper.insert(merchantBill);
+        // ------------------->>>>>>>>>>>>----------------------
     }
-
     @Override
     public ApplyRefundResponse refund(ApplyRefundRequest request) {
         return wxPayService.refund(request);

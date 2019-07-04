@@ -225,6 +225,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public List<VipMemberListResponse> vips(VipMemberListRequest request) throws BusinessException {
+        // v1.0.3
         List<VipMemberListResponse> responses = memberMapper.queryByVip(request);
         DecimalFormat df = new DecimalFormat("######0.00");
         SpatialContext spatialContext = SpatialContext.GEO;

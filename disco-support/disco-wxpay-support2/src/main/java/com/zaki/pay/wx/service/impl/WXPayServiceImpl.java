@@ -1,6 +1,5 @@
 package com.zaki.pay.wx.service.impl;
 
-import com.alibaba.fastjson.util.IOUtils;
 import com.zaki.pay.wx.constants.WXPayConstants;
 import com.zaki.pay.wx.exception.WXPayApiException;
 import com.zaki.pay.wx.model.request.ApplyRefundRequest;
@@ -10,7 +9,6 @@ import com.zaki.pay.wx.model.response.ApplyRefundResponse;
 import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 import com.zaki.pay.wx.model.response.WXPayUnifiedOrderResponse;
 import com.zaki.pay.wx.service.WXPayService;
-import com.zaki.pay.wx.utils.HttpUtils;
 import com.zaki.pay.wx.utils.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
@@ -29,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyStore;

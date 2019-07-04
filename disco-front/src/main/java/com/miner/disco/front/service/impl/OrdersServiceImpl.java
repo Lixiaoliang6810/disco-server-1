@@ -90,6 +90,7 @@ public class OrdersServiceImpl implements OrdersService {
         orders.setBuyer(request.getUserId());
         orders.setSeller(merchantGoods.getMerchantId());
         orders.setStatus(Orders.STATUS.WAIT_PAYMENT.getKey());
+        orders.setRemark(request.getRemark());
         orders.setAssembleSeats(BooleanStatus.NO.getKey());
         orders.setAssembleSeatsCount(0);
         orders.setAssembleSeatsSurplus(0);

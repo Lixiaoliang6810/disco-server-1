@@ -47,4 +47,6 @@ public interface OrdersService {
     boolean cancel(OrdersListRequest request);
 
     Orders query(OrdersListRequest request);
+
+    boolean updateStatus(Orders orders);
 }

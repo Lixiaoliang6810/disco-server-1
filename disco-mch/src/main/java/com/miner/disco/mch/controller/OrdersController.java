@@ -31,8 +31,7 @@ public class OrdersController {
     @GetMapping(value = "/merchant/orders/list", headers = Const.API_VERSION_1_0_0)
     public ViewData list(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                          OrdersListRequest request) {
-        //Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
-        Long merchantId =31L;
+        Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
         request.setMerchantId(merchantId);
 //        request.setStatus(Orders.STATUS.WAIT_CONSUMPTION.getKey());
         //预定订单 和 取消预定订单

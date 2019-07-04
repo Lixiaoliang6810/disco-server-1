@@ -30,4 +30,6 @@ public interface OrdersMapper extends BasicMapper<Orders> {
         boolean cancel(OrdersListRequest request);
 
     Orders queryByNo(OrdersListRequest request);
+
+    boolean queryNo(Orders orders);
 }

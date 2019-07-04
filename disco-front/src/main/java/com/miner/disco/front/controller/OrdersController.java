@@ -153,6 +153,18 @@ public class OrdersController {
         Long sellerId = orders.getSeller();
         Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(sellerId);
         String merchantMobile = merchant.getMobile();
+
+        //如果定金为零不需要支付
+        if (orders.getTotalMoney().equals(BigDecimal.ZERO)){
+            orders.setStatus(Orders.STATUS.WAIT_CONSUMPTION.getKey());
+            boolean status = ordersService.updateStatus(orders);
+            if (status){
+                /*短信服务*/
+//                SMSHelper.sendChinaMessage(content,merchantMobile);
+                smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
+                return ViewData.builder().data(status).message("预定成功").build();
+            }
+        }
         switch (request.getPm()) {
             case ALIPAY:
                 AlipayPreorderResponse appResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());

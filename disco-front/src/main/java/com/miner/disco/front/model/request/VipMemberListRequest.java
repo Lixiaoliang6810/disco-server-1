@@ -33,6 +33,11 @@ public class VipMemberListRequest extends Pagination implements Serializable {
 
     private String geohash;
 
+    /**
+     * 头像
+     */
+    private String avatar;
+
     private SORT sort;
 
     public String getGeohash() {

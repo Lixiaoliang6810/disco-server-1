@@ -24,6 +24,7 @@ public class OrdersPurchaseRequest implements Serializable {
     private Date arrivalTime;
     private String fullname;
     private String mobile;
+    private String remark;
     private String salutation;
     private Integer channel;
 

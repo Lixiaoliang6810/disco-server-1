@@ -19,10 +19,10 @@
         SELECT
             mmb.create_date,
             mmb.amount,
-            mrq.pay_way
+            maq.payment_way
         FROM
             ( SELECT * FROM ds_merchant_bill mb WHERE mb.trade_type = 2 ) AS mmb
-            LEFT JOIN ds_merchant_receivables_qrcode mrq ON mmb.source_id = mrq.id
+            LEFT JOIN ds_merchant_aggregate_qrcode maq ON mmb.source_id = maq.id
         WHERE mmb.merchant_id = #{merchantId}
         ORDER BY mmb.create_date DESC
         LIMIT #{offset},#{limit}

@@ -8,7 +8,7 @@ import com.miner.disco.front.model.request.SweepPaymentNotifyRequest;
 import com.miner.disco.front.service.SweepPaymentService;
 import com.miner.disco.pojo.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -29,6 +29,9 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
 
     @Autowired
     private MerchantReceivablesQrcodeMapper merchantReceivablesQrcodeMapper;
+
+    @Autowired
+    private MerchantAggregateQrcodeMapper merchantAggregateQrcodeMapper;
 
     @Autowired
     private MerchantMapper merchantMapper;
@@ -56,8 +59,11 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
             log.info("{} sn {} repeated callbacks", request.getPayment().getValue(), request.getNotifyId());
             return;
         }
-        MerchantReceivablesQrcode merchantReceivablesQrcode = merchantReceivablesQrcodeMapper.queryByPrimaryKey(request.getQrcodeId());
-        if (merchantReceivablesQrcode == null) {
+
+        // 查询聚合收款码
+        MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByPrimaryKey(request.getQrcodeId());
+
+        if (aggregateQrcode == null) {
             log.error("illegal callbacks, metadata `{}`", JsonParser.serializeToJson(request.getMetadata()));
             return;
         }
@@ -71,18 +77,21 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         callbackNotify.setUpdateDate(new Date());
         callbackNotifyMapper.insert(callbackNotify);
 
-        MerchantReceivablesQrcode saveMerchantReceivablesQrcode = new MerchantReceivablesQrcode();
-        saveMerchantReceivablesQrcode.setStatus(MerchantReceivablesQrcode.STATUS.PAY_SUCCESS.getKey());
-        saveMerchantReceivablesQrcode.setId(merchantReceivablesQrcode.getId());
-        saveMerchantReceivablesQrcode.setPayWay(request.getPayment().getKey());
-        saveMerchantReceivablesQrcode.setUpdateDate(new Date());
-        merchantReceivablesQrcodeMapper.updateByPrimaryKey(saveMerchantReceivablesQrcode);
+        // 更新收款码 MerchantAggregateQrcode 状态为2:支付成功
+        MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
+        BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
+        merchantAggregateQrcode.setStatus(MerchantAggregateQrcode.STATUS.PAY_SUCCESS.getKey());
+        merchantAggregateQrcode.setPaymentWay(request.getPayment().getKey());
+        merchantAggregateQrcode.setPaymentDate(new Date());
+        merchantAggregateQrcode.setUpdateDate(new Date());
+        merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
 
-        Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(merchantReceivablesQrcode.getMchId());
+
+        Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(merchantAggregateQrcode.getMchId());
         BigDecimal merchantAmount = request.getAmount();
         //记录引导员抽成
         if (request.getVipId() != -1) {
-            BigDecimal vipAmount = merchantReceivablesQrcode.getOriginalPrice().multiply(merchant.getVipRatio());
+            BigDecimal vipAmount = merchantAggregateQrcode.getOriginalPrice().multiply(merchant.getVipRatio());
             merchantAmount = merchantAmount.subtract(vipAmount);
 
             //记录VIP引导员流水
@@ -98,7 +107,7 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
             memberBill.setTradeType(MemberBill.TRADE_TYPE.GUIDE_ROYALTY.getKey());
             memberBill.setRemark(MemberBill.TRADE_TYPE.GUIDE_ROYALTY.getValue());
             memberBill.setSource(MemberBill.TRADE_TYPE.GUIDE_ROYALTY.getValue());
-            memberBill.setSourceId(merchantReceivablesQrcode.getId());
+            memberBill.setSourceId(merchantAggregateQrcode.getId());
             memberBill.setCreateDate(new Date());
             memberBill.setUpdateDate(new Date());
             memberBillMapper.insert(memberBill);
@@ -112,7 +121,7 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         }
 
         //记录平台抽成
-        BigDecimal platformAmount = merchantReceivablesQrcode.getOriginalPrice().multiply(merchant.getPlatformRatio());
+        BigDecimal platformAmount = merchantAggregateQrcode.getOriginalPrice().multiply(merchant.getPlatformRatio());
         merchantAmount = merchantAmount.subtract(platformAmount);
 
         PlatformBill platformBill = new PlatformBill();
@@ -136,7 +145,7 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         memberBill.setTradeType(MemberBill.TRADE_TYPE.OFFLINE_PAYMENT.getKey());
         memberBill.setRemark(MemberBill.TRADE_TYPE.OFFLINE_PAYMENT.getValue());
         memberBill.setSource(MemberBill.TRADE_TYPE.OFFLINE_PAYMENT.getValue());
-        memberBill.setSourceId(merchantReceivablesQrcode.getId());
+        memberBill.setSourceId(merchantAggregateQrcode.getId());
         memberBill.setCreateDate(new Date());
         memberBill.setUpdateDate(new Date());
         memberBillMapper.insert(memberBill);
@@ -144,8 +153,8 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         //记录商户流水
         MerchantBill merchantBill = new MerchantBill();
         merchantBill.setAmount(merchantAmount);
-        merchantBill.setMerchantId(merchantReceivablesQrcode.getMchId());
-        merchantBill.setSourceId(merchantReceivablesQrcode.getId());
+        merchantBill.setMerchantId(merchantAggregateQrcode.getMchId());
+        merchantBill.setSourceId(merchantAggregateQrcode.getId());
         merchantBill.setCreateDate(new Date());
         merchantBill.setUpdateDate(new Date());
         merchantBill.setType(MerchantBill.STATUS.IN.getKey());
@@ -154,7 +163,7 @@ public class SweepPaymentServiceImpl implements SweepPaymentService {
         merchantBillMapper.insert(merchantBill);
 
         //更新商户余额
-        Merchant saveMerchant = merchantMapper.queryByPrimaryKeyFroUpdate(merchant.getId());
+        Merchant saveMerchant = merchantMapper.queryByPrimaryKeyForUpdate(merchant.getId());
         saveMerchant.setId(merchant.getId());
         saveMerchant.setUsableBalance(merchant.getUsableBalance().add(merchantAmount));
         merchantMapper.updateByPrimaryKey(saveMerchant);

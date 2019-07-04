@@ -31,6 +31,7 @@
         FROM
         ds_member m
         WHERE m.vip = ${_BOOLEAN_STATUS_YES}
+        AND m.avatar IS NOT NULL
         <if test="nickname != null and nickname != ''">
             AND m.nickname LIKE CONCAT('%',#{nickname},'%')
         </if>

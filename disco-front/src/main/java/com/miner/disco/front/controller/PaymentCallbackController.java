@@ -146,7 +146,7 @@ public class PaymentCallbackController {
                 response.getWriter().write(WXPayUtil.setXML(CALL_WECHAT_STATUS_SUCCESS, OK));
             }
         } catch (Exception e) {
-            log.error("wechat notify error.", e.getMessage(), e);
+            log.error("wechat notify error", e.getMessage(), e);
             try {
                 response.getWriter().write(WXPayUtil.setXML(CALL_WECHAT_STATUS_FAILURE, OK));
             } catch (IOException e1) {

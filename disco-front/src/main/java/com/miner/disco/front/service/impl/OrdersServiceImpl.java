@@ -90,6 +90,7 @@ public class OrdersServiceImpl implements OrdersService {
         orders.setBuyer(request.getUserId());
         orders.setSeller(merchantGoods.getMerchantId());
         orders.setStatus(Orders.STATUS.WAIT_PAYMENT.getKey());
+        orders.setRemark(request.getRemark());
         orders.setAssembleSeats(BooleanStatus.NO.getKey());
         orders.setAssembleSeatsCount(0);
         orders.setAssembleSeatsSurplus(0);
@@ -151,7 +152,7 @@ public class OrdersServiceImpl implements OrdersService {
         merchantGoodsMapper.updateByPrimaryKey(saveMerchantGoods);
 
         //更新商户余额
-        Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(orders.getSeller());
+        Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(orders.getSeller());
         Merchant saveMerchant = new Merchant();
         saveMerchant.setId(merchant.getId());
         saveMerchant.setFrozenBalance(merchant.getFrozenBalance().add(orders.getTotalMoney()));
@@ -267,7 +268,7 @@ public class OrdersServiceImpl implements OrdersService {
             merchantBillMapper.insert(merchantBill);
 
             //更新商户余额
-            Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(orders.getSeller());
+            Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(orders.getSeller());
             Merchant saveMerchant = new Merchant();
             saveMerchant.setId(merchant.getId());
             saveMerchant.setFrozenBalance(merchant.getFrozenBalance().subtract(orders.getTotalMoney()));

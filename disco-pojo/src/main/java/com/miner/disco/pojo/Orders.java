@@ -56,6 +56,10 @@ public class Orders {
      */
     private Integer number;
     /**
+     * 备注
+     */
+    private String remark;
+    /**
      * 定金
      */
     private BigDecimal earnestMoney;

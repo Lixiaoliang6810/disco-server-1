@@ -54,7 +54,7 @@
         m.update_date DESC
     </select>
 
-    <select id="queryByPrimaryKeyFroUpdate" resultType="com.miner.disco.pojo.Merchant">
+    <select id="queryByPrimaryKeyForUpdate" resultType="com.miner.disco.pojo.Merchant">
         SELECT * FROM ds_merchant m WHERE m.id = #{id} FOR UPDATE
     </select>
 

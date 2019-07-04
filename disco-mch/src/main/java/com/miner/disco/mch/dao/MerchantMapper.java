@@ -13,4 +13,5 @@ public interface MerchantMapper extends BasicMapper<Merchant> {
 
     Merchant queryByPrimaryKeyForUpdate(@Param("id") Long id);
 
+
 }

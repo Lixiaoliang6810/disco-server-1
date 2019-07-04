@@ -21,6 +21,4 @@ public interface MemberMapper extends BasicMapper<Member> {
 
     Member queryByImAccount(@Param("imAccount") String imAccount);
 
-    Long queryUser(String name);
-
 }

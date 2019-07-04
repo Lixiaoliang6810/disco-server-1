@@ -285,7 +285,7 @@ public class MerchantServiceImpl implements MerchantService {
             if(response==null) return null;
             String tradeState = response.getTradeState();
             if("SUCCESS".equals(tradeState)){
-                doUpdateBiz(response,outTradeNo);
+                doUpdateBizAsync(response,outTradeNo);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -293,7 +293,13 @@ public class MerchantServiceImpl implements MerchantService {
         return response;
     }
 
-    private void doUpdateBiz(WXPayOrderQueryResponse response,String outTradeNo){
+    /**
+     * 异步执行支付成功后的业务
+     *
+     * @param response
+     * @param outTradeNo
+     */
+    private void doUpdateBizAsync(WXPayOrderQueryResponse response,String outTradeNo){
         // 更新收款码状态为2
         MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
         MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
@@ -459,8 +465,10 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(readOnly = false)
     public CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException {
         MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
-        if(StringUtils.isNotBlank(outTradeNo))
+//        WXPayOrderQueryResponse response = null;
+        if(StringUtils.isNotBlank(outTradeNo)) {
             this.queryOrder(outTradeNo);
+        }
         CheckReceivablesStatusResponse receivablesStatusResponse = new CheckReceivablesStatusResponse();
         receivablesStatusResponse.setStatus(aggregateQrcode != null ? aggregateQrcode.getStatus() : -1);
         receivablesStatusResponse.setAmount(aggregateQrcode == null ? BigDecimal.ZERO : aggregateQrcode.getDiscountPrice());

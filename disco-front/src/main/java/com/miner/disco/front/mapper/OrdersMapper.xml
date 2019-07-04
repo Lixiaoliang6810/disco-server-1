@@ -26,7 +26,9 @@
         <if test="status.name != 'ALL'">
             AND o.status IN (${status.key})
         </if>
-        ORDER BY mg.create_date DESC
+        ORDER BY
+        o.update_date DESC,
+        o.create_date DESC
         LIMIT #{offset},#{limit}
     </select>
 

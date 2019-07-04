@@ -10,6 +10,7 @@ import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.Environment;
 import com.miner.disco.basic.model.response.ViewData;
 import com.miner.disco.basic.util.DateTime;
+import com.miner.disco.basic.util.SMSHelper;
 import com.miner.disco.front.consts.Const;
 import com.miner.disco.front.dao.MerchantMapper;
 import com.miner.disco.front.exception.BusinessException;
@@ -17,6 +18,7 @@ import com.miner.disco.front.exception.BusinessExceptionCode;
 import com.miner.disco.front.model.request.*;
 import com.miner.disco.front.model.response.*;
 import com.miner.disco.front.oauth.model.CustomUserDetails;
+import com.miner.disco.front.service.MerchantService;
 import com.miner.disco.front.service.OrdersService;
 import com.miner.disco.front.service.impl.SmsServiceImpl;
 import com.miner.disco.pojo.Merchant;
@@ -61,6 +63,7 @@ public class OrdersController {
     @Autowired
     private WxpayService wxpayService;
 
+
     @Autowired
     private MerchantMapper merchantMapper;
 
@@ -101,6 +104,36 @@ public class OrdersController {
     }
 
     /**
+     * 订单取消申请
+     * @param no
+     * @param oAuth2Authentication
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    @PostMapping(value="/orders/cancel",headers = Const.API_VERSION_1_0_0)
+    public ViewData cancel(@RequestParam("no" )String no,@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
+                           OrdersListRequest request) throws IOException {
+        //获取当前登录用户id
+        Long uid = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
+        request.setUserId(uid);
+        request.setNo(no);
+        request.setStatus(OrdersListRequest.QUERY_STATUS.APPLY_CANCEL);
+        Orders query = ordersService.query(request);
+        //查询商家电话
+        MerchantListResponse query1 = merchantMapper.query(query.getSeller());
+        boolean cancel = ordersService.cancel(request);
+        System.out.println(query1.getTel());
+        if (cancel){
+            String content ="客户申请取消预定订单!!请登录APP查看";
+            SMSHelper.sendChinaMessage(content,query1.getTel());
+            return ViewData.builder().data(cancel).message("正在申请取消订单").build();
+        }
+        return ViewData.builder().data(cancel).message("订单取消失败").build();
+
+    }
+
+    /**
      * 点击‘立即支付’ 完成后，订单变为 已支付
      */
     @PostMapping(value = "/orders/payment", headers = Const.API_VERSION_1_0_0)
@@ -120,6 +153,7 @@ public class OrdersController {
         Long sellerId = orders.getSeller();
         Merchant merchant = merchantMapper.queryByPrimaryKeyFroUpdate(sellerId);
         String merchantMobile = merchant.getMobile();
+
         switch (request.getPm()) {
             case ALIPAY:
                 AlipayPreorderResponse appResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());

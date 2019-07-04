@@ -437,4 +437,16 @@ public class OrdersServiceImpl implements OrdersService {
         ordersInvitationMapper.updateByPrimaryKey(saveOrdersInvitation);
     }
 
+    @Override
+    public boolean cancel(OrdersListRequest request) {
+        return ordersMapper.cancel(request);
+
+    }
+
+    @Override
+    public Orders query(OrdersListRequest request) {
+        return ordersMapper.queryByNo(request);
+    }
+
+
 }

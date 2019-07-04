@@ -44,4 +44,7 @@ public interface OrdersService {
 
     void refuseAssemble(Long ordersInvitationId) throws BusinessException;
 
+    boolean cancel(OrdersListRequest request);
+
+    Orders query(OrdersListRequest request);
 }

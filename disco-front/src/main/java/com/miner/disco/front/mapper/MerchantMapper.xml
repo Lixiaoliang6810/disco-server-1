@@ -58,4 +58,8 @@
         SELECT * FROM ds_merchant m WHERE m.id = #{id} FOR UPDATE
     </select>
 
+    <select id="query" resultType="com.miner.disco.front.model.response.MerchantListResponse">
+        select * from  ds_merchant where id = #{seller}
+    </select>
+
 </mapper>

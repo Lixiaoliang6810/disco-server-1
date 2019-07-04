@@ -17,6 +17,7 @@ spring:
       validationQuery: select 'x'
       testWhileIdle: true
       testOnBorrow: false
+
       testOnReturn: false
       poolPreparedStatements: true
       maxOpenPreparedStatements: 20

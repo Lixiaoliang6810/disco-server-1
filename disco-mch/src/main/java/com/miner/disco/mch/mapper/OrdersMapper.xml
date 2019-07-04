@@ -24,7 +24,7 @@
             LEFT JOIN ds_merchant_goods mg ON o.goods_id = mg.id
         WHERE
             o.seller = #{merchantId}
-          AND o.status = #{status}
+          AND o.status in(2,7)
         ORDER BY o.payment_date DESC
         LIMIT #{offset},#{limit}
     </select>

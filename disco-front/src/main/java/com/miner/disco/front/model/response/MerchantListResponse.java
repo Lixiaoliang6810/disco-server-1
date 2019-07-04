@@ -72,5 +72,9 @@ public class MerchantListResponse implements Serializable {
      * 更新时间
      */
     private transient Date updateDate;
+    /**
+     * 商家电话
+     */
+    private String tel;
 
 }

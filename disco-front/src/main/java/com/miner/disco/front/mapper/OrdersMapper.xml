@@ -133,4 +133,13 @@
        DELETE FROM ds_orders WHERE no = #{no}
    </delete>
 
+
+    <update id="cancel" parameterType="com.miner.disco.front.model.request.OrdersListRequest">
+        UPDATE ds_orders set  status = #{status.key}    where  no =#{no}  and buyer = #{userId}
+    </update>
+
+    <select  id="queryByNo" resultType="com.miner.disco.pojo.Orders">
+        select * from ds_orders where no = #{no}
+    </select>
+
 </mapper>

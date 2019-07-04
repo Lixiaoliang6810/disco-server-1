@@ -114,7 +114,9 @@ public class Orders {
         WAIT_EVALUATE(3, "待评价"),
         COMPLETE(4, "完成"),
         REFUND(5, "退款"),
-        PAYMENT_TIMEOUT(6, "支付超时");
+        PAYMENT_TIMEOUT(6, "支付超时"),
+        APPLY_CANCEL(7,"订单申请取消"),
+        CANCELED(8,"订单已取消");
 
         Integer key;
         String value;

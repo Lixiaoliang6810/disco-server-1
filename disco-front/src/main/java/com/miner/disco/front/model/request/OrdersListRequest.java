@@ -16,6 +16,7 @@ public class OrdersListRequest extends Pagination implements Serializable {
     private static final long serialVersionUID = -3672117089192837540L;
 
     private Long userId;
+    private String no;
 
     private QUERY_STATUS status = QUERY_STATUS.ALL;
 
@@ -23,8 +24,9 @@ public class OrdersListRequest extends Pagination implements Serializable {
         ALL(null),
         PENDING("1"),
         USABLE("2"),
-        REFUND("5");
-
+        REFUND("5"),
+        APPLY_CANCEL("7"),
+        CANCELED("8");
         private String key;
 
         QUERY_STATUS(String key) {

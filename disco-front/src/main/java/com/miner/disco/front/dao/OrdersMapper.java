@@ -1,9 +1,6 @@
 package com.miner.disco.front.dao;
 
-import com.miner.disco.front.model.request.ApplyAssembleOrdersListRequest;
-import com.miner.disco.front.model.request.AssembleOrdersListRequest;
-import com.miner.disco.front.model.request.LaunchAssembleOrdersListRequest;
-import com.miner.disco.front.model.request.OrdersListRequest;
+import com.miner.disco.front.model.request.*;
 import com.miner.disco.front.model.response.*;
 import com.miner.disco.pojo.Orders;
 import com.miner.disco.mybatis.support.BasicMapper;
@@ -20,13 +17,17 @@ public interface OrdersMapper extends BasicMapper<Orders> {
 
     OrdersDetailsResponse queryById(@Param("ordersId") Long ordersId);
 
-    Orders queryByPrimaryKeyForUpdate(@Param("ordersId") Long ordersId);
+        Orders queryByPrimaryKeyForUpdate(@Param("ordersId") Long ordersId);
 
-    List<AssembleOrdersListResponse> queryAssembleList(AssembleOrdersListRequest request);
+        List<AssembleOrdersListResponse> queryAssembleList(AssembleOrdersListRequest request);
 
-    List<LaunchAssembleOrdersListResponse> queryLaunchAssembleList(LaunchAssembleOrdersListRequest request);
+        List<LaunchAssembleOrdersListResponse> queryLaunchAssembleList(LaunchAssembleOrdersListRequest request);
 
-    List<ApplyAssembleOrdersListResponse> queryApplyAssembleList(ApplyAssembleOrdersListRequest request);
+        List<ApplyAssembleOrdersListResponse> queryApplyAssembleList(ApplyAssembleOrdersListRequest request);
 
-    void deleteOrders(String no);
+        void deleteOrders(String no);
+
+        boolean cancel(OrdersListRequest request);
+
+    Orders queryByNo(OrdersListRequest request);
 }

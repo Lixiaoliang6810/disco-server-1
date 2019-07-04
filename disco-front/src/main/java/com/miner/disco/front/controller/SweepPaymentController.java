@@ -62,7 +62,6 @@ public class SweepPaymentController {
                                  @RequestParam("payment") Payment payment,
                                  @AuthenticationPrincipal OAuth2Authentication oAuth2Authentication) throws UnsupportedEncodingException {
         Long memberId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
-        // 查询收款码
         MerchantReceivablesQrcode receivablesQrcode = merchantReceivablesQrcodeService.queryByKey(key);
         if (receivablesQrcode == null) {
             return ViewData.builder().status(BusinessExceptionCode.ILLEGAL_OPERATION.getCode()).message("非法操作").build();

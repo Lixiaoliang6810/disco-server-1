@@ -28,6 +28,8 @@ import java.util.Map;
  */
 public class HttpClientUtil {
 
+    private static HttpPost httpPost = null;
+
     public static String doGet(String url, Map<String, String> param) {
 
         // 创建Httpclient对象
@@ -71,6 +73,17 @@ public class HttpClientUtil {
         return doGet(url, null);
     }
 
+
+    public static HttpPost createHttpPost(String url){
+        if(httpPost==null)
+            httpPost = new HttpPost(url);
+        return httpPost;
+    }
+    public static void addHeader(String key,String value){
+        if(httpPost!=null){
+            httpPost.addHeader(key,value);
+        }
+    }
     public static String doPost(String url, Map<String, String> param) {
         // 创建Httpclient对象
         final CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -78,7 +91,7 @@ public class HttpClientUtil {
         String resultString = "";
         try {
             // 创建Http Post请求
-            final HttpPost httpPost = new HttpPost(url);
+            final HttpPost httpPost = createHttpPost(url);
             // 创建参数列表
             if (param != null) {
                 List<NameValuePair> nameValuePairList = new ArrayList<>();

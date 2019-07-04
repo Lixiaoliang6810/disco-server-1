@@ -71,7 +71,7 @@ public class MerchantController {
                                       @RequestParam("winePrice") BigDecimal winePrice,
                                       @RequestParam("foodPrice") BigDecimal foodPrice,
                                       @RequestParam(value = "coupon", required = false) String coupon,
-                                      HttpServletRequest servletRequest) throws UnsupportedEncodingException {
+                                      HttpServletRequest servletRequest) {
         Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
         ReceivablesQrcodeRequest receivablesQrcodeRequest = new ReceivablesQrcodeRequest();
         receivablesQrcodeRequest.setMerchantId(merchantId);
@@ -98,7 +98,7 @@ String outRefundNo;
  String refundFee;amount
      */
     @PostMapping(value = "/merchant/refund", headers = Const.API_VERSION_1_0_0)
-    public ViewData receivablesStatusx(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
+    public ViewData refund(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
                                        @RequestParam("outTradeNo") String outTradeNo,
                                        @RequestParam("totalFee") String totalFee,
                                        @RequestParam("refundFee") String refundFee){

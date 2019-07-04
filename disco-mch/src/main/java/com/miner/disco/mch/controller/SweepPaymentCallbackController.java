@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.Payment;
 import com.miner.disco.basic.util.JsonParser;
+import com.miner.disco.mch.consts.Const;
 import com.miner.disco.mch.model.request.SweepPaymentNotifyRequest;
 import com.miner.disco.mch.service.SweepPaymentService;
 import com.miner.disco.wxpay.support.utils.WXPayUtil;
@@ -114,7 +115,7 @@ public class SweepPaymentCallbackController {
 
 
 
-    @PostMapping(value = "/aggregate/wxpay/sweep/notify")
+    @PostMapping(value = "/aggregate/wxpay/sweep/notify",headers = Const.API_VERSION_1_0_0)
     public void sweepWxPayNotify(HttpServletRequest request, HttpServletResponse response) {
         try {
             log.info("wechat payment callback.");

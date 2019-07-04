@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.beans.ConstructorProperties;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -13,7 +14,9 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-public class QrCodeResponse {
+public class WXQrCodeResponse implements Serializable {
+    private static final long serialVersionUID = 6618476693021456958L;
+
     /**
      * 二维码
      */

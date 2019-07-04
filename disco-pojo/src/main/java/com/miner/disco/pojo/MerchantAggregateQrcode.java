@@ -20,7 +20,9 @@ public class MerchantAggregateQrcode {
     private String outTradeNo;
     private String qrcode;
     private String coupon;
+    // @Deprecated -> totalPrice
     private BigDecimal totalPrice;
+    private BigDecimal originalPrice;
     private BigDecimal winePrice;
     private BigDecimal foodPrice;
     private BigDecimal discountPrice;
@@ -79,5 +81,6 @@ public class MerchantAggregateQrcode {
             this.value = value;
         }
     }
+
 
 }

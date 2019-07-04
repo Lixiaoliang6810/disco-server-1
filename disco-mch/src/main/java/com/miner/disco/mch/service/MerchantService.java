@@ -6,7 +6,7 @@ import com.miner.disco.mch.model.response.CheckReceivablesStatusResponse;
 import com.miner.disco.mch.model.response.MerchantDetailsResponse;
 import com.zaki.pay.wx.model.request.ApplyRefundRequest;
 import com.zaki.pay.wx.model.response.ApplyRefundResponse;
-import com.zaki.pay.wx.model.response.QrCodeResponse;
+import com.zaki.pay.wx.model.response.WXQrCodeResponse;
 import com.zaki.pay.wx.model.response.WXPayOrderQueryResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,5 +36,5 @@ public interface MerchantService {
 
     ApplyRefundResponse refund(ApplyRefundRequest request);
 
-    QrCodeResponse unifiedOrder(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest);
+    WXQrCodeResponse unifiedOrder(ReceivablesQrcodeRequest receivablesQrcodeRequest, HttpServletRequest servletRequest);
 }

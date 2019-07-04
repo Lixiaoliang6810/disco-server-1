@@ -9,7 +9,7 @@ import com.miner.disco.mch.oauth.model.CustomUserDetails;
 import com.miner.disco.mch.service.MerchantService;
 import com.zaki.pay.wx.model.request.ApplyRefundRequest;
 import com.zaki.pay.wx.model.response.ApplyRefundResponse;
-import com.zaki.pay.wx.model.response.QrCodeResponse;
+import com.zaki.pay.wx.model.response.WXQrCodeResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -79,8 +79,8 @@ public class MerchantController {
         receivablesQrcodeRequest.setWinePrice(winePrice);
         receivablesQrcodeRequest.setFoodPrice(foodPrice);
 //        ReceivablesQrcodeResponse response = merchantService.receivablesQrcode(receivablesQrcodeRequest, servletRequest);
-        QrCodeResponse qrCodeResponse = merchantService.unifiedOrder(receivablesQrcodeRequest, servletRequest);
-        return ViewData.builder().data(qrCodeResponse).build();
+        WXQrCodeResponse WXQrCodeResponse = merchantService.unifiedOrder(receivablesQrcodeRequest, servletRequest);
+        return ViewData.builder().data(WXQrCodeResponse).build();
     }
 
     @GetMapping(value = "/merchant/receivables/status", headers = Const.API_VERSION_1_0_0)

@@ -196,6 +196,7 @@ public class MerchantServiceImpl implements MerchantService {
         // notifyUrl
         String callbackUrl = (environment == Environment.RELEASE) ? getPath(servletRequest) : paymentCallbackUrl;
 
+        // 回调
         wxPayUnifiedOrderRequest.setNotifyUrl(String.format("%s%s", callbackUrl, "/wxpay/orders/notify"));
         WXPayUnifiedOrderResponse response;
         try {

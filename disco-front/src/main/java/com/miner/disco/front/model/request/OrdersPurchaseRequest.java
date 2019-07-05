@@ -23,6 +23,10 @@ public class OrdersPurchaseRequest implements Serializable {
     private Long goodsId;
     private Date arrivalTime;
     private String fullname;
+    /**
+     * 预定人数
+     */
+    private Integer number;
     private String mobile;
     private String remark;
     private String salutation;

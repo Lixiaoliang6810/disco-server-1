@@ -33,6 +33,10 @@ public class OrdersDetailsResponse implements Serializable {
      */
     private Date arrivalTime;
     /**
+     * 预定人数
+     */
+    private Integer number;
+    /**
      * 定金
      */
     private BigDecimal tailMoney;

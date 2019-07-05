@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletInputStream;
@@ -114,11 +115,14 @@ public class SweepPaymentCallbackController {
     }
 
 
-
+    private static boolean hasPaidOnce = Boolean.FALSE;
     @PostMapping(value = "/aggregate/wxpay/sweep/notify",headers = Const.API_VERSION_1_0_0)
     public void sweepWxPayNotify(HttpServletRequest request, HttpServletResponse response){
         String outTradeNo = request.getParameter("outTradeNo");
-        sweepPaymentService.doUpdateBizAsync(outTradeNo);
+        if(HttpMethod.POST.name().equalsIgnoreCase(request.getMethod()) && !hasPaidOnce){
+            sweepPaymentService.doUpdateBizAsync(outTradeNo);
+            hasPaidOnce = Boolean.TRUE;
+        }
     }
 
 

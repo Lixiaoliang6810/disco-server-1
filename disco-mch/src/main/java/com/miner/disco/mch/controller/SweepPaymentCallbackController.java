@@ -116,7 +116,7 @@ public class SweepPaymentCallbackController {
 
 
     private static boolean hasPaidOnce = Boolean.FALSE;
-    @PostMapping(value = "/aggregate/wxpay/sweep/notify",headers = Const.API_VERSION_1_0_0)
+    @PostMapping(value = "/aggregate/wxpay/sweep/notify")
     public void sweepWxPayNotify(HttpServletRequest request, HttpServletResponse response){
         String outTradeNo = request.getParameter("outTradeNo");
         if(HttpMethod.POST.name().equalsIgnoreCase(request.getMethod()) && !hasPaidOnce){

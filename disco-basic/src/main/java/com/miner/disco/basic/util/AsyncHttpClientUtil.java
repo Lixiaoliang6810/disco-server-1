@@ -104,7 +104,6 @@ public class AsyncHttpClientUtil {
     {
         Preconditions.checkArgument(isClientStart, "还没有建立Http Client");
         HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("X-disco-mch-api-v", "1.0.0");
         if (parameters != null)
         {
             List<BasicNameValuePair> pairs = Lists.newArrayList();

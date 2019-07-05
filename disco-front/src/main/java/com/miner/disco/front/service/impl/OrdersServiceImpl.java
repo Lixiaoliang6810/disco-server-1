@@ -93,6 +93,7 @@ public class OrdersServiceImpl implements OrdersService {
         orders.setRemark(request.getRemark());
         orders.setAssembleSeats(BooleanStatus.NO.getKey());
         orders.setAssembleSeatsCount(0);
+        orders.setNumber(request.getNumber());
         orders.setAssembleSeatsSurplus(0);
         orders.setAssembleSeatsMoney(BigDecimal.ZERO);
         orders.setEarnestMoney(merchantGoods.getPrice());

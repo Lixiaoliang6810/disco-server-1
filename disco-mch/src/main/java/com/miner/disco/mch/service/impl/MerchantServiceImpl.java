@@ -9,8 +9,8 @@ import com.miner.disco.basic.assertion.Assert;
 import com.miner.disco.basic.constants.BasicConst;
 import com.miner.disco.basic.constants.BooleanStatus;
 import com.miner.disco.basic.constants.Environment;
+import com.miner.disco.basic.util.AsyncHttpClientUtil;
 import com.miner.disco.basic.util.DtoTransition;
-import com.miner.disco.basic.util.JsonParser;
 import com.miner.disco.basic.util.ShareCodeUtils;
 import com.miner.disco.basic.util.UidMaskUtils;
 import com.miner.disco.mch.consts.Const;
@@ -34,10 +34,13 @@ import com.zaki.pay.wx.model.response.WXQrCodeResponse;
 import com.zaki.pay.wx.service.WXPayService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +48,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 /**
  * @author Created by lubycoder@163.com 2019/1/8
@@ -324,7 +330,7 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public WXPayOrderQueryResponse queryOrder(String outTradeNo) {
+    public WXPayOrderQueryResponse queryOrder(String outTradeNo, HttpServletRequest servletRequest) {
         WXPayOrderQueryResponse response=null;
         WXPayOrderQueryRequest request = new WXPayOrderQueryRequest();
         request.setOutTradeNo(outTradeNo);
@@ -333,7 +339,19 @@ public class MerchantServiceImpl implements MerchantService {
             if(response==null) return null;
             String tradeState = response.getTradeState();
             if("SUCCESS".equals(tradeState)){
-                doUpdateBizAsync(response,outTradeNo);
+                try {
+                    AsyncHttpClientUtil.startHttpClient();
+                    AsyncHttpClientUtil.StringFutureCallback stringFutureCallback = content -> {};
+                    TreeMap<String, String> tree = new TreeMap<>();
+                    tree.put("outTradeNo",outTradeNo);
+                    String callbackUrl = String.format("%s%s", getPath(servletRequest), "/aggregate/wxpay/sweep/notify");
+                    Future<HttpResponse> http = AsyncHttpClientUtil.http(HttpMethod.POST.name(), callbackUrl, tree, stringFutureCallback);
+                    http.get();
+//                    HttpEntity entity = httpResponse.getEntity();
+//                    System.out.println("entity>>>>>>" + EntityUtils.toString(entity, Charset.forName("UTF-8")));
+                }  finally {
+                    AsyncHttpClientUtil.closeHttpClient();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -341,103 +359,7 @@ public class MerchantServiceImpl implements MerchantService {
         return response;
     }
 
-    /**
-     * 异步执行支付成功后的业务
-     *
-     * @param response
-     * @param outTradeNo
-     */
-    private void doUpdateBizAsync(WXPayOrderQueryResponse response,String outTradeNo){
-        // 更新收款码状态为2 >>>>>>>>>
-        MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
-        MerchantAggregateQrcode merchantAggregateQrcode = new MerchantAggregateQrcode();
-        if(aggregateQrcode!=null){
-            BeanUtils.copyProperties(aggregateQrcode,merchantAggregateQrcode);
-            merchantAggregateQrcode.setStatus(MerchantAggregateQrcode.STATUS.PAY_SUCCESS.getKey());
-            merchantAggregateQrcode.setPaymentDate(new Date());
-            merchantAggregateQrcodeMapper.updateByPrimaryKey(merchantAggregateQrcode);
-        }
 
-        //更新订单信息--支付成功 >>>>>>>>>
-        Orders orders = ordersMapper.queryByOutTradeNo(outTradeNo);
-
-        Orders saveOrders = new Orders();
-        BeanUtils.copyProperties(orders,saveOrders);
-        // 支付成功后将姓名改成微信用户id-- openid
-        saveOrders.setBuyer(-1L);
-        saveOrders.setFullname(StringUtils.isBlank(response.getOpenId())?"微信线下扫码用户-已付款":response.getOpenId());
-        saveOrders.setUpdateDate(new Date());
-        saveOrders.setPaymentDate(new Date());
-        saveOrders.setStatus(Orders.STATUS.COMPLETE.getKey());
-        ordersMapper.updateByPrimaryKey(saveOrders);
-
-        //更新商品信息 >>>>>>>>>
-        MerchantGoods merchantGoods = merchantGoodsMapper.queryByPrimaryKey(orders.getGoodsId());
-        if(merchantGoods!=null){
-            MerchantGoods saveMerchantGoods = new MerchantGoods();
-            saveMerchantGoods.setId(orders.getGoodsId());
-            saveMerchantGoods.setSalesVolume(merchantGoods.getSalesVolume() == null ? 1 : merchantGoods.getSalesVolume() + 1);
-            merchantGoodsMapper.updateByPrimaryKey(saveMerchantGoods);
-        }
-
-        //更新商户余额 >>>>>>>>>
-        Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(orders.getSeller());
-        Assert.notNull(merchant, MchBusinessExceptionCode.OBJECT_DOES_NOT_EXIST.getCode(), "商户不存在");
-        Merchant saveMerchant = new Merchant();
-        saveMerchant.setId(merchant.getId());
-        saveMerchant.setFrozenBalance(merchant.getFrozenBalance().add(orders.getTotalMoney()));
-        saveMerchant.setUpdateDate(new Date());
-        merchantMapper.updateByPrimaryKey(saveMerchant);
-
-        //记录回调记录 >>>>>>>>>
-//        CallbackNotify callbackNotify = callbackNotifyMapper.queryBySnAndType(request.getNotifyId(), request.getPaymentMethod().getKey());
-//        if (callbackNotify != null) {
-//            log.info("{} sn {} repeated callbacks", request.getPaymentMethod().getValue(), request.getNotifyId());
-//            return;
-//        }
-//        CallbackNotify callbackNotify = new CallbackNotify();
-////        callbackNotify.setCallbackSn(request.getNotifyId());
-//        callbackNotify.setCallbackSn(outTradeNo);
-////        callbackNotify.setCallbackType(request.getPaymentMethod().getKey());
-//        assert aggregateQrcode != null;
-//        callbackNotify.setCallbackType(aggregateQrcode.getPaymentWay());
-//        callbackNotify.setMetadata(aggregateQrcode.getMetadata());
-////        callbackNotify.setMetadata(JsonParser.serializeToJson(request.getMetadata()));
-//        callbackNotify.setCreateDate(new Date());
-//        callbackNotify.setUpdateDate(new Date());
-//        callbackNotifyMapper.insert(callbackNotify);
-
-        // 线下扫码用户没有个人流水
-//                //记录用户流水 >>>>>>>>>
-//                MemberBill memberBill = new MemberBill();
-//                memberBill.setSerialNo(outTradeNo);
-//                memberBill.setAmount(orders.getTailMoney());
-//                memberBill.setUserId(orders.getBuyer());
-//                memberBill.setType(MemberBill.TYPE.OUT.getKey());
-//                memberBill.setTradeType(MemberBill.TRADE_TYPE.ONLINE_PURCHASE.getKey());
-//                memberBill.setRemark(MemberBill.TRADE_TYPE.ONLINE_PURCHASE.getValue());
-//                memberBill.setSource(merchantGoods.getName());
-//                memberBill.setSourceId(orders.getId());
-//                memberBill.setCreateDate(new Date());
-//                memberBill.setUpdateDate(new Date());
-//                memberBillMapper.insert(memberBill);
-
-        //记录商户流水 >>>>>>>>>
-        MerchantBill merchantBill = new MerchantBill();
-        merchantBill.setAmount(orders.getTotalMoney());
-        merchantBill.setMerchantId(orders.getSeller());
-        // 商户该条流水来源
-        merchantBill.setSourceId(orders.getId());
-        merchantBill.setCreateDate(new Date());
-        merchantBill.setUpdateDate(new Date());
-        // 类型-- 1:收入
-        merchantBill.setType(MerchantBill.STATUS.IN.getKey());
-        // 交易类型-- 2:线下扫码
-        merchantBill.setTradeType(MerchantBill.TRADE_STATUS.OFF_LINE.getKey());
-        merchantBill.setRemark(MerchantBill.TRADE_STATUS.OFF_LINE.getValue());
-        merchantBillMapper.insert(merchantBill);
-        // -------------------<<<<<<<<<<<<<----------------------
-    }
     @Override
     public ApplyRefundResponse refund(ApplyRefundRequest request) {
         return wxPayService.refund(request);
@@ -500,12 +422,12 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    @Transactional(readOnly = false)
-    public CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException {
+    @Transactional
+    public CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo, HttpServletRequest servletRequest) throws MchBusinessException {
         MerchantAggregateQrcode aggregateQrcode = merchantAggregateQrcodeMapper.queryByOutTradeNo(outTradeNo);
 //        WXPayOrderQueryResponse response = null;
         if(StringUtils.isNotBlank(outTradeNo)) {
-            this.queryOrder(outTradeNo);
+            this.queryOrder(outTradeNo,servletRequest);
         }
         CheckReceivablesStatusResponse receivablesStatusResponse = new CheckReceivablesStatusResponse();
         receivablesStatusResponse.setStatus(aggregateQrcode != null ? aggregateQrcode.getStatus() : -1);

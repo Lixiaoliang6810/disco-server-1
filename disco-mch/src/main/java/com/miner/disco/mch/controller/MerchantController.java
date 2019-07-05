@@ -85,9 +85,9 @@ public class MerchantController {
 
     @GetMapping(value = "/merchant/receivables/status", headers = Const.API_VERSION_1_0_0)
     public ViewData receivablesStatus(@AuthenticationPrincipal OAuth2Authentication oAuth2Authentication,
-                                      @RequestParam("outTradeNo") String outTradeNo) {
+                                      @RequestParam("outTradeNo") String outTradeNo,HttpServletRequest request) {
         Long merchantId = ((CustomUserDetails) oAuth2Authentication.getPrincipal()).getId();
-        CheckReceivablesStatusResponse checkReceivablesStatusResponse = merchantService.receivablesStatus(merchantId, outTradeNo);
+        CheckReceivablesStatusResponse checkReceivablesStatusResponse = merchantService.receivablesStatus(merchantId, outTradeNo,request);
         return ViewData.builder().data(checkReceivablesStatusResponse).build();
     }
 

@@ -116,46 +116,56 @@ public class SweepPaymentCallbackController {
 
 
     @PostMapping(value = "/aggregate/wxpay/sweep/notify",headers = Const.API_VERSION_1_0_0)
-    public void sweepWxPayNotify(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            log.info("wechat payment callback.");
-            InputStream is = request.getInputStream();
-            String result = IOUtils.toString(is);
-            log.info("wechat callback info {}", result);
-            Map<String, String> params = WXPayUtil.xmlToMap(result);
-
-            String sign = WXPayUtil.generateSignature(params, wxpaySecret);
-            log.info("wxpay callback sign {}", sign);
-            if (!StringUtils.equals(sign, params.get("sign"))) {
-                response.getWriter().write(CALL_WECHAT_STATUS_FAILURE);
-                return;
-            }
-            //判断是否是支付成功状态
-            if (params.get("result_code").equalsIgnoreCase(CALL_WECHAT_STATUS_SUCCESS)) {
-                String passback_params = URLDecoder.decode(params.get("attach"), BasicConst.UTF_8.displayName());
-                Map<String, String> customParams = paramsToMap(passback_params);
-                String notifyId = params.get("transaction_id");
-                String outTradeNo = customParams.get("out_trade_no");
-                BigDecimal amount = new BigDecimal(params.get("total_fee")).divide(BigDecimal.valueOf(100L), 2, BigDecimal.ROUND_CEILING);
-
-                SweepPaymentNotifyRequest sweepPaymentNotifyRequest = new SweepPaymentNotifyRequest();
-                sweepPaymentNotifyRequest.setAmount(amount);
-                sweepPaymentNotifyRequest.setNotifyId(notifyId);
-                sweepPaymentNotifyRequest.setOutTradeNo(outTradeNo);
-                sweepPaymentNotifyRequest.setPayment(Payment.ALIPAY);
-                sweepPaymentNotifyRequest.setMetadata(params);
-                sweepPaymentService.callback(sweepPaymentNotifyRequest);
-                response.getWriter().write(WXPayUtil.setXML(CALL_WECHAT_STATUS_SUCCESS, OK));
-            }
-        } catch (Exception e) {
-            log.error("wechat notify error.", e.getMessage(), e);
-            try {
-                response.getWriter().write(WXPayUtil.setXML(CALL_WECHAT_STATUS_FAILURE, OK));
-            } catch (IOException e1) {
-                log.error("notify wechat callback error", e);
-            }
-        }
+    public void sweepWxPayNotify(HttpServletRequest request, HttpServletResponse response){
+        String outTradeNo = request.getParameter("outTradeNo");
+        sweepPaymentService.doUpdateBizAsync(outTradeNo);
     }
+
+
+
+
+
+
+//    public void sweepWxPayNotify(HttpServletRequest request, HttpServletResponse response) {
+//        try {
+//            log.info("wechat payment callback.");
+//            InputStream is = request.getInputStream();
+//            String result = IOUtils.toString(is);
+//            log.info("wechat callback info {}", result);
+//            Map<String, String> params = WXPayUtil.xmlToMap(result);
+//
+//            String sign = WXPayUtil.generateSignature(params, wxpaySecret);
+//            log.info("wxpay callback sign {}", sign);
+//            if (!StringUtils.equals(sign, params.get("sign"))) {
+//                response.getWriter().write(CALL_WECHAT_STATUS_FAILURE);
+//                return;
+//            }
+//            //判断是否是支付成功状态
+//            if (params.get("result_code").equalsIgnoreCase(CALL_WECHAT_STATUS_SUCCESS)) {
+//                String passback_params = URLDecoder.decode(params.get("attach"), BasicConst.UTF_8.displayName());
+//                Map<String, String> customParams = paramsToMap(passback_params);
+//                String notifyId = params.get("transaction_id");
+//                String outTradeNo = customParams.get("out_trade_no");
+//                BigDecimal amount = new BigDecimal(params.get("total_fee")).divide(BigDecimal.valueOf(100L), 2, BigDecimal.ROUND_CEILING);
+//
+//                SweepPaymentNotifyRequest sweepPaymentNotifyRequest = new SweepPaymentNotifyRequest();
+//                sweepPaymentNotifyRequest.setAmount(amount);
+//                sweepPaymentNotifyRequest.setNotifyId(notifyId);
+//                sweepPaymentNotifyRequest.setOutTradeNo(outTradeNo);
+//                sweepPaymentNotifyRequest.setPayment(Payment.ALIPAY);
+//                sweepPaymentNotifyRequest.setMetadata(params);
+//                sweepPaymentService.callback(sweepPaymentNotifyRequest);
+//                response.getWriter().write(WXPayUtil.setXML(CALL_WECHAT_STATUS_SUCCESS, OK));
+//            }
+//        } catch (Exception e) {
+//            log.error("wechat notify error.", e.getMessage(), e);
+//            try {
+//                response.getWriter().write(WXPayUtil.setXML(CALL_WECHAT_STATUS_FAILURE, OK));
+//            } catch (IOException e1) {
+//                log.error("notify wechat callback error", e);
+//            }
+//        }
+//    }
 
 
     private Map<String, String> paramsToMap(String params) throws UnsupportedEncodingException {

@@ -10,4 +10,6 @@ public interface SweepPaymentService {
 
     void callback(SweepPaymentNotifyRequest request) throws MchBusinessException;
 
+    void doUpdateBizAsync(String outTradeNo);
+
 }

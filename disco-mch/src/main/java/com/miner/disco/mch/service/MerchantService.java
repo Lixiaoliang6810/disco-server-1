@@ -30,9 +30,9 @@ public interface MerchantService {
 
     MerchantDetailsResponse details(Long merchantId) throws MchBusinessException;
 
-    CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo) throws MchBusinessException;
+    CheckReceivablesStatusResponse receivablesStatus(Long merchantId, String outTradeNo,HttpServletRequest servletRequest) throws MchBusinessException;
 
-    WXPayOrderQueryResponse queryOrder(String outTradeNo);
+    WXPayOrderQueryResponse queryOrder(String outTradeNo,HttpServletRequest servletRequest);
 
     ApplyRefundResponse refund(ApplyRefundRequest request);
 

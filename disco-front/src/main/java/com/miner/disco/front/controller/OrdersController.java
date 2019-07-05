@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.List;
 
@@ -153,11 +154,24 @@ public class OrdersController {
         Long sellerId = orders.getSeller();
         Merchant merchant = merchantMapper.queryByPrimaryKeyForUpdate(sellerId);
         String merchantMobile = merchant.getMobile();
+
+        //如果定金为零不需要支付
+
+        if (  0D == orders.getTotalMoney().doubleValue()){
+            orders.setStatus(Orders.STATUS.WAIT_CONSUMPTION.getKey());
+            boolean status = ordersService.updateStatus(orders);
+            if (status){
+
+                /*短信服务*/
+                smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
+
+            }
+            return ViewData.builder().data(status).message("预定成功").build();
+        }
         switch (request.getPm()) {
             case ALIPAY:
                 AlipayPreorderResponse appResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
                 /*短信服务*/
-//                SMSHelper.sendChinaMessage(content,merchantMobile);
                 smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
                 return ViewData.builder().data(appResponse).message("支付宝预支付").build();
             case WXPAY:
@@ -181,6 +195,11 @@ public class OrdersController {
         return ViewData.builder().data(response).message("订单详情").build();
     }
 
+    public static void main(String[] args) {
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        String format = decimalFormat.format(BigDecimal.ZERO);
+        System.out.println(format);
+    }
     /**
      * 预订订金可以极速退款--
      * @param ordersId

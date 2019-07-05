@@ -449,5 +449,10 @@ public class OrdersServiceImpl implements OrdersService {
         return ordersMapper.queryByNo(request);
     }
 
+    @Override
+    public boolean updateStatus(Orders  orders) {
+        return ordersMapper.queryNo(orders);
+    }
+
 
 }

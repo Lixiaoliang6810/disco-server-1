@@ -181,7 +181,6 @@ public class OrdersController {
                 return ViewData.builder().data(response).message("微信预支付").build();
             case WAP_ALIPAY:
                 AlipayPreorderResponse wapResponse = alipay(servletRequest, orders.getNo(), orders.getTotalMoney(), callbackParam, request.getPm());
-//                SMSHelper.sendChinaMessage(content,merchantMobile);
                 smsService.newOrderSmsNotify(merchantMobile,mobile,arrivalTime,amount);
                 return ViewData.builder().data(wapResponse).message("支付宝网页预支付").build();
             default:

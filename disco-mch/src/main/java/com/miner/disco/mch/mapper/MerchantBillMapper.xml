@@ -12,6 +12,9 @@
             YEAR ( mb.create_date ) = #{year}
             AND MONTH ( mb.create_date ) = #{month}
             AND mb.merchant_id = #{merchantId}
+            ORDER BY
+            mb.update_date
+            DESC
     </select>
 
     <select id="offLineBills" parameterType="com.miner.disco.mch.model.request.MerchantOfflineBillRequest"

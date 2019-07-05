@@ -20,6 +20,7 @@ public class OrdersListResponse implements Serializable {
     private String no;
     private Integer status;
     private Date arrivalTime;
+    private Integer number;
     private BigDecimal tailMoney;
     private BigDecimal totalMoney;
     private Date createDate;

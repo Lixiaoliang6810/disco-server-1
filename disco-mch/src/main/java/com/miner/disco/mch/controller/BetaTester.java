@@ -33,7 +33,7 @@ public class BetaTester {
     @PostMapping(value = "/zaki/doSth",headers = Const.API_VERSION_1_0_0)
     public void doSomething(HttpServletRequest request,HttpServletResponse response) throws IOException {
         String w = request.getParameter("z");
-        response.getWriter().write(">>>>>>>>>this is response from ./zaki/doSth");
+        response.getWriter().write(">>>>>>>>>this is a response which from ./zaki/doSth");
         System.out.println(w);
     }
 

@@ -24,4 +24,8 @@
         SELECT  * FROM ds_friend f WHERE f.own_user_id = #{ownUserId} AND f.him_user_id = #{himUserId} AND f.deleted = ${_DELETE_STATUS_NORMAL} LIMIT 1
     </select>
 
+    <select id="existByOwnAndHim" resultType="com.miner.disco.pojo.Friend">
+        SELECT  * FROM ds_friend f WHERE f.own_user_id = #{ownUserId} AND f.him_user_id = #{himUserId}  LIMIT 1
+    </select>
+
 </mapper>

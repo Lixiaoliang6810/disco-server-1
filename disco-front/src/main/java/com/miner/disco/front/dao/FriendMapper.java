@@ -21,4 +21,6 @@ public interface FriendMapper  extends BasicMapper<Friend> {
 
     Friend queryByOwnAndHim(@Param("ownUserId") Long ownUserId, @Param("himUserId") Long himUserId);
 
+    Friend existByOwnAndHim(@Param("ownUserId") Long ownUserId, @Param("himUserId") Long himUserId);
+
 }

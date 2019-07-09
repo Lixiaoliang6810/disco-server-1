@@ -10,5 +10,5 @@ public interface ShieldService {
 
     List<VipMemberListResponse> screenList(Long currentUserId, List<VipMemberListResponse> vips);
 
-    public List<Shield> getShieldList(Long currentUserId);
+    List<Shield> getShieldList(Long currentUserId);
 }

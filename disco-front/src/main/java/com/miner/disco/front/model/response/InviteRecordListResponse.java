@@ -20,8 +20,8 @@ public class InviteRecordListResponse implements Serializable {
     private String mobile;
     private Date createDate;
 
-    public String getMobile() {
-        return this.mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
-    }
+//    public String getMobile() {
+//        return this.mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+//    }
 
 }
